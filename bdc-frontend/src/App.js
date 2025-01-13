@@ -1,19 +1,17 @@
-import './App.css';
-import axios from 'axios';
-import { useState } from 'react';
-
+import React from 'react';
+import {BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import Home from './tmp/Home'
+import HandleRedirect from './tmp/HandleRedirect'
 
 function App() {
-
-  axios.get('/test')
-  .then(r => console.log(r.data))
-
   return (
-    
     <div>
-      test
+      <h1>My React App</h1>
+      <Routes>
+        <Route path='/home' element={<Home/>} />
+        <Route path='/redirect/auth' element={<HandleRedirect/>} />
+      </Routes>
     </div>
-
   );
 }
 

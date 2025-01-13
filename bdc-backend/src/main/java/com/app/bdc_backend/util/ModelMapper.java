@@ -2,7 +2,7 @@ package com.app.bdc_backend.util;
 
 import org.modelmapper.convention.MatchingStrategies;
 
-public class Mapper {
+public class ModelMapper {
 
     private static org.modelmapper.ModelMapper mapper;
 

@@ -1,8 +1,7 @@
 package com.app.bdc_backend.model.order;
 
-import com.app.bdc_backend.model.Address;
-import com.app.bdc_backend.model.User;
-import lombok.AllArgsConstructor;
+import com.app.bdc_backend.model.user.Address;
+import com.app.bdc_backend.model.user.User;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;
