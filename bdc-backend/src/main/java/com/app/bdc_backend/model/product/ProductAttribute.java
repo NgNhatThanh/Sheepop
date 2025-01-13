@@ -10,7 +10,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "product_attributes")
 @Getter
 @Setter
-@AllArgsConstructor
 public class ProductAttribute {
 
     @Id

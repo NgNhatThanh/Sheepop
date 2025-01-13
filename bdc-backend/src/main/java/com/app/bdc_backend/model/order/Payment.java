@@ -13,7 +13,6 @@ import java.util.Date;
 @Document(collection = "payments")
 @Getter
 @Setter
-@AllArgsConstructor
 public class Payment {
 
     @Id

@@ -14,7 +14,6 @@ import java.util.List;
 @Document(collection = "carts")
 @Getter
 @Setter
-@AllArgsConstructor
 public class Cart {
 
     @Id

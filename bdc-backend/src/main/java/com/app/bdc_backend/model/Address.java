@@ -11,7 +11,6 @@ import org.springframework.data.mongodb.core.mapping.DocumentReference;
 @Document(collection = "addresses")
 @Getter
 @Setter
-@AllArgsConstructor
 public class Address {
 
     @Id

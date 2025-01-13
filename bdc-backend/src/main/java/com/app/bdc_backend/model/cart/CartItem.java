@@ -15,7 +15,6 @@ import java.util.Date;
 @Document(collection = "cart_items")
 @Getter
 @Setter
-@AllArgsConstructor
 public class CartItem {
 
     @Id

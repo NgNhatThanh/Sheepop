@@ -12,7 +12,6 @@ import java.util.Date;
 @Document(collection = "categories")
 @Getter
 @Setter
-@AllArgsConstructor
 public class Category {
 
     @Id

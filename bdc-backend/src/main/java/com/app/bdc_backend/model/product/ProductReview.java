@@ -14,7 +14,6 @@ import java.util.Date;
 @Document(collection = "product_reviews")
 @Getter
 @Setter
-@AllArgsConstructor
 public class ProductReview {
 
     @Id

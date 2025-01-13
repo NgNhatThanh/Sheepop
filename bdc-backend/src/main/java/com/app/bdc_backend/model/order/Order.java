@@ -15,7 +15,6 @@ import java.util.Date;
 @Document(collection = "orders")
 @Getter
 @Setter
-@AllArgsConstructor
 public class Order {
 
     @Id

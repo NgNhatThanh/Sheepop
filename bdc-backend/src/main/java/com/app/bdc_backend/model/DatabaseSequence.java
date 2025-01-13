@@ -15,4 +15,8 @@ public class DatabaseSequence {
 
     private long seq;
 
+    public long getSeq(){
+        return seq;
+    }
+
 }

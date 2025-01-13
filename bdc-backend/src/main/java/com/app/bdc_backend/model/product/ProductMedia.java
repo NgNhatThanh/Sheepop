@@ -11,7 +11,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "product_media")
 @Getter
 @Setter
-@AllArgsConstructor
 public class ProductMedia {
 
     @Id

@@ -13,7 +13,6 @@ import java.util.Date;
 @Document(collection = "product_skus")
 @Getter
 @Setter
-@AllArgsConstructor
 public class ProductSKU {
 
     @Id

@@ -13,7 +13,6 @@ import java.util.List;
 @Document(collection = "products")
 @Getter
 @Setter
-@AllArgsConstructor
 public class Product {
 
     @Id

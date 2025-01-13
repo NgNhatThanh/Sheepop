@@ -1,19 +1,18 @@
 package com.app.bdc_backend.model;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 @Document(collection = "users")
-@Getter
 @Setter
-@AllArgsConstructor
+@Getter
 public class User {
 
     @Id
@@ -35,6 +34,6 @@ public class User {
 
     private Date dob;
 
-    private List<Address> addressList;
+    private List<Address> addressList = new ArrayList<>();
 
 }
