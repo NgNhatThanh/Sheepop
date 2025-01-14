@@ -14,8 +14,12 @@ public class ProductService {
 
     private ProductRepository productRepository;
 
-    public Optional<Product> findById(ObjectId id){
+    public Optional<Product> findById(String id){
         return productRepository.findById(id);
+    }
+
+    public int countProductOfShop(String shopId){
+        return productRepository.countByShopId(new ObjectId(shopId));
     }
 
 

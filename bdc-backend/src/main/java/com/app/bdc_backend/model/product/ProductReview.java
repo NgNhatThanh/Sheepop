@@ -18,8 +18,13 @@ public class ProductReview {
     @Id
     private ObjectId id;
 
+    private String shopId;
+
     @DocumentReference
     private User reviewer;
+
+    @DocumentReference
+    private Product product;
 
     private ProductSKU productSKU;
 

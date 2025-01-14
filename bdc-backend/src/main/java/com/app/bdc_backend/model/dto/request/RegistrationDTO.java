@@ -1,9 +1,6 @@
-package com.app.bdc_backend.model.dto;
+package com.app.bdc_backend.model.dto.request;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.Date;
 
@@ -11,6 +8,7 @@ import java.util.Date;
 @Setter
 @AllArgsConstructor
 @Builder
+@NoArgsConstructor
 public class RegistrationDTO {
 
     private String fullName;

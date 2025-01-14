@@ -1,6 +1,6 @@
-package com.app.bdc_backend.model.product;
+package com.app.bdc_backend.model.shop;
 
-import com.app.bdc_backend.model.shop.Shop;
+import com.app.bdc_backend.model.user.User;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;
@@ -8,29 +8,25 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.DocumentReference;
 
-import java.util.List;
+import java.util.Date;
 
-@Document(collection = "products")
+@Document(collection = "shops")
 @Getter
 @Setter
-public class Product {
+public class Shop {
 
     @Id
     private ObjectId id;
 
     private String name;
 
-    @DocumentReference
-    private Shop shop;
-
     private String description;
 
-    private String thumbnailUrl;
+    private String avatarUrl;
 
     @DocumentReference
-    private List<ProductSKU> productSKUList;
+    private User user;
 
-    @DocumentReference
-    private List<ProductMedia> productMediaList;
+    private Date createdAt;
 
 }

@@ -6,6 +6,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -14,6 +15,7 @@ import java.io.IOException;
 
 @Component
 @AllArgsConstructor
+@Slf4j
 public class JwtAuthFilter extends OncePerRequestFilter {
 
     private JwtService jwtService;
@@ -22,18 +24,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
-        if (request.getServletPath().contains("/api/v1/auth")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
         String authHeader = request.getHeader("Authorization");
         String token = authHeader != null && authHeader.startsWith("Bearer ") ? authHeader.substring(7) : null;
         if(token != null && jwtService.isTokenValid(token)){
             SecurityContextHolder.getContext().setAuthentication(jwtService.getAuthentication(token));
-        }
-        else{
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-            return;
         }
         filterChain.doFilter(request, response);
     }

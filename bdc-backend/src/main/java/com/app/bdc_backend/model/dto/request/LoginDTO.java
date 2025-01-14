@@ -1,13 +1,14 @@
-package com.app.bdc_backend.model.dto;
+package com.app.bdc_backend.model.dto.request;
 
-import jakarta.annotation.security.DenyAll;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
 @AllArgsConstructor
+@NoArgsConstructor
 public class LoginDTO {
 
     private String username;

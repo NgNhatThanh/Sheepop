@@ -1,9 +1,9 @@
 package com.app.bdc_backend.controller;
 
 import com.app.bdc_backend.model.user.User;
-import com.app.bdc_backend.model.dto.LoginDTO;
-import com.app.bdc_backend.model.dto.LogoutDTO;
-import com.app.bdc_backend.model.dto.RegistrationDTO;
+import com.app.bdc_backend.model.dto.request.LoginDTO;
+import com.app.bdc_backend.model.dto.request.LogoutDTO;
+import com.app.bdc_backend.model.dto.request.RegistrationDTO;
 import com.app.bdc_backend.service.JwtService;
 import com.app.bdc_backend.service.Oauth2Service;
 import com.app.bdc_backend.service.UserService;
@@ -17,12 +17,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 @Slf4j
 @RestController
@@ -63,7 +61,7 @@ public class AuthController{
         }
     }
 
-    @GetMapping("/oauth2")
+    @GetMapping("/oauth2/login")
     public ResponseEntity<?> oauth2Login(@RequestParam(value = "provider") String provider,
                                          @RequestParam(value = "code") String code){
         provider = provider.toLowerCase();

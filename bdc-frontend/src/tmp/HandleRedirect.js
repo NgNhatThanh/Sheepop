@@ -3,7 +3,7 @@ import React from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 function sendApi(code){
-    fetch(`http://localhost:8080/api/v1/auth/oauth2?provider=google&code=${code}`)
+    fetch(`http://localhost:8080/api/v1/auth/oauth2/login?provider=google&code=${code}`)
     .then(res => res.json())
     .then(re => console.log(re))
     .catch(err => console.log(err))
