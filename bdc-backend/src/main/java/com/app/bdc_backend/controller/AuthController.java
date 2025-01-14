@@ -1,14 +1,15 @@
 package com.app.bdc_backend.controller;
 
-import com.app.bdc_backend.model.User;
+import com.app.bdc_backend.model.user.User;
 import com.app.bdc_backend.model.dto.LoginDTO;
 import com.app.bdc_backend.model.dto.LogoutDTO;
 import com.app.bdc_backend.model.dto.RegistrationDTO;
 import com.app.bdc_backend.service.JwtService;
+import com.app.bdc_backend.service.Oauth2Service;
 import com.app.bdc_backend.service.UserService;
 import com.app.bdc_backend.service.redis.JwtRedisService;
-import com.app.bdc_backend.util.Mapper;
-import lombok.AllArgsConstructor;
+import com.app.bdc_backend.util.ModelMapper;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -16,30 +17,34 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 @Slf4j
 @RestController
-@AllArgsConstructor
+@RequiredArgsConstructor
 @RequestMapping("/api/v1/auth")
-public class AuthController {
+public class AuthController{
 
-    private UserService userSevice;
+    private final UserService userSevice;
 
-    private AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
 
-    private JwtService jwtService;
+    private final JwtService jwtService;
 
-    private JwtRedisService jwtRedisService;
+    private final JwtRedisService jwtRedisService;
+
+    private final Oauth2Service oauth2Service;
     
     private final String REFRESH_TOKEN_COOKIE_NAME = "refresh_token";
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegistrationDTO dto){
-        User newUser = Mapper.getInstance().map(dto, User.class);
+        User newUser = ModelMapper.getInstance().map(dto, User.class);
         try{
             userSevice.register(newUser);
             String accessToken = jwtService.generateAccessToken(newUser.getUsername(), new HashMap<>());
@@ -55,6 +60,42 @@ public class AuthController {
             return ResponseEntity.badRequest().body(
                     Map.of("message", e.getMessage())
             );
+        }
+    }
+
+    @GetMapping("/oauth2")
+    public ResponseEntity<?> oauth2Login(@RequestParam(value = "provider") String provider,
+                                         @RequestParam(value = "code") String code){
+        provider = provider.toLowerCase();
+        if (provider.equals("google")) {
+            try{
+                Map<String, Object> getUserInfo = oauth2Service.getOauth2Profile(code, provider);
+                String fullName = (String) getUserInfo.get("name");
+                String email = (String) getUserInfo.get("email");
+                String username = email.split("@")[0];
+                User user = userSevice.findByUsername(username);
+                if(user == null){
+                    return register(RegistrationDTO.builder()
+                            .username(username)
+                            .email(email)
+                            .fullName(fullName)
+                            .password("")
+                            .build());
+                }
+                else{
+                    return login(new LoginDTO(user.getUsername(), ""));
+                }
+            }
+            catch (Exception e){
+                return ResponseEntity.badRequest().body(
+                        Map.of("message", e.getMessage())
+                );
+            }
+        }
+        else{
+            return ResponseEntity.badRequest().body(Map.of(
+                    "message", "Invalid provider"
+            ));
         }
     }
 
@@ -95,7 +136,7 @@ public class AuthController {
                 .build();
     }
 
-    @GetMapping("/refresh")
+    @GetMapping("/refreshToken")
     public ResponseEntity<Map<String, String>> refreshToken(@CookieValue(value = REFRESH_TOKEN_COOKIE_NAME, defaultValue = "") String token){
         if (token == null || token.isEmpty()
                 || !jwtService.isTokenValid(token)

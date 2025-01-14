@@ -1,7 +1,7 @@
 package com.app.bdc_backend.service;
 
 import com.app.bdc_backend.dao.UserRepository;
-import com.app.bdc_backend.model.User;
+import com.app.bdc_backend.model.user.User;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
