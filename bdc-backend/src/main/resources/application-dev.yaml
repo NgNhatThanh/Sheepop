@@ -1,0 +1,10 @@
+spring:
+  data:
+    mongodb:
+      database: ${MONGO_DATABASE}
+      username: ${MONGO_USERNAME}
+      password: ${MONGO_PASSWORD}
+
+redis:
+  host: localhost
+  port: 6379

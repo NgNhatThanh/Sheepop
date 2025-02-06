@@ -10,7 +10,6 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @Service
@@ -25,8 +24,8 @@ public class Oauth2Service {
     @Value("${google.token-endpoint}")
     private String googleTokenEndpoint;
 
-    @Value("${google.userinfo-uri}")
-    private String googleUserInfoUri;
+    @Value("${google.userinfo-endpoint}")
+    private String googleUserInfoEndpoint;
 
     @Value("${google.redirect-uri}")
     private String googleRedirectUri;
@@ -56,7 +55,7 @@ public class Oauth2Service {
                         req.getHeaders().add("Authorization", "Bearer " + oauth2AccessToken);
                         return executionContext.execute(req, body);
                     });
-                    return convertJsonToMap(restTemplate.getForEntity(googleUserInfoUri, String.class).getBody());
+                    return convertJsonToMap(restTemplate.getForEntity(googleUserInfoEndpoint, String.class).getBody());
                 } else {
                     throw new Exception("Failed to get tokens: " + response.getStatusCode());
                 }

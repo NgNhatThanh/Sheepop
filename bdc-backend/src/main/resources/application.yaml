@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: bdc-backend
+
+app:
+  cors:
+    allowedOrigins: http://localhost:3000,http://localhost:8080,http://localhost:5173
+
+google:
+  client-id: ${GOOGLE.CLIENT_ID}
+  client-secret: ${GOOGLE.CLIENT_SECRET}
+  token-endpoint: ${GOOGLE.TOKEN_ENDPOINT}
+  redirect-uri: ${GOOGLE.REDIRECT_URI}
+  userinfo-endpoint: ${GOOGLE.USERINFO_URI}
+
+redis:
+  cart:
+    expire-time-in-minutes: 30

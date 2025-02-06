@@ -1,0 +1,12 @@
+spring:
+  data:
+    mongodb:
+      host: mongo_db
+      database: bdc
+      username: root
+      password: root
+      authentication-database: admin
+
+redis:
+  host: redis
+  port: 6379

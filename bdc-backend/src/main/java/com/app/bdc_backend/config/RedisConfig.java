@@ -7,6 +7,8 @@ import com.fasterxml.jackson.databind.deser.std.DateDeserializers;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.DateSerializer;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -42,29 +44,24 @@ public class RedisConfig{
     public <K, V> RedisTemplate<K, V> redisTemplate() {
         RedisTemplate<K, V> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(getConnectionFactory());
-
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
         objectMapper.activateDefaultTyping(
                 objectMapper.getPolymorphicTypeValidator(),
                 ObjectMapper.DefaultTyping.NON_FINAL
         );
-
+        objectMapper.registerModule(new JavaTimeModule());
+//        SimpleModule simpleModule = new SimpleModule();
+//        simpleModule.addSerializer(Date.class, new DateSerializer());
+//        simpleModule.addDeserializer(Date.class, new DateDeserializers.DateDeserializer());
+//        objectMapper.registerModule(simpleModule);
         RedisSerializer<Object> serializer = new GenericJackson2JsonRedisSerializer(objectMapper);
         redisTemplate.setDefaultSerializer(serializer);
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setValueSerializer(serializer);
+        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
+        redisTemplate.setHashValueSerializer(serializer);
         return redisTemplate;
-    }
-
-    @Bean
-    public ObjectMapper redisObjectMapper() {
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
-
-        SimpleModule simpleModule = new SimpleModule();
-        simpleModule.addSerializer(Date.class, new DateSerializer());
-        simpleModule.addDeserializer(Date.class, new DateDeserializers.DateDeserializer());
-        objectMapper.registerModule(simpleModule);
-        return objectMapper;
     }
 
 }

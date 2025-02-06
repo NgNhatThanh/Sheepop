@@ -1,14 +1,15 @@
 package com.app.bdc_backend.controller;
 
+import com.app.bdc_backend.model.cart.Cart;
+import com.app.bdc_backend.model.shop.Shop;
 import com.app.bdc_backend.model.user.User;
 import com.app.bdc_backend.model.dto.request.LoginDTO;
 import com.app.bdc_backend.model.dto.request.LogoutDTO;
 import com.app.bdc_backend.model.dto.request.RegistrationDTO;
-import com.app.bdc_backend.service.JwtService;
-import com.app.bdc_backend.service.Oauth2Service;
-import com.app.bdc_backend.service.UserService;
+import com.app.bdc_backend.service.*;
 import com.app.bdc_backend.service.redis.JwtRedisService;
 import com.app.bdc_backend.util.ModelMapper;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -19,6 +20,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,6 +39,10 @@ public class AuthController{
     private final JwtRedisService jwtRedisService;
 
     private final Oauth2Service oauth2Service;
+
+    private final ShopService shopSevice;
+
+    private final CartService cartSevice;
     
     private final String REFRESH_TOKEN_COOKIE_NAME = "refresh_token";
 
@@ -48,6 +54,16 @@ public class AuthController{
             String accessToken = jwtService.generateAccessToken(newUser.getUsername(), new HashMap<>());
             String refreshToken = jwtService.generateRefreshToken(newUser.getUsername(), new HashMap<>());
             jwtRedisService.setNewRefreshToken(newUser.getUsername(), refreshToken);
+            Shop shop = new Shop();
+            shop.setName(dto.getUsername());
+            shop.setUser(newUser);
+            shop.setDescription(dto.getFullName() + "'s shop");
+            shop.setCreatedAt(new Date());
+            shopSevice.addShop(shop);
+
+            Cart cart = new Cart();
+            cart.setUser(newUser);
+            cartSevice.save(cart);
             return ResponseEntity.ok()
                     .header(HttpHeaders.SET_COOKIE, getRefreshTokenCookie(refreshToken).toString())
                     .body(Map.of(
@@ -57,7 +73,7 @@ public class AuthController{
         catch(RuntimeException e){
             return ResponseEntity.badRequest().body(
                     Map.of("message", e.getMessage())
-            );
+            );  
         }
     }
 
@@ -120,8 +136,10 @@ public class AuthController{
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(@RequestBody LogoutDTO dto){
-        jwtRedisService.deleteRefreshToken(dto.getUsername());
+    public ResponseEntity<?> logout(HttpServletRequest request){
+        String accessToken = request.getHeader("Authorization").substring(7);
+        String username = jwtService.extractUsername(accessToken);
+        jwtRedisService.deleteRefreshToken(username);
         ResponseCookie cookie = ResponseCookie
                 .from(REFRESH_TOKEN_COOKIE_NAME, "")
                 .httpOnly(true)
@@ -134,8 +152,14 @@ public class AuthController{
                 .build();
     }
 
+    @GetMapping("/ping")
+    public ResponseEntity<?> ping(){
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping("/refreshToken")
     public ResponseEntity<Map<String, String>> refreshToken(@CookieValue(value = REFRESH_TOKEN_COOKIE_NAME, defaultValue = "") String token){
+        log.info(token);
         if (token == null || token.isEmpty()
                 || !jwtService.isTokenValid(token)
                 || !jwtRedisService.isRefreshTokenValid(jwtService.extractUsername(token), token))
@@ -163,6 +187,7 @@ public class AuthController{
                 .from(REFRESH_TOKEN_COOKIE_NAME, token)
                 .httpOnly(true)
                 .secure(true)
+                .domain("localhost")
                 .path("/")
                 .maxAge(jwtService.getRefreshTokenExpiration())
                 .build();

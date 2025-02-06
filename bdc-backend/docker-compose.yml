@@ -1,0 +1,39 @@
+services:
+  mongo_db:
+    image: mongo:latest
+    # restart: unless-stopped
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=root
+    ports:
+      - 27018:27017
+    volumes:
+      - db:/data/db
+    stdin_open: true
+    tty: true
+
+  app:
+    depends_on:
+      - mongo_db
+    build: .
+    # restart: on-failure
+    ports:
+      - 8080:8080
+    volumes:
+      - .m2:/root/.m2
+      - ./logs:/app/logs
+    stdin_open: true
+    tty: true
+
+  redis:
+    image:
+      redis:latest
+    # restart: unless-stopped
+    ports:
+      - 6380:6379
+    volumes:
+      - redis_data:/data
+
+volumes:
+  db:
+  redis_data:

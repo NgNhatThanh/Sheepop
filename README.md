@@ -1,0 +1,1 @@
+nhớ config timezone trong Dockerfile để log cho đúng thời gian

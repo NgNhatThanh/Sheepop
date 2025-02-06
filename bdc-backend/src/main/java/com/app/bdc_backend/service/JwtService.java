@@ -8,6 +8,7 @@ import io.jsonwebtoken.security.Keys;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -19,6 +20,8 @@ import java.security.Key;
 import java.time.Instant;
 import java.util.Date;
 import java.util.Map;
+import java.util.Random;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -36,6 +39,8 @@ public class JwtService {
 
     private final UserDetailsService userDetailsService;
 
+    private Random rand = new Random();
+
     public String extractUsername(String token) {
         return Jwts
                 .parserBuilder()
@@ -44,6 +49,16 @@ public class JwtService {
                 .parseClaimsJws(token)
                 .getBody()
                 .getSubject();
+    }
+
+    public String extractId(String token) {
+        return Jwts
+                .parserBuilder()
+                .setSigningKey(getSignKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getId();
     }
 
     public Authentication getAuthentication(String token) {
@@ -65,8 +80,10 @@ public class JwtService {
 
     public String generateRefreshToken(String username, Map<String, Object> claims) {
         Instant expiration = Instant.now().plusSeconds(refreshTokenExpiration);
+        String id = String.valueOf(rand.nextInt(100000000, 999999999));
         return Jwts.builder()
                 .setClaims(claims)
+                .setId(id)
                 .setSubject(username)
                 .setExpiration(Date.from(expiration))
                 .signWith(getSignKey())

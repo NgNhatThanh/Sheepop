@@ -1,0 +1,24 @@
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+
+    <appender name="File" class="ch.qos.logback.core.FileAppender">
+        <file>logs/today.log</file>
+        <encoder>
+            <pattern>%d{"yyyy-MM-dd HH:mm:ss,zzz"} %p [%t] %C{36}.%M: %msg%n%n%throwable</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/app_%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>3GB</totalSizeCap>
+        </rollingPolicy>
+    </appender>
+
+    <logger name="org.springframework.security" level="TRACE">
+    </logger>
+
+    <springProfile name="prod">
+        <root level="INFO">
+            <appender-ref ref="File"/>
+        </root>
+    </springProfile>
+</configuration>

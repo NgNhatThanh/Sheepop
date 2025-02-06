@@ -1,0 +1,33 @@
+.sidebar {
+  background: #333;
+  color: white;
+  transition: width 0.3s ease;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.sidebar a{
+  color: white;
+}
+
+.sidebar ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar li {
+  padding: 10px 20px;
+  white-space: nowrap;
+}
+
+.sidebar.collapsed li a {
+  display: none;
+}
+
+.toggle-button {
+  top: 20px;
+  cursor: pointer;
+  padding: 10px;
+  z-index: 1000;
+}
