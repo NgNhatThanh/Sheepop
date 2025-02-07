@@ -3,6 +3,7 @@ package com.app.bdc_backend.model.cart;
 import com.app.bdc_backend.model.product.Product;
 import com.app.bdc_backend.model.product.ProductAttribute;
 import com.app.bdc_backend.model.product.ProductSKU;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,6 +24,7 @@ public class CartItem {
     private ObjectId id;
 
     @DocumentReference
+    @JsonIgnore
     private Cart cart;
 
     @DocumentReference

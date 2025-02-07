@@ -20,7 +20,6 @@ import java.util.List;
 public class Cart {
 
     @Id
-    @JsonSerialize(using = ToStringSerializer.class)
     private ObjectId id;
 
     @DocumentReference
@@ -30,9 +29,5 @@ public class Cart {
 
     @DocumentReference
     private List<CartItem> items = new ArrayList<>();
-
-    public String toString(){
-        return user.getUsername() + " " + id.toString();
-    }
 
 }

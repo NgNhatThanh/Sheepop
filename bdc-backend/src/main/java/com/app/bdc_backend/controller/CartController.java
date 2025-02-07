@@ -59,9 +59,13 @@ public class CartController {
                     "message", "Product not found"
             ));
         }
-        Cart cart = cartService.findByUser(user);
+        Cart cart = cartRedisService.findByUser(user);
+        if(cart == null){
+            log.info("Add to cart: missed cache");
+            cart = cartService.findByUser(user);
+        }
         try{
-            cartService.addToCart(cart, product, dto.getQuantity(), dto.getAttributes());
+            cart = cartService.addToCart(cart, product, dto.getQuantity(), dto.getAttributes());
             return ResponseEntity.ok().body(Map.of(
                     "msg", "Successfully added to cart"
             ));
@@ -70,6 +74,9 @@ public class CartController {
             return ResponseEntity.badRequest().body(Map.of(
                     "message", e.getMessage()
             ));
+        }
+        finally {
+            cartRedisService.save(cart);
         }
     }
 

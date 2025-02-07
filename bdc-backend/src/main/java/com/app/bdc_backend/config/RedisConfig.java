@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ser.std.DateSerializer;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -55,6 +56,10 @@ public class RedisConfig{
 //        simpleModule.addSerializer(Date.class, new DateSerializer());
 //        simpleModule.addDeserializer(Date.class, new DateDeserializers.DateDeserializer());
 //        objectMapper.registerModule(simpleModule);
+
+        SimpleModule simpleModule = new SimpleModule();
+        simpleModule.addSerializer(ObjectId.class, new ObjectIdToStringSerializer());
+        objectMapper.registerModule(simpleModule);
         RedisSerializer<Object> serializer = new GenericJackson2JsonRedisSerializer(objectMapper);
         redisTemplate.setDefaultSerializer(serializer);
         redisTemplate.setKeySerializer(new StringRedisSerializer());

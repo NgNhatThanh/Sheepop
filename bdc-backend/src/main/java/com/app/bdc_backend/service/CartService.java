@@ -2,7 +2,7 @@ package com.app.bdc_backend.service;
 
 import com.app.bdc_backend.dao.CartItemRepository;
 import com.app.bdc_backend.dao.CartRepository;
-import com.app.bdc_backend.exception.QuantityExceededException;
+import com.app.bdc_backend.exception.AddToCartException;
 import com.app.bdc_backend.model.cart.Cart;
 import com.app.bdc_backend.model.cart.CartItem;
 import com.app.bdc_backend.model.product.Product;
@@ -28,33 +28,32 @@ public class CartService {
         return cartRepository.findByUser(user);
     }
 
-    public void save(Cart cart){
-        cartRepository.save(cart);
+    public Cart save(Cart cart){
+        return cartRepository.save(cart);
     }
 
-    public void addToCart(Cart cart, Product product, int quantity, List<ProductAttribute> attributes){
+    public Cart addToCart(Cart cart, Product product, int quantity, List<ProductAttribute> attributes){
         if(product.getSkuList().isEmpty() && quantity > product.getQuantity())
-            throw new QuantityExceededException("Không thể thêm sản phẩm do số lượng vượt quá số lượng còn lại: " + product.getQuantity());
+            throw new AddToCartException("Không thể thêm sản phẩm do số lượng vượt quá số lượng còn lại: " + product.getQuantity());
         for(ProductSKU sku : product.getSkuList()){
             if(new HashSet<>(sku.getAttributes()).containsAll(attributes)){
                 if(quantity > sku.getQuantity())
-                    throw new QuantityExceededException("Không thể thêm sản phẩm do số lượng vượt quá số lượng còn lại: " + sku.getQuantity());
+                    throw new AddToCartException("Không thể thêm sản phẩm do số lượng vượt quá số lượng còn lại: " + sku.getQuantity());
             }
         }
         for(CartItem it : cart.getItems()){
             if(it.getProduct().equals(product) && new HashSet<>(it.getAttributes()).containsAll(attributes)){
                 if(product.getSkuList().isEmpty() && it.getQuantity() + quantity > product.getQuantity())
-                    throw new QuantityExceededException("Không thể thêm sản phẩm do tổng số lượng vượt quá số lượng còn lại: " + product.getQuantity());
+                    throw new AddToCartException("Không thể thêm sản phẩm do tổng số lượng vượt quá số lượng còn lại: " + product.getQuantity());
                 for(ProductSKU sku : product.getSkuList()){
                     if(new HashSet<>(sku.getAttributes()).containsAll(attributes)){
                         if(it.getQuantity() + quantity > sku.getQuantity())
-                            throw new QuantityExceededException("Không thể thêm sản phẩm do tổng số lượng vượt quá số lượng còn lại: " + sku.getQuantity());
+                            throw new AddToCartException("Không thể thêm sản phẩm do tổng số lượng vượt quá số lượng còn lại: " + sku.getQuantity());
                     }
                 }
                 it.setQuantity(it.getQuantity() + quantity);
                 cartItemRepository.save(it);
-                save(cart);
-                return;
+                return save(cart);
             }
         }
         CartItem item = new CartItem();
@@ -76,7 +75,7 @@ public class CartService {
         cartItemRepository.save(item);
         cart.getItems().add(item);
         cart.setUpdatedAt(new Date());
-        save(cart);
+        return save(cart);
     }
 
 }

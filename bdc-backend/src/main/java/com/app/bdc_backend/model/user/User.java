@@ -1,5 +1,7 @@
 package com.app.bdc_backend.model.user;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;
