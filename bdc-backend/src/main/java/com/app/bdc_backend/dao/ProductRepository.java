@@ -15,4 +15,6 @@ public interface ProductRepository extends MongoRepository<Product, String> {
 
     Page<Product> findByShop(Shop shop, Pageable pageable);
 
+    Page<Product> findAllByVisible(boolean visible, Pageable pageable);
+
 }

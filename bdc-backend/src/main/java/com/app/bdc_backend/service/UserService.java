@@ -22,7 +22,9 @@ public class UserService {
         if(userRepository.existsByUsername(user.getUsername())) {
             throw new DataExistedException("Username already exists");
         }
-        if(userRepository.existsByPhoneNumber(user.getPhoneNumber())){
+        if(user.getPhoneNumber() != null
+                && !user.getPhoneNumber().isEmpty()
+                && userRepository.existsByPhoneNumber(user.getPhoneNumber())){
             throw new DataExistedException("Phone number already exists");
         }
         user.setCreatedAt(new Date());

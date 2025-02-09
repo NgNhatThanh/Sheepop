@@ -3,6 +3,7 @@ package com.app.bdc_backend.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.Map;
 
 @Service
+@Slf4j
 public class Oauth2Service {
 
     @Value("${google.client-id}")
@@ -50,6 +52,9 @@ public class Oauth2Service {
                 if (response.getStatusCode() == HttpStatus.OK) {
                     Map<String, Object> tokenInfo = convertJsonToMap(response.getBody());
                     oauth2AccessToken = tokenInfo.get("access_token").toString();
+
+//                    String token = "ya29.a0AXeO80S2KWb2LjaEB5pqV9WiTQI3RZcJzzfvYu0vgycEJ3ojs5jUI4Xda0eWVmfnyWBFIUuulb6QI1AMNvkvN3fRTKteZMQCB4w9qrUVgMx98BPeLv7SQHY3ASCho1JarLbtd6jU2At8B0Z0Iwe9n-ieFcIvcpf8sr4Qi8awaCgYKAUkSARMSFQHGX2MiwELcW3JHLC96D1gFu_Zerg0175";
+//                    log.info("Token: " + token);
 
                     restTemplate.getInterceptors().add((req, body, executionContext) -> {
                         req.getHeaders().add("Authorization", "Bearer " + oauth2AccessToken);

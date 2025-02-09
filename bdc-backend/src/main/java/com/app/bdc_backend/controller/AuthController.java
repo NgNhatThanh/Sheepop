@@ -77,7 +77,7 @@ public class AuthController{
         }
     }
 
-    @GetMapping("/oauth2/login")
+    @PostMapping("/oauth2/login")
     public ResponseEntity<?> oauth2Login(@RequestParam(value = "provider") String provider,
                                          @RequestParam(value = "code") String code){
         provider = provider.toLowerCase();
@@ -101,6 +101,7 @@ public class AuthController{
                 }
             }
             catch (Exception e){
+                log.info(e.toString());
                 return ResponseEntity.badRequest().body(
                         Map.of("message", e.getMessage())
                 );
@@ -159,7 +160,7 @@ public class AuthController{
 
     @GetMapping("/refreshToken")
     public ResponseEntity<Map<String, String>> refreshToken(@CookieValue(value = REFRESH_TOKEN_COOKIE_NAME, defaultValue = "") String token){
-        log.info(token);
+        log.info("Refresh token: " + token );
         if (token == null || token.isEmpty()
                 || !jwtService.isTokenValid(token)
                 || !jwtRedisService.isRefreshTokenValid(jwtService.extractUsername(token), token))

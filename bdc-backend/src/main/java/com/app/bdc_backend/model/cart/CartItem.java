@@ -36,4 +36,6 @@ public class CartItem {
 
     private int quantity;
 
+    private boolean selected = true;
+
 }

@@ -78,4 +78,12 @@ public class CartService {
         return save(cart);
     }
 
+    public void saveAllItem(List<CartItem> items){
+        cartItemRepository.saveAll(items);
+    }
+
+    public void deleteItem(CartItem item){
+        cartItemRepository.delete(item);
+    }
+
 }

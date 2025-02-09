@@ -21,19 +21,35 @@ public class JwtRedisServiceImpl implements JwtRedisService {
     @Override
     public boolean isRefreshTokenValid(String username, String token) {
         String tokenId = jwtService.extractId(token);
-        String curTokenId = (String)redisTemplate.opsForHash().get(username, REFRESH_TOKEN_ID_NAME);
-        return tokenId.equals(curTokenId);
+        try{
+            String curTokenId = (String)redisTemplate.opsForHash().get(username, REFRESH_TOKEN_ID_NAME);
+            return tokenId.equals(curTokenId);
+        }
+        catch (Exception e){
+            log.info("Redis isn't working");
+            return false;
+        }
     }
 
     @Override
     public void setNewRefreshToken(String username, String token) {
         String tokenId = jwtService.extractId(token);
-        redisTemplate.opsForHash().put(username, REFRESH_TOKEN_ID_NAME, tokenId);
+        try{
+            redisTemplate.opsForHash().put(username, REFRESH_TOKEN_ID_NAME, tokenId);
+        }
+        catch (Exception e){
+            log.info("Redis isn't working");
+        }
     }
 
     @Override
     public void deleteRefreshToken(String username) {
-        redisTemplate.opsForHash().delete(username, REFRESH_TOKEN_ID_NAME);
+        try{
+            redisTemplate.opsForHash().delete(username, REFRESH_TOKEN_ID_NAME);
+        }
+        catch (Exception e){
+            log.info("Redis isn't working");
+        }
     }
 
 

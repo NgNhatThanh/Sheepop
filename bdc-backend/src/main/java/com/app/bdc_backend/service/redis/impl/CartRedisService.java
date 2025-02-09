@@ -18,20 +18,25 @@ public class CartRedisService{
 
     private final Duration expireTime = Duration.ofMinutes(30);
 
-    public Cart findByUser(User user){
+    public Cart findByUser(String username){
         try{
-            Cart cart = (Cart)redisTemplate.opsForValue().get(user.getUsername() + "-cart");
+            Cart cart = (Cart)redisTemplate.opsForValue().get(username + "-cart");
             return cart;
         }
         catch (Exception e){
-            System.out.println(e.getMessage());
+            log.error("Redis didn't start");
             return null;
         }
     }
 
     public void save(Cart cart){
-        redisTemplate.opsForValue().set(cart.getUser().getUsername() + "-cart", cart, expireTime);
-        log.info("Save cart: " + cart.getUser().getUsername());
+        try {
+            redisTemplate.opsForValue().set(cart.getUser().getUsername() + "-cart", cart, expireTime);
+            log.info("Save cart: " + cart.getUser().getUsername());
+        }
+        catch (Exception e){
+            log.error("Redis didn't start");
+        }
     }
 
 }

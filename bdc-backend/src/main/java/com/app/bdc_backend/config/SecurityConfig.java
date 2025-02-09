@@ -53,7 +53,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/auth/**", "/api/v1/shop/info/**",
                                 "/api/v1/shop/base/**",
                                 "/api/v1/common/**",
-                                "/api/v1/product/**").permitAll()
+                                "/api/v1/product/**",
+                                "/api/v1/homepage/**").permitAll()
                         .requestMatchers("/api/v1/auth/logout").authenticated()
                         .anyRequest().authenticated())
                 .csrf(AbstractHttpConfigurer::disable)
