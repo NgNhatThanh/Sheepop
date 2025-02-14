@@ -1,7 +1,9 @@
 package com.app.bdc_backend.service;
 
+import com.app.bdc_backend.dao.ShopAddressRepository;
 import com.app.bdc_backend.dao.ShopRepository;
 import com.app.bdc_backend.model.shop.Shop;
+import com.app.bdc_backend.model.shop.ShopAddress;
 import com.app.bdc_backend.model.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -11,6 +13,8 @@ import org.springframework.stereotype.Service;
 public class ShopService {
 
     private final ShopRepository shopRepository;
+
+    private final ShopAddressRepository shopAddressRepository;
 
     public void addShop(Shop shop) {
         shopRepository.save(shop);
@@ -22,6 +26,14 @@ public class ShopService {
 
     public Shop findById(String id) {
         return shopRepository.findById(id).orElse(null);
+    }
+
+    public ShopAddress findAddressByShopId(String shopId){
+        return shopAddressRepository.findByShopId(shopId);
+    }
+
+    public void saveAddress(ShopAddress shopAddress) {
+        shopAddressRepository.save(shopAddress);
     }
 
 }

@@ -1,6 +1,6 @@
 package com.app.bdc_backend.model.order;
 
-import com.app.bdc_backend.model.user.Address;
+import com.app.bdc_backend.model.user.UserAddress;
 import com.app.bdc_backend.model.user.User;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,8 +22,10 @@ public class Order {
     @DocumentReference
     private User user;
 
-    private Address address;
+    @DocumentReference
+    private UserAddress userAddress;
 
+    @DocumentReference
     private Payment payment;
 
     private long total;

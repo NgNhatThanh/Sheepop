@@ -24,7 +24,7 @@ public class OrderItem {
     @DocumentReference
     private Order order;
 
-    private ProductSKU productSKU;
+    private Product product;
 
     private OrderStatus status;
 

@@ -36,6 +36,4 @@ public class User {
 
     private Date dob;
 
-    private List<Address> addressList = new ArrayList<>();
-
 }

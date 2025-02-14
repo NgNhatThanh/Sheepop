@@ -38,6 +38,8 @@ public class Product {
     @DocumentReference
     private Category category;
 
+    private int weight;
+
     @DocumentReference
     private List<ProductSKU> skuList;
 
