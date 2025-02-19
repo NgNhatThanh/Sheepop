@@ -1,7 +1,7 @@
 package com.app.bdc_backend.model.order;
 
 import com.app.bdc_backend.model.enums.PaymentStatus;
-import lombok.AllArgsConstructor;
+import com.app.bdc_backend.model.enums.PaymentType;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;
@@ -20,11 +20,13 @@ public class Payment {
 
     private long amount;
 
-    private String provider;
+    private PaymentType type;
 
     private PaymentStatus status;
 
-    private Date createdAt;
+    private Date expireAt;
+
+    private Date createdAt = new Date();
 
     private Date updatedAt;
 

@@ -155,7 +155,7 @@ public class CheckoutController {
             int totalWeight = 0;
             for(CartItem cartItem : cart.getItems()){
                 if(cartItem.getProduct().getShop().getId().toString().equals(shopCheckoutDTO.getShop().getId())){
-                    totalWeight += cartItem.getProduct().getWeight();
+                    totalWeight += cartItem.getProduct().getWeight() * cartItem.getQuantity();
                 }
             }
             shipmentInfo.setWeight(totalWeight);

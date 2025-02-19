@@ -31,6 +31,8 @@ public class AddProductDTO {
 
     private List<ProductMedia> mediaList;
 
+    private int weight;
+
     private boolean visible;
 
 }

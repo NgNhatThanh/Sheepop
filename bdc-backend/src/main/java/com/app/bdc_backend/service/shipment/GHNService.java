@@ -48,7 +48,8 @@ public class GHNService implements IShipmentService{
         int toDistricId = getDistrictId(toProvinceId, info.getTo().getDistrict().getName());
         String toWardCode = getWardCode(toDistricId, info.getTo().getWard().getName());
         List<Integer> serviceIds = getServiceIdList(fromDistricId, toDistricId);
-        int fee = getFee(serviceIds.get(0), fromDistricId, toDistricId,
+        int fee = getFee(info.getWeight() <= 20000 ? serviceIds.get(0) : serviceIds.get(1),
+                fromDistricId, toDistricId,
                 fromWardCode, toWardCode, info.getWeight());
         Date expDeliveryTime = getExpectedDeliveryDate(serviceIds.get(0), fromDistricId, toDistricId,
                 fromWardCode, toWardCode, info.getWeight());

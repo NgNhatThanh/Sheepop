@@ -5,10 +5,12 @@ import com.app.bdc_backend.model.address.Province;
 import com.app.bdc_backend.model.address.Ward;
 import com.app.bdc_backend.model.dto.request.AddAddressDTO;
 import com.app.bdc_backend.model.dto.request.AddProductDTO;
-import com.app.bdc_backend.model.dto.response.PageResponse;
-import com.app.bdc_backend.model.dto.response.ProductSKUResponseDTO;
-import com.app.bdc_backend.model.dto.response.ShopProductTableResponseDTO;
-import com.app.bdc_backend.model.dto.response.ShopResponseDTO;
+import com.app.bdc_backend.model.dto.response.*;
+import com.app.bdc_backend.model.enums.PaymentStatus;
+import com.app.bdc_backend.model.enums.PaymentType;
+import com.app.bdc_backend.model.enums.ShopOrderStatus;
+import com.app.bdc_backend.model.order.OrderItem;
+import com.app.bdc_backend.model.order.ShopOrder;
 import com.app.bdc_backend.model.product.Category;
 import com.app.bdc_backend.model.product.Product;
 import com.app.bdc_backend.model.product.ProductSKU;
@@ -26,6 +28,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +49,8 @@ public class ShopController {
     private final ReviewService reviewService;
 
     private final AddressService addressService;
+
+    private final OrderService orderService;
 
     @GetMapping("/info/{username}")
     public ResponseEntity<?> getShopInfo(@PathVariable String username) {
@@ -93,7 +98,7 @@ public class ShopController {
             }
             productService.addProductMediaList(product.getMediaList());
             productService.addProductSKUList(product.getSkuList());
-            productService.addProduct(product);
+            productService.saveProduct(product);
             return ResponseEntity.ok().build();
         }
         catch (RuntimeException e){
@@ -119,6 +124,107 @@ public class ShopController {
         );
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/order/get_list")
+    public ResponseEntity<?> getShopOrderList(@RequestParam(value = "type") int type,
+                                              @RequestParam(value = "page", defaultValue = "0") int page,
+                                              @RequestParam (value = "limit")int limit){
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userService.findByUsername(username);
+        Shop shop = shopService.findByUser(user);
+        Pageable pageable = PageRequest.of(page, limit);
+        Page<ShopOrder> data = null;
+        switch (type){
+            case 0:
+                data = orderService.getShopOrderByShop(shop, pageable);
+                break;
+            case 1:
+                data = orderService.getShopOrderByShopAndStatus(shop,
+                        List.of(ShopOrderStatus.PENDING),
+                        pageable);
+                break;
+            case 2:
+                data = orderService.getShopOrderByShopAndStatus(shop,
+                        List.of(ShopOrderStatus.PREPARING),
+                        pageable);
+                break;
+            case 3:
+                data = orderService.getShopOrderByShopAndStatus(shop,
+                        List.of(ShopOrderStatus.SENT),
+                        pageable);
+                break;
+            case 4:
+                data = orderService.getShopOrderByShopAndStatus(shop,
+                        List.of(ShopOrderStatus.DELIVERED, ShopOrderStatus.COMPLETED, ShopOrderStatus.RATED),
+                        pageable);
+                break;
+            case 5:
+                data = orderService.getShopOrderByShopAndStatus(shop,
+                        List.of(ShopOrderStatus.CANCELLED),
+                        pageable);
+                break;
+        }
+        if(data == null){
+            return ResponseEntity.badRequest().body(Map.of(
+                    "message", "Invalid request"
+            ));
+        }
+        Page<ShopOrderDTO> dtos = data.map(this::toShopOrderDTO);
+        PageResponse<ShopOrderDTO> response = new PageResponse<>(dtos);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/order/update")
+    public ResponseEntity<?> updateOrderStatus(@RequestParam(value = "shopOrderId") String shopOrderId,
+                                               @RequestParam(value = "currentStatus") int currentStatus){
+        if(currentStatus > 2){
+            return ResponseEntity.badRequest().body(Map.of(
+                    "message", "Invalid request"
+            ));
+        }
+        ShopOrder shopOrder = orderService.getShopOrderById(shopOrderId);
+        if(shopOrder == null){
+            return ResponseEntity.badRequest().body(Map.of(
+                    "message", "Invalid shop order id"
+            ));
+        }
+        if(shopOrder.getStatus() != currentStatus){
+            return ResponseEntity.badRequest().body(Map.of(
+                    "message", "Invalid current status"
+            ));
+        }
+        if(currentStatus == ShopOrderStatus.PENDING) shopOrder.setStatus(ShopOrderStatus.PREPARING);
+        else shopOrder.setStatus(ShopOrderStatus.SENT);
+        orderService.saveAllShopOrders(List.of(shopOrder));
+        return ResponseEntity.ok().build();
+    }
+
+    private ShopOrderDTO toShopOrderDTO(ShopOrder shopOrder) {
+        ShopOrderDTO dtoShopOrder = new ShopOrderDTO();
+        dtoShopOrder.setId(shopOrder.getId().toString());
+        dtoShopOrder.setUsername(shopOrder.getShop().getUser().getUsername());
+        dtoShopOrder.setName(shopOrder.getShop().getName());
+        dtoShopOrder.setCompletedPayment(shopOrder.getOrder().getPayment().getStatus() != PaymentStatus.PENDING
+                    || shopOrder.getOrder().getPayment().getType() == PaymentType.COD);
+        dtoShopOrder.setStatus(shopOrder.getStatus());
+        dtoShopOrder.setCreatedAt(shopOrder.getCreatedAt());
+        dtoShopOrder.setShippingFee(shopOrder.getShippingFee());
+        List<OrderItemDTO> itemDtos = new ArrayList<>();
+        for(OrderItem item : shopOrder.getItems()){
+            OrderItemDTO dtoItem = new OrderItemDTO();
+            dtoItem.setId(item.getId().toString());
+            dtoItem.setQuantity(item.getQuantity());
+            dtoItem.setPrice(item.getPrice());
+            dtoItem.setAttributes(item.getAttributes());
+            dtoItem.getProduct().setId(item.getProduct().getId().toString());
+            dtoItem.getProduct().setName(item.getProduct().getName());
+            dtoItem.getProduct().setThumbnailUrl(item.getProduct().getThumbnailUrl());
+            itemDtos.add(dtoItem);
+        }
+        dtoShopOrder.setItems(itemDtos);
+        return dtoShopOrder;
+    }
+
 
     private ShopProductTableResponseDTO toProductTableDTO(Product product) {
         ShopProductTableResponseDTO dto = new ShopProductTableResponseDTO();

@@ -15,11 +15,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -54,8 +51,12 @@ public class ProductService {
         productAttributeRepository.saveAll(productAttribute);
     }
 
-    public void addProduct(Product product) {
+    public void saveProduct(Product product) {
         productRepository.save(product);
+    }
+
+    public void saveSKU(ProductSKU productSKU) {
+        productSkuRepository.save(productSKU);
     }
 
     public Product findById(String id){

@@ -1,7 +1,7 @@
 package com.app.bdc_backend.model.order;
 
-import com.app.bdc_backend.model.enums.OrderStatus;
-import com.app.bdc_backend.model.user.UserAddress;
+import com.app.bdc_backend.model.enums.ShopOrderStatus;
+import com.app.bdc_backend.model.shop.Shop;
 import com.app.bdc_backend.model.user.User;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,11 +11,12 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.DocumentReference;
 
 import java.util.Date;
+import java.util.List;
 
-@Document(collection = "orders")
+@Document(collection = "shop_orders")
 @Getter
 @Setter
-public class Order {
+public class ShopOrder {
 
     @Id
     private ObjectId id;
@@ -24,10 +25,17 @@ public class Order {
     private User user;
 
     @DocumentReference
-    private UserAddress address;
+    private Order order;
 
     @DocumentReference
-    private Payment payment;
+    private Shop shop;
+
+    @DocumentReference
+    private List<OrderItem> items;
+
+    private int shippingFee;
+
+    private int status = ShopOrderStatus.PENDING;
 
     private Date createdAt = new Date();
 
