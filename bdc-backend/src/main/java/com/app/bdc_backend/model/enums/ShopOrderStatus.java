@@ -8,7 +8,7 @@ public class ShopOrderStatus {
 
     public static int SENT = 3;
 
-    public static int DELIVERED = 4;
+    public static int DELIVERING = 4;
 
     public static int COMPLETED = 5;
 

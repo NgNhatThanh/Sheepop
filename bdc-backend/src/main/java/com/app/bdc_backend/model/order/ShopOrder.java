@@ -1,6 +1,5 @@
 package com.app.bdc_backend.model.order;
 
-import com.app.bdc_backend.model.enums.ShopOrderStatus;
 import com.app.bdc_backend.model.shop.Shop;
 import com.app.bdc_backend.model.user.User;
 import lombok.Getter;
@@ -10,6 +9,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.DocumentReference;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -35,8 +35,19 @@ public class ShopOrder {
 
     private int shippingFee;
 
-    private int status = ShopOrderStatus.PENDING;
+    private int status;
+
+    private List<ShopOrderTrack> tracks = new ArrayList<>();
+
+    private String cancelReason;
+
+    private int canceledBy;
 
     private Date createdAt = new Date();
+
+    public void setStatus(int status) {
+        this.status = status;
+        this.tracks.add(new ShopOrderTrack(new Date(), status));
+    }
 
 }

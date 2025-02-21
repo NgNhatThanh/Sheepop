@@ -11,6 +11,7 @@ import com.app.bdc_backend.model.enums.PaymentType;
 import com.app.bdc_backend.model.enums.ShopOrderStatus;
 import com.app.bdc_backend.model.order.OrderItem;
 import com.app.bdc_backend.model.order.ShopOrder;
+import com.app.bdc_backend.model.order.ShopOrderTrack;
 import com.app.bdc_backend.model.product.Category;
 import com.app.bdc_backend.model.product.Product;
 import com.app.bdc_backend.model.product.ProductSKU;
@@ -19,6 +20,7 @@ import com.app.bdc_backend.model.shop.ShopAddress;
 import com.app.bdc_backend.model.user.User;
 import com.app.bdc_backend.service.*;
 import com.app.bdc_backend.util.ModelMapper;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -28,6 +30,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -52,33 +57,33 @@ public class ShopController {
 
     private final OrderService orderService;
 
-    @GetMapping("/info/{username}")
-    public ResponseEntity<?> getShopInfo(@PathVariable String username) {
-        User user = userService.findByUsername(username);
-        if(user == null){
-            return ResponseEntity.badRequest().body(Map.of(
-                    "message", "User not found!"
-            ));
-        }
-        Shop shop = shopService.findByUser(user);
-        if(shop == null){
-            return ResponseEntity.badRequest().body(Map.of(
-                    "message", "User doesn't have a shop"
-            ));
-        }
-        return ResponseEntity.ok(toShopResponseDTO(shop));
-    }
-
-    @GetMapping("/base/{shopId}")
-    public ResponseEntity<?> getShopBase(@PathVariable String shopId) {
-        Shop shop = shopService.findById(shopId);
-        if(shop == null){
-            return ResponseEntity.badRequest().body(Map.of(
-                    "message", "Shop not found!"
-            ));
-        }
-        return ResponseEntity.ok(toShopResponseDTO(shop));
-    }
+//    @GetMapping("/info/{username}")
+//    public ResponseEntity<?> getShopInfo(@PathVariable String username) {
+//        User user = userService.findByUsername(username);
+//        if(user == null){
+//            return ResponseEntity.badRequest().body(Map.of(
+//                    "message", "User not found!"
+//            ));
+//        }
+//        Shop shop = shopService.findByUser(user);
+//        if(shop == null){
+//            return ResponseEntity.badRequest().body(Map.of(
+//                    "message", "User doesn't have a shop"
+//            ));
+//        }
+//        return ResponseEntity.ok(toShopResponseDTO(shop));
+//    }
+//
+//    @GetMapping("/base/{shopId}")
+//    public ResponseEntity<?> getShopBase(@PathVariable String shopId) {
+//        Shop shop = shopService.findById(shopId);
+//        if(shop == null){
+//            return ResponseEntity.badRequest().body(Map.of(
+//                    "message", "Shop not found!"
+//            ));
+//        }
+//        return ResponseEntity.ok(toShopResponseDTO(shop));
+//    }
 
     @PostMapping("/product/add")
     public ResponseEntity<?> addProduct(@RequestBody AddProductDTO productDTO) {
@@ -150,12 +155,12 @@ public class ShopController {
                 break;
             case 3:
                 data = orderService.getShopOrderByShopAndStatus(shop,
-                        List.of(ShopOrderStatus.SENT),
+                        List.of(ShopOrderStatus.SENT, ShopOrderStatus.DELIVERING),
                         pageable);
                 break;
             case 4:
                 data = orderService.getShopOrderByShopAndStatus(shop,
-                        List.of(ShopOrderStatus.DELIVERED, ShopOrderStatus.COMPLETED, ShopOrderStatus.RATED),
+                        List.of(ShopOrderStatus.COMPLETED, ShopOrderStatus.RATED),
                         pageable);
                 break;
             case 5:
@@ -193,8 +198,12 @@ public class ShopController {
                     "message", "Invalid current status"
             ));
         }
-        if(currentStatus == ShopOrderStatus.PENDING) shopOrder.setStatus(ShopOrderStatus.PREPARING);
-        else shopOrder.setStatus(ShopOrderStatus.SENT);
+        if(currentStatus == ShopOrderStatus.PENDING){
+            shopOrder.setStatus(ShopOrderStatus.PREPARING);
+        }
+        else{
+            shopOrder.setStatus(ShopOrderStatus.DELIVERING);
+        }
         orderService.saveAllShopOrders(List.of(shopOrder));
         return ResponseEntity.ok().build();
     }
@@ -301,17 +310,17 @@ public class ShopController {
         return address;
     }
 
-    private ShopResponseDTO toShopResponseDTO(Shop shop) {
-        int followerCount = followService.getShopFollowCount(shop.getId().toString());
-        int productCount = productService.countProductOfShop(shop.getId().toString());
-        Map<String, String> ratingInfo = reviewService.getCountAndAverageReviewOfShop(shop.getId().toString());
-        ShopResponseDTO dto = ModelMapper.getInstance().map(shop, ShopResponseDTO.class);
-        dto.setShopId(shop.getId().toString());
-        dto.setFollowerCount(followerCount);
-        dto.setProductCount(productCount);
-        dto.setReviewCount(Integer.parseInt(ratingInfo.get("reviewCount")));
-        dto.setAverageRating(Float.parseFloat(ratingInfo.get("averageRating")));
-        return dto;
-    }
+//    private ShopResponseDTO toShopResponseDTO(Shop shop) {
+//        int followerCount = followService.getShopFollowCount(shop.getId().toString());
+//        int productCount = productService.countProductOfShop(shop.getId().toString());
+//        Map<String, String> ratingInfo = reviewService.getCountAndAverageReviewOfShop(shop.getId().toString());
+//        ShopResponseDTO dto = ModelMapper.getInstance().map(shop, ShopResponseDTO.class);
+//        dto.setShopId(shop.getId().toString());
+//        dto.setFollowerCount(followerCount);
+//        dto.setProductCount(productCount);
+//        dto.setReviewCount(Integer.parseInt(ratingInfo.get("reviewCount")));
+//        dto.setAverageRating(Float.parseFloat(ratingInfo.get("averageRating")));
+//        return dto;
+//    }
 
 }
