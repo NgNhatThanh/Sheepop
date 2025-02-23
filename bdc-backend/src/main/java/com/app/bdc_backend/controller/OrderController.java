@@ -198,6 +198,10 @@ public class OrderController {
                     "message", "Invalid request: status"
             ));
         }
+        for(OrderItem item : shopOrder.getItems()){
+            item.setSuccess(true);
+        }
+        orderService.saveAllItems(shopOrder.getItems());
         shopOrder.setStatus(ShopOrderStatus.COMPLETED);
         orderService.saveAllShopOrders(List.of(shopOrder));
         return ResponseEntity.ok().build();

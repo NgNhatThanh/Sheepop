@@ -54,7 +54,8 @@ public class SecurityConfig {
                                 "/api/v1/shop/base/**",
                                 "/api/v1/common/**",
                                 "/api/v1/product/**",
-                                "/api/v1/homepage/**").permitAll()
+                                "/api/v1/homepage/**",
+                                "/api/v1/review/get_review_list").permitAll()
                         .requestMatchers("/api/v1/auth/logout").authenticated()
                         .anyRequest().authenticated())
                 .csrf(AbstractHttpConfigurer::disable)

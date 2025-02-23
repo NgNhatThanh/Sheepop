@@ -10,6 +10,7 @@ import com.app.bdc_backend.model.order.ShopOrder;
 import com.app.bdc_backend.model.shop.Shop;
 import com.app.bdc_backend.model.user.User;
 import lombok.RequiredArgsConstructor;
+import org.bson.types.ObjectId;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
@@ -75,6 +76,12 @@ public class OrderService {
         return shopOrderRepository.findLastByShopOrderByCreatedAtDesc(shop, pageable);
     }
 
+    public int countProductSold(ObjectId productId){
+        return orderItemRepository.countProductSoldByProductId(productId);
+    }
 
+    public int countShopSold(ObjectId shopId){
+        return shopOrderRepository.countShopSold(shopId);
+    }
 
 }

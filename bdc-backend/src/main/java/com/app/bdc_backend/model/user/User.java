@@ -1,5 +1,6 @@
 package com.app.bdc_backend.model.user;
 
+import com.app.bdc_backend.model.enums.Gender;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.EqualsAndHashCode;
@@ -35,6 +36,8 @@ public class User {
     private String phoneNumber;
 
     private String avatarUrl;
+
+    private Gender gender;
 
     private Date createdAt;
 

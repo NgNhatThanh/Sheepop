@@ -1,10 +1,13 @@
 package com.app.bdc_backend.controller;
 
+import com.app.bdc_backend.model.dto.BasicReviewInfo;
 import com.app.bdc_backend.model.dto.response.PageResponse;
 import com.app.bdc_backend.model.dto.response.ProductCardDTO;
 import com.app.bdc_backend.model.product.Product;
 import com.app.bdc_backend.model.product.ProductSKU;
+import com.app.bdc_backend.service.OrderService;
 import com.app.bdc_backend.service.ProductService;
+import com.app.bdc_backend.service.ReviewService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +24,10 @@ import java.util.OptionalLong;
 public class HomepageController {
 
     private final ProductService productService;
+
+    private final ReviewService reviewService;
+
+    private final OrderService orderService;
 
     @GetMapping("/get-items")
     public ResponseEntity<?> getItems(@RequestParam(value = "page", defaultValue = "0") int page,
@@ -45,6 +52,10 @@ public class HomepageController {
                     .min();
             dto.setPrice(minPrice.getAsLong());
         }
+        BasicReviewInfo reviewInfo = reviewService.getProductReviewInfo(product.getId());
+        dto.setAverageRating(reviewInfo.getAverageRating());
+        int sold = orderService.countProductSold(product.getId());
+        dto.setSold(sold);
         return dto;
     }
 

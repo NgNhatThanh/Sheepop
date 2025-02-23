@@ -21,6 +21,8 @@ public class RegistrationDTO {
 
     private String email;
 
+    private String avatarUrl;
+
     private Date dob;
 
 }

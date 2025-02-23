@@ -63,8 +63,8 @@ public class ProductService {
         return productRepository.findById(id).orElse(null);
     }
 
-    public int countProductOfShop(String shopId){
-        return productRepository.countByShopId(new ObjectId(shopId));
+    public int countProductOfShop(ObjectId shopId){
+        return productRepository.countByShop(shopId);
     }
 
 }

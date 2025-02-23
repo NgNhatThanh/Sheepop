@@ -15,4 +15,8 @@ public class ProductCardDTO {
 
     private long price;
 
+    private double averageRating;
+
+    private int sold;
+
 }

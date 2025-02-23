@@ -1,5 +1,6 @@
 package com.app.bdc_backend.service;
 
+import com.app.bdc_backend.model.user.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
@@ -66,12 +67,14 @@ public class JwtService {
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
-    public String generateAccessToken(String username, Map<String, Object> claims) {
+    public String generateAccessToken(User user, Map<String, Object> claims) {
         Instant now = Instant.now();
         Instant expiration = now.plusSeconds(accessTokenExpiration);
+        claims.put("avatarUrl", user.getAvatarUrl());
+        claims.put("fullName", user.getFullName());
         return Jwts.builder()
                 .setClaims(claims)
-                .setSubject(username)
+                .setSubject(user.getUsername())
                 .setIssuedAt(Date.from(now))
                 .setExpiration(Date.from(expiration))
                 .signWith(getSignKey())

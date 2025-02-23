@@ -37,4 +37,10 @@ public interface ShopOrderRepository extends MongoRepository<ShopOrder, String> 
                                                                   List<Integer> status,
                                                                   Pageable pageable);
 
+    @Aggregation(pipeline = {
+        "{ $match: { shop: ?0, status: { $gte: 5 } } }",
+        "{ $group: { _id: null, count: { $sum: { $size: '$items' } } } }"
+    })
+    int countShopSold(ObjectId shopId);
+
 }

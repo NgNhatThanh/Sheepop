@@ -23,11 +23,14 @@ public class OrderItem {
     @Id
     private ObjectId id;
 
+    @DocumentReference
     private Product product;
 
     private int quantity;
 
     private long price;
+
+    private boolean success;
 
     private List<ProductAttribute> attributes;
 

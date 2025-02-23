@@ -1,5 +1,6 @@
 package com.app.bdc_backend.model.dto.response;
 
+import com.app.bdc_backend.model.enums.Gender;
 import lombok.*;
 
 import java.util.Date;
@@ -22,6 +23,8 @@ public class UserResponseDTO {
     private String phoneNumber;
 
     private String avatarUrl;
+    
+    private Gender gender;
 
     private Date dob;
 

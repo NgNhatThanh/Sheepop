@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ProductRepository extends MongoRepository<Product, String> {
 
-    int countByShopId(ObjectId shopId);
+    int countByShop(ObjectId shopId);
 
     Page<Product> findByShop(Shop shop, Pageable pageable);
 

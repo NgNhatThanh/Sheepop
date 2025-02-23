@@ -4,6 +4,7 @@ import com.app.bdc_backend.model.address.District;
 import com.app.bdc_backend.model.address.Province;
 import com.app.bdc_backend.model.address.Ward;
 import com.app.bdc_backend.model.dto.request.AddAddressDTO;
+import com.app.bdc_backend.model.dto.request.UpdateProfileDTO;
 import com.app.bdc_backend.model.dto.response.UserResponseDTO;
 import com.app.bdc_backend.model.user.UserAddress;
 import com.app.bdc_backend.model.user.User;
@@ -32,15 +33,10 @@ public class UserController {
 
     private final AddressService addressService;
 
-    @GetMapping("/profile/{username}")
-    public ResponseEntity<?> getUserInfo(@PathVariable String username) {
+    @GetMapping("/profile")
+    public ResponseEntity<?> getUserInfo() {
         String curUsername = SecurityContextHolder.getContext().getAuthentication().getName();
-        if(!curUsername.equals(username)) {
-            return ResponseEntity.badRequest().body(Map.of(
-                    "message", "You are not the current user"
-            ));
-        }
-        User user = userService.findByUsername(username);
+        User user = userService.findByUsername(curUsername);
         if (user == null) {
             return ResponseEntity.badRequest().body(Map.of(
                     "message", "User not found"
@@ -48,6 +44,24 @@ public class UserController {
         }
         UserResponseDTO response = ModelMapper.getInstance().map(user, UserResponseDTO.class);
         response.setId(user.getId().toString());
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/profile/update")
+    public ResponseEntity<?> updateProfile(@RequestBody UpdateProfileDTO dto) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        if(!username.equals(dto.getUsername())){
+            return ResponseEntity.badRequest().body(Map.of(
+                    "message", "Invalid request: username"
+            ));
+        }
+        User user = userService.findByUsername(username);
+        user.setDob(dto.getDob());
+        user.setAvatarUrl(dto.getAvatarUrl());
+        user.setFullName(dto.getFullName());
+        user.setGender(dto.getGender());
+        userService.save(user);
+        UserResponseDTO response = ModelMapper.getInstance().map(user, UserResponseDTO.class);
         return ResponseEntity.ok(response);
     }
 

@@ -1,5 +1,6 @@
 package com.app.bdc_backend.controller;
 
+import com.app.bdc_backend.model.dto.BasicReviewInfo;
 import com.app.bdc_backend.model.dto.request.SelectVariationDTO;
 import com.app.bdc_backend.model.dto.response.ProductResponseDTO;
 import com.app.bdc_backend.model.dto.response.SelectVariationResponseDTO;
@@ -7,14 +8,16 @@ import com.app.bdc_backend.model.dto.response.VariationDisplayIndicator;
 import com.app.bdc_backend.model.product.Product;
 import com.app.bdc_backend.model.product.ProductAttribute;
 import com.app.bdc_backend.model.product.ProductSKU;
+import com.app.bdc_backend.service.OrderService;
 import com.app.bdc_backend.service.ProductService;
+import com.app.bdc_backend.service.ReviewService;
+import com.app.bdc_backend.service.ShopService;
 import com.app.bdc_backend.util.ModelMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,6 +26,12 @@ public class ProductController {
 
     private final ProductService productService;
 
+    private final ReviewService reviewService;
+
+    private final OrderService orderService;
+
+    private final ShopService shopService;
+
     @GetMapping("/{productId}")
     public ResponseEntity<?> getProduct(@PathVariable("productId") String productId) {
         Product product = productService.findById(productId);
@@ -30,6 +39,21 @@ public class ProductController {
             return ResponseEntity.notFound().build();
         }
         ProductResponseDTO responseDTO = toProductResponseDTO(product);
+        BasicReviewInfo productReviewInfo = reviewService.getProductReviewInfo(product.getId());
+        BasicReviewInfo shopReviewInfo = reviewService.getShopReviewInfo(product.getShop().getId());
+        int soldCount = orderService.countProductSold(product.getId());
+        int shopProductCount = productService.countProductOfShop(product.getShop().getId());
+        responseDTO.setAverageRating(productReviewInfo.getAverageRating());
+        responseDTO.setTotalReviews(productReviewInfo.getTotalReviews());
+        responseDTO.setSoldCount(soldCount);
+
+        responseDTO.getShop().setId(product.getShop().getId().toString());
+        responseDTO.getShop().setName(product.getShop().getName());
+        responseDTO.getShop().setAvatarUrl(product.getShop().getAvatarUrl());
+        responseDTO.getShop().setAverageRating(shopReviewInfo.getAverageRating());
+        responseDTO.getShop().setTotalReviews(shopReviewInfo.getTotalReviews());
+        responseDTO.getShop().setCreatedAt(product.getShop().getCreatedAt());
+        responseDTO.getShop().setTotalProducts(shopProductCount);
         return ResponseEntity.ok(responseDTO);
     }
 

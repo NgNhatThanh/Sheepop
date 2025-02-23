@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -27,10 +28,38 @@ public class ProductResponseDTO {
 
     private int quantity;
 
+    private double averageRating;
+
+    private int totalReviews;
+
+    private int soldCount;
+
+    private ShopDTO shop;
+
     private Category category;
 
     private List<VariationDisplayIndicator> variationDisplayIndicators = new ArrayList<>();
 
     private List<ProductMedia> mediaList;
+
+    @Getter
+    @Setter
+    public static class ShopDTO{
+
+        private String id;
+
+        private String name;
+
+        private String avatarUrl;
+
+        private int totalProducts;
+
+        private int totalReviews;
+
+        private double averageRating;
+
+        private Date createdAt;
+
+    }
 
 }

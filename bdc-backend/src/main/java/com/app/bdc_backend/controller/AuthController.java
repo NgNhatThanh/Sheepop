@@ -48,12 +48,17 @@ public class AuthController{
     
     private final String REFRESH_TOKEN_COOKIE_NAME = "refresh_token";
 
+    private String userAvatarUrl = "https://res.cloudinary.com/daxt0vwoc/image/upload/v1740297885/User-avatar.svg_nihuye.png";
+
+    private String shopAvatarUrl = "https://res.cloudinary.com/daxt0vwoc/image/upload/v1740305995/online-shop-icon-vector_pj0wre.jpg";
+
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegistrationDTO dto){
         User newUser = ModelMapper.getInstance().map(dto, User.class);
+        newUser.setAvatarUrl(userAvatarUrl);
         try{
             userSevice.register(newUser);
-            String accessToken = jwtService.generateAccessToken(newUser.getUsername(), new HashMap<>());
+            String accessToken = jwtService.generateAccessToken(newUser, new HashMap<>());
             String refreshToken = jwtService.generateRefreshToken(newUser.getUsername(), new HashMap<>());
             jwtRedisService.setNewRefreshToken(newUser.getUsername(), refreshToken);
             Shop shop = new Shop();
@@ -61,6 +66,7 @@ public class AuthController{
             shop.setUser(newUser);
             shop.setDescription(dto.getFullName() + "'s shop");
             shop.setCreatedAt(new Date());
+            shop.setAvatarUrl(shopAvatarUrl);
             shopSevice.addShop(shop);
 
             Cart cart = new Cart();
@@ -89,12 +95,14 @@ public class AuthController{
                 String fullName = (String) getUserInfo.get("name");
                 String email = (String) getUserInfo.get("email");
                 String username = email.split("@")[0];
+                String avatarUrl = (String) getUserInfo.get("picture");
                 User user = userSevice.findByUsername(username);
                 if(user == null){
                     return register(RegistrationDTO.builder()
                             .username(username)
                             .email(email)
                             .fullName(fullName)
+                            .avatarUrl(avatarUrl)
                             .password("")
                             .build());
                 }
@@ -122,7 +130,8 @@ public class AuthController{
             UsernamePasswordAuthenticationToken authToken =
                     new UsernamePasswordAuthenticationToken(dto.getUsername(), dto.getPassword());
             authenticationManager.authenticate(authToken);
-            String accessToken = jwtService.generateAccessToken(dto.getUsername(), new HashMap<>());
+            User user = userSevice.findByUsername(dto.getUsername());
+            String accessToken = jwtService.generateAccessToken(user, new HashMap<>());
             String refreshToken = jwtService.generateRefreshToken(dto.getUsername(), new HashMap<>());
             jwtRedisService.setNewRefreshToken(dto.getUsername(), refreshToken);
             return ResponseEntity.ok()
@@ -162,7 +171,6 @@ public class AuthController{
 
     @GetMapping("/refreshToken")
     public ResponseEntity<Map<String, String>> refreshToken(@CookieValue(value = REFRESH_TOKEN_COOKIE_NAME, defaultValue = "") String token){
-        log.info("Refresh token: " + token );
         if (token == null || token.isEmpty()
                 || !jwtService.isTokenValid(token)
                 || !jwtRedisService.isRefreshTokenValid(jwtService.extractUsername(token), token))
@@ -170,8 +178,9 @@ public class AuthController{
                     "message", "Invalid refresh token"
             ));
         String username = jwtService.extractUsername(token);
+        User user = userSevice.findByUsername(username);
         String accessToken = jwtService.generateAccessToken(
-                username,
+                user,
                 new HashMap<>());
         String refreshToken = jwtService.generateRefreshToken(
                 username,
