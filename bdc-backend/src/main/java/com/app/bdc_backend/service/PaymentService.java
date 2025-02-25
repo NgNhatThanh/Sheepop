@@ -1,6 +1,6 @@
 package com.app.bdc_backend.service;
 
-import com.app.bdc_backend.dao.PaymentRepository;
+import com.app.bdc_backend.dao.order.PaymentRepository;
 import com.app.bdc_backend.model.order.Payment;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

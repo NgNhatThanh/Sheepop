@@ -1,17 +1,13 @@
 package com.app.bdc_backend.service;
 
-import com.app.bdc_backend.dao.ProductReviewMediaRepository;
-import com.app.bdc_backend.dao.ReviewRepository;
+import com.app.bdc_backend.dao.product.ProductReviewMediaRepository;
+import com.app.bdc_backend.dao.order.ReviewRepository;
 import com.app.bdc_backend.model.dto.BasicReviewInfo;
-import com.app.bdc_backend.model.dto.response.ProductReviewDTO;
 import com.app.bdc_backend.model.dto.response.ReviewSummary;
 import com.app.bdc_backend.model.product.ProductReview;
 import com.app.bdc_backend.model.product.ProductReviewMedia;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

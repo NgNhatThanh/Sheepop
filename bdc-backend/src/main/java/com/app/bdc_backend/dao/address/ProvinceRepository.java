@@ -1,4 +1,4 @@
-package com.app.bdc_backend.dao;
+package com.app.bdc_backend.dao.address;
 
 import com.app.bdc_backend.model.address.Province;
 import org.springframework.data.mongodb.repository.MongoRepository;

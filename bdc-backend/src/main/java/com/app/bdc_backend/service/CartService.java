@@ -1,7 +1,7 @@
 package com.app.bdc_backend.service;
 
-import com.app.bdc_backend.dao.CartItemRepository;
-import com.app.bdc_backend.dao.CartRepository;
+import com.app.bdc_backend.dao.cart.CartItemRepository;
+import com.app.bdc_backend.dao.cart.CartRepository;
 import com.app.bdc_backend.exception.AddToCartException;
 import com.app.bdc_backend.model.cart.Cart;
 import com.app.bdc_backend.model.cart.CartItem;

@@ -1,7 +1,7 @@
 package com.app.bdc_backend.service;
 
-import com.app.bdc_backend.dao.ShopAddressRepository;
-import com.app.bdc_backend.dao.ShopRepository;
+import com.app.bdc_backend.dao.shop.ShopAddressRepository;
+import com.app.bdc_backend.dao.shop.ShopRepository;
 import com.app.bdc_backend.model.shop.Shop;
 import com.app.bdc_backend.model.shop.ShopAddress;
 import com.app.bdc_backend.model.user.User;

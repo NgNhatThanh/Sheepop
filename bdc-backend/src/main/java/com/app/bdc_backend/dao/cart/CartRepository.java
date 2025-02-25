@@ -1,4 +1,4 @@
-package com.app.bdc_backend.dao;
+package com.app.bdc_backend.dao.cart;
 
 import com.app.bdc_backend.model.cart.Cart;
 import com.app.bdc_backend.model.user.User;

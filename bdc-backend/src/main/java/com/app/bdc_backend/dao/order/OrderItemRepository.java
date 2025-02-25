@@ -1,4 +1,4 @@
-package com.app.bdc_backend.dao;
+package com.app.bdc_backend.dao.order;
 
 import com.app.bdc_backend.model.order.OrderItem;
 import org.bson.types.ObjectId;

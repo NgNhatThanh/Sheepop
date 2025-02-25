@@ -1,9 +1,8 @@
 package com.app.bdc_backend.service;
 
-import com.app.bdc_backend.dao.CategoryRepository;
+import com.app.bdc_backend.dao.product.CategoryRepository;
 import com.app.bdc_backend.model.product.Category;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

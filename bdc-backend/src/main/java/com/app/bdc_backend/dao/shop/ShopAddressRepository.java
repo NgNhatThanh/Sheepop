@@ -1,4 +1,4 @@
-package com.app.bdc_backend.dao;
+package com.app.bdc_backend.dao.shop;
 
 import com.app.bdc_backend.model.shop.ShopAddress;
 import org.springframework.data.mongodb.repository.MongoRepository;

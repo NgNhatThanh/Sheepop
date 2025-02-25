@@ -1,8 +1,8 @@
 package com.app.bdc_backend.service;
 
-import com.app.bdc_backend.dao.DistrictRepository;
-import com.app.bdc_backend.dao.ProvinceRepository;
-import com.app.bdc_backend.dao.WardRepository;
+import com.app.bdc_backend.dao.address.DistrictRepository;
+import com.app.bdc_backend.dao.address.ProvinceRepository;
+import com.app.bdc_backend.dao.address.WardRepository;
 import com.app.bdc_backend.model.address.District;
 import com.app.bdc_backend.model.address.Province;
 import com.app.bdc_backend.model.address.Ward;

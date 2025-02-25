@@ -2,13 +2,16 @@ package com.app.bdc_backend.controller;
 
 import com.app.bdc_backend.model.cart.Cart;
 import com.app.bdc_backend.model.cart.CartItem;
+import com.app.bdc_backend.model.dto.request.OrderCancelationDTO;
 import com.app.bdc_backend.model.dto.response.*;
+import com.app.bdc_backend.model.enums.CommonEntity;
 import com.app.bdc_backend.model.enums.PaymentStatus;
 import com.app.bdc_backend.model.enums.PaymentType;
 import com.app.bdc_backend.model.enums.ShopOrderStatus;
 import com.app.bdc_backend.model.order.*;
 import com.app.bdc_backend.model.product.Product;
 import com.app.bdc_backend.model.product.ProductSKU;
+import com.app.bdc_backend.model.shop.Shop;
 import com.app.bdc_backend.model.user.User;
 import com.app.bdc_backend.model.user.UserAddress;
 import com.app.bdc_backend.service.*;
@@ -207,6 +210,95 @@ public class OrderController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/cancel")
+    public ResponseEntity<?> cancelOrder(@RequestBody OrderCancelationDTO dto) {
+        if(dto.getCancelReason() == null || dto.getCancelReason().isEmpty()){
+            return ResponseEntity.badRequest().body(Map.of(
+                    "message", "Invalid request: cancel reason mustn't be empty"
+            ));
+        }
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        List<ShopOrder> cancelList = new ArrayList<>();
+        if(dto.getWhoCancel() == CommonEntity.USER){
+            if(dto.getOrderId() == null){
+                return ResponseEntity.badRequest().body(Map.of(
+                        "message", "Invalid request: order id mustn't be null"
+                ));
+            }
+            Order order = orderService.getOrderById(dto.getOrderId());
+            if(order == null){
+                return ResponseEntity.badRequest().body(Map.of(
+                        "message", "Invalid request: order not found"
+                ));
+            }
+            if(!order.getUser().getUsername().equals(username)){
+                return ResponseEntity.badRequest().body(Map.of(
+                        "message", "Invalid request: user"
+                ));
+            }
+            List<ShopOrder> shopOrders = orderService.getAllShopOrderByOrder(order);
+            if(order.getPayment().getStatus() == PaymentStatus.PENDING){
+                if(dto.getShopOrderIds().size() != shopOrders.size()){
+                    return ResponseEntity.badRequest().body(Map.of(
+                            "message", "Invalid request: invalid shop orders amount"
+                    ));
+                }
+                order.getPayment().setStatus(PaymentStatus.CANCELLED);
+                cancelList = shopOrders;
+            }
+            else{
+                for(ShopOrder shopOrder : shopOrders){
+                    if(shopOrder.getId().toString().equals(dto.getShopOrderIds().get(0))){
+                        cancelList = List.of(shopOrder);
+                        break;
+                    }
+                }
+                if(order.getPayment().getStatus() == PaymentStatus.COMPLETED){
+                    refund();
+                }
+            }
+        }
+        else if(dto.getWhoCancel() == CommonEntity.SHOP){
+            ShopOrder shopOrder = orderService.getShopOrderById(dto.getShopOrderIds().get(0));
+            if(dto.getShopOrderIds().isEmpty()){
+                return ResponseEntity.badRequest().body(Map.of(
+                        "message", "Invalid request: shopOrderIds mustn't be empty"
+                ));
+            }
+            if(shopOrder == null){
+                return ResponseEntity.badRequest().body(Map.of(
+                        "message", "Invalid request: shopOrder not found"
+                ));
+            }
+            if(!shopOrder.getShop().getUser().getUsername().equals(username)){
+                return ResponseEntity.badRequest().body(Map.of(
+                        "message", "Invalid request: invalid shop owner"
+                ));
+            }
+            if(shopOrder.getStatus() != ShopOrderStatus.PENDING){
+                return ResponseEntity.badRequest().body(Map.of(
+                        "message", "Invalid request: this order cannot be canceled"
+                ));
+            }
+            cancelList = List.of(shopOrder);
+        }
+        else if(dto.getWhoCancel() == CommonEntity.ADMIN){
+            // code for admin
+        }
+        else{
+            return ResponseEntity.badRequest().body(Map.of(
+                    "message", "Invalid request: entity"
+            ));
+        }
+        orderService.cancelAllShopOrders(cancelList, dto.getWhoCancel(), dto.getCancelReason());
+        return ResponseEntity.ok().build();
+    }
+
+
+    private void refund(){
+        log.info("Need to refund");
+    }
+
     private OrderPageResponse getOrderByShopOrderStatus(User user, List<Integer> status, int offset, int limit) {
         OrderPageResponse response = new OrderPageResponse();
         List<OrderDTO> orderDTOS = new ArrayList<>();
@@ -267,7 +359,7 @@ public class OrderController {
             boolean pendingPayment = order.getPayment().getStatus() == PaymentStatus.PENDING
                     && order.getPayment().getType() != PaymentType.COD;
             orderDTO.setPending(pendingPayment);
-            List<ShopOrder> shopOrders = orderService.findByOrder(order);
+            List<ShopOrder> shopOrders = orderService.getAllShopOrderByOrder(order);
             List<ShopOrderDTO> dtoShopOrders = new ArrayList<>();
             for(ShopOrder shopOrder : shopOrders){
                 ShopOrderDTO dtoShopOrder = toShopOrderDTO(shopOrder);

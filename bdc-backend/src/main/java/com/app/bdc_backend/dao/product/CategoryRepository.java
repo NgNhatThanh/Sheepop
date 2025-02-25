@@ -1,4 +1,4 @@
-package com.app.bdc_backend.dao;
+package com.app.bdc_backend.dao.product;
 
 import com.app.bdc_backend.model.product.Category;
 import org.springframework.data.mongodb.repository.MongoRepository;

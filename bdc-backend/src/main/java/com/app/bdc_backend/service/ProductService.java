@@ -1,9 +1,9 @@
 package com.app.bdc_backend.service;
 
-import com.app.bdc_backend.dao.ProductAttributeRepository;
-import com.app.bdc_backend.dao.ProductMediaRepository;
-import com.app.bdc_backend.dao.ProductRepository;
-import com.app.bdc_backend.dao.ProductSKURepository;
+import com.app.bdc_backend.dao.product.ProductAttributeRepository;
+import com.app.bdc_backend.dao.product.ProductMediaRepository;
+import com.app.bdc_backend.dao.product.ProductRepository;
+import com.app.bdc_backend.dao.product.ProductSKURepository;
 import com.app.bdc_backend.model.product.Product;
 import com.app.bdc_backend.model.product.ProductAttribute;
 import com.app.bdc_backend.model.product.ProductMedia;

@@ -1,9 +1,11 @@
 package com.app.bdc_backend.service;
 
-import com.app.bdc_backend.dao.OrderItemRepository;
-import com.app.bdc_backend.dao.OrderRerpository;
-import com.app.bdc_backend.dao.ShopOrderRepository;
+import com.app.bdc_backend.dao.order.OrderItemRepository;
+import com.app.bdc_backend.dao.order.OrderRerpository;
+import com.app.bdc_backend.dao.shop.ShopOrderRepository;
+import com.app.bdc_backend.model.dto.ShopOrderPageImpl;
 import com.app.bdc_backend.model.enums.PaymentStatus;
+import com.app.bdc_backend.model.enums.ShopOrderStatus;
 import com.app.bdc_backend.model.order.Order;
 import com.app.bdc_backend.model.order.OrderItem;
 import com.app.bdc_backend.model.order.ShopOrder;
@@ -14,6 +16,7 @@ import org.bson.types.ObjectId;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -28,6 +31,10 @@ public class OrderService {
 
     public Order save(Order order) {
         return orderRerpository.save(order);
+    }
+
+    public Order getOrderById(String orderId) {
+        return orderRerpository.findById(orderId).orElse(null);
     }
 
     public void saveAllItems(List<OrderItem> items){
@@ -57,6 +64,15 @@ public class OrderService {
                 .stream().toList();
     }
 
+    public void cancelAllShopOrders(List<ShopOrder> shopOrders, int canceledBy, String reason){
+        for(ShopOrder shopOrder : shopOrders){
+            shopOrder.setCanceledBy(canceledBy);
+            shopOrder.setCancelReason(reason);
+            shopOrder.setStatus(ShopOrderStatus.CANCELLED);
+        }
+        saveAllShopOrders(shopOrders);
+    }
+
     public List<ShopOrder> getShopOrderByStatus(User user, List<Integer> statusList, int offset, int limit){
         return shopOrderRepository.findLastByUserAndStatusInOrderByCreatedAtDesc(user.getId(),
                 statusList,
@@ -64,11 +80,49 @@ public class OrderService {
                 limit);
     }
 
-    public Page<ShopOrder> getShopOrderByShopAndStatus(Shop shop, List<Integer> statusList, Pageable pageable){
-        return shopOrderRepository.findLastByShopAndStatusInOrderByCreatedAtDesc(shop, statusList, pageable);
+    public Page<ShopOrder> getShopOrderByShopAndStatus(Shop shop,
+                                                       List<Integer> statusList,
+                                                       Pageable pageable,
+                                                       int filterType,
+                                                       String keyword){
+         if(filterType == 0)
+             return shopOrderRepository.findLastByShopAndStatusInOrderByCreatedAtDesc(shop, statusList, pageable);
+         else {
+             if(filterType == 1)
+                 return shopOrderRepository
+                         .findLastByShopAndIdAndStatusInOrderByCreatedAtDesc(
+                                 shop,
+                                 keyword,
+                                 statusList,
+                                 pageable);
+             else if(filterType == 2){
+                 ShopOrderPageImpl pageRes = shopOrderRepository.findByShopAndUserFullNameContainingIgnoreCaseAndStatusInOrderByCreatedAtDesc(
+                         shop.getId(),
+                         keyword,
+                         statusList,
+                         pageable.getOffset(),
+                         pageable.getPageSize()
+                 );
+                 if(pageRes == null)
+                     return new PageImpl<>(new ArrayList<>());
+                 return new PageImpl<>(pageRes.getContent(), pageable, pageRes.getTotalElements());
+             }
+             else{
+                ShopOrderPageImpl pageRes = shopOrderRepository.findShopOrderThatProductNameContainingIgnoreCaseAndStatusInOrderByCreatedAtDesc(
+                        shop.getId(),
+                        keyword,
+                        statusList,
+                        pageable.getOffset(),
+                        pageable.getPageSize()
+                );
+                if(pageRes == null)
+                    return new PageImpl<>(new ArrayList<>());
+                return new PageImpl<>(pageRes.getContent(), pageable, pageRes.getTotalElements());
+             }
+         }
     }
 
-    public List<ShopOrder> findByOrder(Order order){
+    public List<ShopOrder> getAllShopOrderByOrder(Order order){
         return shopOrderRepository.findByOrder(order);
     }
 
