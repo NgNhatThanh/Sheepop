@@ -1,5 +1,6 @@
 package com.app.bdc_backend.service;
 
+import com.app.bdc_backend.model.dto.response.OauthUserDTO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -32,7 +33,7 @@ public class Oauth2Service {
     @Value("${google.redirect-uri}")
     private String googleRedirectUri;
 
-    public Map<String, Object> getOauth2Profile(String code, String provider) throws Exception {
+    public OauthUserDTO getOauth2Profile(String code, String provider) throws Exception {
         RestTemplate restTemplate = new RestTemplate();
         String oauth2AccessToken;
         switch (provider){
@@ -56,7 +57,13 @@ public class Oauth2Service {
                         req.getHeaders().add("Authorization", "Bearer " + oauth2AccessToken);
                         return executionContext.execute(req, body);
                     });
-                    return convertJsonToMap(restTemplate.getForEntity(googleUserInfoEndpoint, String.class).getBody());
+                    Map<String, Object> res = convertJsonToMap(restTemplate.getForEntity(googleUserInfoEndpoint, String.class).getBody());
+                    OauthUserDTO userDTO = new OauthUserDTO();
+                    userDTO.setEmail((String)res.get("email"));
+                    userDTO.setFullName((String)res.get("name"));
+                    userDTO.setUsername(userDTO.getEmail().split("@")[0]);
+                    userDTO.setAvatarUrl((String) res.get("picture"));
+                    return userDTO;
                 } else {
                     throw new Exception("Failed to get tokens: " + response.getStatusCode());
                 }

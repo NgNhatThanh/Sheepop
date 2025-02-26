@@ -86,4 +86,14 @@ public class CartService {
         cartItemRepository.delete(item);
     }
 
+    public int getItemStock(CartItem item){
+        if(item.getProduct().getSkuList().isEmpty()) return item.getProduct().getQuantity();
+        for(ProductSKU skU : item.getProduct().getSkuList()){
+            if(new HashSet<>(skU.getAttributes()).containsAll(item.getAttributes())){
+                return skU.getQuantity();
+            }
+        }
+        return 0;
+    }
+
 }

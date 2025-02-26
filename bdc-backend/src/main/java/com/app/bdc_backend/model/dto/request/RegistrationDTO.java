@@ -23,6 +23,8 @@ public class RegistrationDTO {
 
     private String avatarUrl;
 
+    private boolean fromSocial = false;
+
     private Date dob;
 
 }

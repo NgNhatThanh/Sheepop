@@ -1,5 +1,6 @@
 package com.app.bdc_backend.service;
 
+import com.app.bdc_backend.config.Constant;
 import com.app.bdc_backend.model.user.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
@@ -28,19 +29,11 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class JwtService {
 
-    @Value("${JWT_SECRET_KEY}")
-    private String jwtSecret;
-
-    @Value("${ACCESS_TOKEN_EXPIRATION}")
-    private long accessTokenExpiration;
-
-    @Value("${REFRESH_TOKEN_EXPIRATION}")
-    @Getter
-    private long refreshTokenExpiration;
-
     private final UserDetailsService userDetailsService;
 
     private Random rand = new Random();
+
+    private final Constant constant;
 
     public String extractUsername(String token) {
         return Jwts
@@ -69,7 +62,7 @@ public class JwtService {
 
     public String generateAccessToken(User user, Map<String, Object> claims) {
         Instant now = Instant.now();
-        Instant expiration = now.plusSeconds(accessTokenExpiration);
+        Instant expiration = now.plusSeconds(constant.getAccessTokenExpiration());
         claims.put("avatarUrl", user.getAvatarUrl());
         claims.put("fullName", user.getFullName());
         return Jwts.builder()
@@ -82,7 +75,7 @@ public class JwtService {
     }
 
     public String generateRefreshToken(String username, Map<String, Object> claims) {
-        Instant expiration = Instant.now().plusSeconds(refreshTokenExpiration);
+        Instant expiration = Instant.now().plusSeconds(constant.getRefreshTokenExpiration());
         String id = String.valueOf(rand.nextInt(100000000, 999999999));
         return Jwts.builder()
                 .setClaims(claims)
@@ -108,7 +101,7 @@ public class JwtService {
     }
 
     private Key getSignKey(){
-        byte[] keyBytes = Decoders.BASE64URL.decode(jwtSecret);
+        byte[] keyBytes = Decoders.BASE64URL.decode(constant.getJwtSecret());
         return Keys.hmacShaKeyFor(keyBytes);
     }
 

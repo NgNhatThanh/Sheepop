@@ -41,6 +41,8 @@ public class User {
 
     private Date createdAt;
 
+    private boolean fromSocial = false;
+
     private Date dob;
 
 }

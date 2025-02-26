@@ -1,107 +1,28 @@
 package com.app.bdc_backend.controller;
 
+import com.app.bdc_backend.facade.ReviewFacadeService;
 import com.app.bdc_backend.model.dto.request.CreateReviewDTO;
-import com.app.bdc_backend.model.dto.response.ProductReviewDTO;
-import com.app.bdc_backend.model.dto.response.ReviewListDTO;
-import com.app.bdc_backend.model.enums.ReviewFilter;
-import com.app.bdc_backend.model.enums.ShopOrderStatus;
-import com.app.bdc_backend.model.order.OrderItem;
-import com.app.bdc_backend.model.order.ShopOrder;
-import com.app.bdc_backend.model.product.Product;
-import com.app.bdc_backend.model.product.ProductReview;
-import com.app.bdc_backend.model.product.ProductReviewMedia;
-import com.app.bdc_backend.service.OrderService;
-import com.app.bdc_backend.service.ProductService;
-import com.app.bdc_backend.service.ReviewService;
-import com.app.bdc_backend.util.ModelMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/review")
 public class ReviewController {
 
-    private final ReviewService reviewService;
-
-    private final OrderService orderService;
-
-    private final ProductService productService;
+    private final ReviewFacadeService reviewFacadeService;
 
     @PostMapping("/create_review")
     public ResponseEntity<?> createReview(@RequestBody CreateReviewDTO dto){
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        ShopOrder shopOrder = orderService.getShopOrderById(dto.getShopOrderId());
-        if(shopOrder == null){
-            return ResponseEntity.badRequest().body(Map.of(
-                    "message", "Invalid request: shop order id"
-            ));
+        try{
+            reviewFacadeService.createReview(dto);
+            return ResponseEntity.ok().build();
         }
-        if(shopOrder.getStatus() != ShopOrderStatus.COMPLETED){
-            return ResponseEntity.badRequest().body(Map.of(
-                    "message", "Invalid request: order status"
-            ));
+        catch (Exception e){
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
         }
-        if(shopOrder.getItems().size() != dto.getItemReviews().size()){
-            return ResponseEntity.badRequest().body(Map.of(
-                    "message", "Invalid request: items amount"
-            ));
-        }
-        if(!shopOrder.getUser().getUsername().equals(username)){
-            return ResponseEntity.badRequest().body(Map.of(
-                    "message", "Invalid request: reviewer"
-            ));
-        }
-        boolean ok = true;
-        for(OrderItem item : shopOrder.getItems()){
-            boolean tmp = false;
-            for(CreateReviewDTO.ItemReview itemReview : dto.getItemReviews()){
-                if(itemReview.getOrderItemId().equals(item.getId().toString())){
-                    tmp = true;
-                    break;
-                }
-            }
-            if(!tmp){
-                ok = false;
-                break;
-            }
-        }
-        if(!ok){
-            return ResponseEntity.badRequest().body(Map.of(
-                    "message", "Invalid request: invalid item(s)"
-            ));
-        }
-        List<ProductReview> reviews = new ArrayList<>();
-        List<ProductReviewMedia> medias = new ArrayList<>();
-        for(OrderItem item : shopOrder.getItems()){
-            for(CreateReviewDTO.ItemReview itemReview : dto.getItemReviews()){
-                if(itemReview.getOrderItemId().equals(item.getId().toString())){
-                    ProductReview review = ModelMapper.getInstance().map(itemReview, ProductReview.class);
-                    review.setReviewer(shopOrder.getUser());
-                    review.setOrderItem(item);
-                    review.setCreatedAt(new Date());
-                    review.getMediaList().stream().map(medias::add);
-                    reviews.add(review);
-                    break;
-                }
-            }
-        }
-        reviewService.saveAllMedia(medias);
-        reviewService.saveAllReview(reviews);
-        shopOrder.setStatus(ShopOrderStatus.RATED);
-        orderService.saveAllShopOrders(List.of(shopOrder));
-        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/get_review_list")
@@ -110,48 +31,20 @@ public class ReviewController {
                                            @RequestParam("filterType") int filterType,
                                            @RequestParam("page") int page,
                                            @RequestParam("limit") int limit){
-        Product product = productService.findById(productId);
-        if(product == null){
-            return ResponseEntity.badRequest().body(Map.of(
-                    "message", "Invalid request: Product not found"
+        try{
+            return ResponseEntity.ok(reviewFacadeService.getProductReviewList(
+                    productId,
+                    rating,
+                    filterType,
+                    page,
+                    limit
             ));
         }
-        if(rating < 0 || rating > 5 || filterType < 0 || filterType > 2){
-            return ResponseEntity.badRequest().body(Map.of(
-                    "message", "Invalid request"
-            ));
+        catch (Exception e){
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
         }
-        List<ProductReview> reviewList;
-        if(filterType == ReviewFilter.ALL){
-            if(rating == 0) reviewList = reviewService.getAllReviewOfProduct(product.getId(), page, limit);
-            else reviewList = reviewService.getAllReviewOfProductByRating(product.getId(), rating, page, limit);
-        }
-        else if(filterType == ReviewFilter.WITH_CONTENT){
-            reviewList = reviewService.getAllReviewOfProductHasContent(product.getId(), page, limit);
-        }
-        else reviewList = reviewService.getAllReviewOfProductHasMedia(product.getId(), page, limit);
-        ReviewListDTO dto = new ReviewListDTO();
-        List<ProductReviewDTO> reviewDTOList = reviewList.stream().map(this::toProductReviewDTO).toList();
-        dto.setReviews(reviewDTOList);
-        dto.setSummary(reviewService.getProductReviewSummary(product.getId()));
-        return ResponseEntity.ok(dto);
     }
 
-    private ProductReviewDTO toProductReviewDTO(ProductReview productReview){
-        ProductReviewDTO dto = new ProductReviewDTO();
-        dto.setId(productReview.getId().toString());
-        dto.setRating(productReview.getRating());
-        dto.setContent(productReview.getContent());
-        dto.setMediaList(productReview.getMediaList());
-        dto.setReactionCount(productReview.getReactionCount());
-        dto.setCreatedAt(productReview.getCreatedAt());
 
-        dto.getReviewer().setUsername(productReview.getReviewer().getUsername());
-        dto.getReviewer().setAvatarUrl(productReview.getReviewer().getAvatarUrl());
-
-        dto.getItem().setAttributes(productReview.getOrderItem().getAttributes());
-        dto.getItem().setQuantity(productReview.getOrderItem().getQuantity());
-        return dto;
-    }
 
 }
