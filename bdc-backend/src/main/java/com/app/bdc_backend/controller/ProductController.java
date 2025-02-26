@@ -15,6 +15,7 @@ import com.app.bdc_backend.service.ShopService;
 import com.app.bdc_backend.util.ModelMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;

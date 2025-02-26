@@ -61,6 +61,11 @@ public class CartController {
                     "message", "Product not found"
             ));
         }
+        if(product.getShop().getUser().getUsername().equals(username)){
+            return ResponseEntity.badRequest().body(Map.of(
+                    "message", "Invalid request: cannot buy your own product"
+            ));
+        }
         Cart cart = cartRedisService.findByUser(username);
         if(cart == null){
             User user = userService.findByUsername(username);

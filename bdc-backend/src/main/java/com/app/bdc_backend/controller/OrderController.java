@@ -11,7 +11,6 @@ import com.app.bdc_backend.model.enums.ShopOrderStatus;
 import com.app.bdc_backend.model.order.*;
 import com.app.bdc_backend.model.product.Product;
 import com.app.bdc_backend.model.product.ProductSKU;
-import com.app.bdc_backend.model.shop.Shop;
 import com.app.bdc_backend.model.user.User;
 import com.app.bdc_backend.model.user.UserAddress;
 import com.app.bdc_backend.service.*;
@@ -61,8 +60,15 @@ public class OrderController {
         List<CartItem> checkoutList = new ArrayList<>();
         for(CartItem item : cart.getItems()){
             if(item.isSelected()){
+                if(item.getProduct().getShop().getUser().getUsername().equals(username)){
+                    return ResponseEntity.badRequest().body(Map.of(
+                            "message", "Invalid request: cannot buy your own product"
+                    ));
+                }
                 if(item.getQuantity() > getItemStock(item)){
-                    return ResponseEntity.badRequest().build();
+                    return ResponseEntity.badRequest().body(Map.of(
+                            "message", "Invalid request: exceeded quantity"
+                    ));
                 }
                 else{
                     checkoutList.add(item);
