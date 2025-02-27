@@ -5,7 +5,7 @@ import com.app.bdc_backend.model.address.District;
 import com.app.bdc_backend.model.address.Province;
 import com.app.bdc_backend.model.address.Ward;
 import com.app.bdc_backend.model.dto.request.AddAddressDTO;
-import com.app.bdc_backend.model.dto.request.AddProductDTO;
+import com.app.bdc_backend.model.dto.request.SaveProductDTO;
 import com.app.bdc_backend.model.dto.response.*;
 import com.app.bdc_backend.model.enums.PaymentStatus;
 import com.app.bdc_backend.model.enums.PaymentType;
@@ -45,6 +45,21 @@ public class ShopFacadeService {
 
     private final OrderService orderService;
 
+    private final ProductFacadeService productFacadeService;
+
+    public ProductResponseDTO previewProduct(String productId) throws RuntimeException {
+        Product product = productService.findById(productId);
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        if(!product.getShop().getUser().getUsername().equals(username)) {
+            throw new RuntimeException("Invalid request: not your shop's product");
+        }
+        return productFacadeService.getProduct(productId, true);
+    }
+
+    public Product getProductForEdit(String productId){
+        return productService.findById(productId);
+    }
+
     public ShopAddress addAddress(AddAddressDTO addressDTO) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userService.findByUsername(username);
@@ -61,6 +76,17 @@ public class ShopFacadeService {
         address.setShopId(shop.getId().toString());
         shopService.saveAddress(address);
         return address;
+    }
+
+    public void deleteProduct(String productId) throws RuntimeException {
+        Product product = productService.findById(productId);
+        if(product == null)
+            throw new DataNotExistException("Invalid reques: Product not found");
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        if(!product.getShop().getUser().getUsername().equals(username)) {
+            throw new RuntimeException("Invalid request: not your shop's product");
+        }
+        productService.delete(product);
     }
 
     public Page<ShopOrderDTO> getShopOrders(int type,
@@ -150,7 +176,7 @@ public class ShopFacadeService {
         orderService.saveAllShopOrders(List.of(shopOrder));
     }
 
-    public void addProduct(AddProductDTO productDTO) throws RuntimeException {
+    public void addProduct(SaveProductDTO productDTO) throws RuntimeException {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userService.findByUsername(username);
         Shop shop = shopService.findByUser(user);
@@ -159,7 +185,6 @@ public class ShopFacadeService {
         product.setCreatedAt(new Date());
         Category category = ModelMapper.getInstance().map(productDTO.getCategory(), Category.class);
         product.setCategory(category);
-
         for(ProductSKU sku : product.getSkuList()){
             sku.setProduct(product);
             productService.addProductAttributeList(sku.getAttributes());
@@ -169,12 +194,35 @@ public class ShopFacadeService {
         productService.saveProduct(product);
     }
 
+    public void updateProduct(SaveProductDTO dto) throws RuntimeException {
+        Product product = productService.findById(dto.getProductId());
+        if(product == null){
+            throw new DataNotExistException("Invalid request: product not found");
+        }
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        if(!product.getShop().getUser().getUsername().equals(username)){
+            throw new RuntimeException("Invalid request: not your shop's product");
+        }
+        Product updatedProd = ModelMapper.getInstance().map(dto, Product.class);
+        updatedProd.setId(product.getId());
+        updatedProd.setUpdatedAt(new Date());
+        updatedProd.setCreatedAt(product.getCreatedAt());
+        updatedProd.setShop(product.getShop());
+        for(ProductSKU sku : updatedProd.getSkuList()){
+            sku.setProduct(updatedProd);
+            productService.addProductAttributeList(sku.getAttributes());
+        }
+        productService.addProductMediaList(updatedProd.getMediaList());
+        productService.addProductSKUList(updatedProd.getSkuList());
+        productService.saveProduct(updatedProd);
+    }
+
     public Page<ShopProductTableResponseDTO> getProductList(int page, int limit){
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userService.findByUsername(username);
         Shop shop = shopService.findByUser(user);
         Pageable pageable = PageRequest.of(page, limit);
-        Page<Product> productList = productService.findByShop(shop, pageable);
+        Page<Product> productList = productService.findForShopProductTable(shop, pageable);
         return productList.map(
                 this::toProductTableDTO
         );
@@ -197,6 +245,9 @@ public class ShopFacadeService {
         dto.setVisible(product.isVisible());
         dto.setCreatedAt(product.getCreatedAt());
         dto.setUpdatedAt(product.getUpdatedAt());
+        ProductSaleInfo saleInfo = orderService.getProductSaleInfo(product.getId());
+        dto.setRevenue(saleInfo.getRevenue());
+        dto.setSold(saleInfo.getSold());
         if(!product.getSkuList().isEmpty()){
             for(ProductSKU sku : product.getSkuList()){
                 dto.setQuantity(dto.getQuantity() + sku.getQuantity());

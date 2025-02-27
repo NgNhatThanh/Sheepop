@@ -17,7 +17,7 @@ public class ProductController {
     @GetMapping("/{productId}")
     public ResponseEntity<?> getProduct(@PathVariable("productId") String productId) {
         try{
-            return ResponseEntity.ok(productFacadeService.getProduct(productId));
+            return ResponseEntity.ok(productFacadeService.getProduct(productId, false));
         }
         catch (DataNotExistException e){
             return ResponseEntity.notFound().build();

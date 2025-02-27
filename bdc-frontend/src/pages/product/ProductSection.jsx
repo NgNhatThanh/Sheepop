@@ -5,7 +5,7 @@ import {fetchWithAuth} from '../../util/AuthUtil'
 import { toast, ToastContainer } from 'react-toastify';
 import { FaStar, FaRegStar, FaStarHalfAlt } from "react-icons/fa";
 
-export default function ProductSection({product}){
+export default function ProductSection({product, isPreview}){
 
     const minPrice = product.price
     const [variationDisplay, setVariationDisplay] = useState([])
@@ -264,21 +264,23 @@ export default function ProductSection({product}){
                         <p className="text-red-500 text-sm mt-2">{errorMessage}</p>
                     )}
 
-                    <div className="flex gap-4 mt-6">
-                        <button
-                        className='px-6 py-3 text-lg font-bold rounded-sm transition bg-blue-100 text-blue-700 cursor-pointer border-1 border-blue-500 hover:bg-blue-200'
-                        onClick={handleAddToCart}
-                        >
-                        🛒 Thêm vào giỏ hàng
-                        </button>
+                    {!isPreview && (
+                        <div className="flex gap-4 mt-6">
+                            <button
+                            className='px-6 py-3 text-lg font-bold rounded-sm transition bg-blue-100 text-blue-700 cursor-pointer border-1 border-blue-500 hover:bg-blue-200'
+                            onClick={handleAddToCart}
+                            >
+                            🛒 Thêm vào giỏ hàng
+                            </button>
 
-                        <button
-                        className='px-6 py-3 text-lg font-bold rounded-sm transition bg-blue-500 cursor-pointer hover:bg-blue-600 text-white'
-                        onClick={handleBuyNow}
-                        >
-                        ⚡ Mua ngay
-                        </button>
-                    </div>
+                            <button
+                            className='px-6 py-3 text-lg font-bold rounded-sm transition bg-blue-500 cursor-pointer hover:bg-blue-600 text-white'
+                            onClick={handleBuyNow}
+                            >
+                            ⚡ Mua ngay
+                            </button>
+                        </div>
+                    )} 
 
                 </div>
             </div>

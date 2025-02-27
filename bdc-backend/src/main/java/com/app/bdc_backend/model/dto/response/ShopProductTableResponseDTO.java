@@ -21,6 +21,10 @@ public class ShopProductTableResponseDTO {
 
     private int quantity;
 
+    private long revenue;
+
+    private int sold;
+
     private List<ProductSKUResponseDTO> skuList = new ArrayList<>();
 
     private boolean visible;

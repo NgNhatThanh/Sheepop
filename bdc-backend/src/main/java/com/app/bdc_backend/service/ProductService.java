@@ -32,11 +32,11 @@ public class ProductService {
 
     public Page<Product> findAllForHomepage(int page, int limit) {
         Pageable pageable = PageRequest.of(page, limit);
-        return productRepository.findAllByVisible(true, pageable);
+        return productRepository.findAllByVisibleAndDeleted(true, false, pageable);
     }
 
-    public Page<Product> findByShop(Shop shop, Pageable pageable) {
-        return productRepository.findByShop(shop, pageable);
+    public Page<Product> findForShopProductTable(Shop shop, Pageable pageable) {
+        return productRepository.findByShopAndDeleted(shop, false, pageable);
     }
 
     public void addProductSKUList(List<ProductSKU> productSKU) {
@@ -64,7 +64,13 @@ public class ProductService {
     }
 
     public int countProductOfShop(ObjectId shopId){
-        return productRepository.countByShop(shopId);
+        return productRepository.countByShopAndVisibleAndDeleted(shopId, true, false);
+    }
+
+    public void delete(Product product) {
+        product.setVisible(false);
+        product.setDeleted(true);
+        saveProduct(product);
     }
 
 }

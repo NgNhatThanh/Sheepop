@@ -31,9 +31,9 @@ public class ProductFacadeService {
 
     private final OrderService orderService;
 
-    public ProductResponseDTO getProduct(String productId) throws DataNotExistException{
+    public ProductResponseDTO getProduct(String productId, boolean preview) throws DataNotExistException{
         Product product = productService.findById(productId);
-        if(product == null || !product.isVisible()) {
+        if(product == null || (!preview && !product.isVisible())) {
             throw new DataNotExistException("Product not found");
         }
         return toProductResponseDTO(product);

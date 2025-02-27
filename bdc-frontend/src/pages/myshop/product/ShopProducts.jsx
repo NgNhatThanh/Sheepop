@@ -6,6 +6,12 @@ import { formatDate } from '../../../util/DateUtil'
 import { BASE_API_URL } from "../../../constants";
 import Pagination from "../../common/Pagination";
 import { ToastContainer, toast } from "react-toastify";
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 
 const tabs = [
     "Tất cả",
@@ -20,6 +26,8 @@ export default function ShopProducts(){
     const searchParams = new URLSearchParams(location.search);
     const currentType = parseInt(searchParams.get("type")) || 0;
 
+    const [changeVisibleProductId, setChangeVisibleProductId] = useState(null)
+    const [deleteProductId, setDeleteProductId] = useState(null)
     const [openOtherActionDropdowm, setOpenOtherActionDropdown] = useState({})
     const [page, setPage] = useState(1)
     const [limit, setLimit] = useState(10)
@@ -67,6 +75,21 @@ export default function ShopProducts(){
                 setProducts(updateProd)
             })
             .catch(() => toast.error('Có lỗi xảy ra, vui lòng thử lại sau!'))
+    }
+
+    const handleDeleteProduct = (productId) => {
+        fetchWithAuth(`${BASE_API_URL}/v1/shop/product/delete/${productId}`, window.location, true, {
+            method: "POST"
+        })
+            .then(res => {
+                if(!res.ok){
+                    toast.error("Có lỗi xảy ra, vui lòng thử lại sau!")
+                    return
+                }
+                toast.success("Xóa sản phẩm thành công")
+                setProducts(prev => prev.filter(prod => prod.id !== productId))
+            })
+            .catch(() => toast.error("Có lỗi xảy ra, vui lòng thử lại sau!"))
     }
     
     useEffect(() => {
@@ -147,8 +170,9 @@ export default function ShopProducts(){
                             <th className="border border-gray-300 p-2">Tên</th>
                             <th className="border border-gray-300 p-2">Giá</th>
                             <th className="border border-gray-300 p-2">Kho hàng</th>
+                            <th className="border border-gray-300 p-2">Doanh thu</th>
+                            <th className="border border-gray-300 p-2">Đã bán</th>
                             <th className="border border-gray-300 p-2">Thời gian tạo</th>
-                            <th className="border border-gray-300 p-2">Cập nhật lần cuối</th>
                             <th className="border border-gray-300 p-2">Thao tác</th>
                         </tr>
                     </thead>
@@ -183,13 +207,19 @@ export default function ShopProducts(){
                                     <p className="mr-auto">{product.name}</p>
                                 </div>
                             </td>
-                            <td className="border border-gray-300 p-2 text-center">{product.skuList.length > 0 ? '---' : product.price}</td>
+                            <td className="border border-gray-300 p-2 text-center">{product.skuList.length > 0 ? '---' : product.price.toLocaleString() + ' VND'}</td>
                             <td className="border border-gray-300 p-2 text-center">{product.quantity}</td>
+                            <td className="border border-gray-300 p-2 text-center">{product.revenue.toLocaleString()} VND</td>
+                            <td className="border border-gray-300 p-2 text-center">{product.sold}</td>
                             <td className="border border-gray-300 p-2 text-center">{formatDate(product.createdAt)}</td>
-                            <td className="border border-gray-300 p-2 text-center">{product.updatedAt ? formatDate(product.updatedAt) : '---'}</td>
                             <td className="border border-gray-300 p-2">
                             <div className="flex flex-col gap-1">
-                                <button className="text-white cursor-pointer rounded-xs bg-blue-400 p-1 hover:bg-blue-500">Chỉnh sửa</button>
+                                <Link 
+                                    to={`../product/${product.id}`}
+                                    className="text-white text-center cursor-pointer rounded-xs bg-blue-400 p-1 hover:bg-blue-500"
+                                >
+                                    Chỉnh sửa
+                                </Link>
                                 {product.skuList.length > 0 && 
                                 <button
                                     className="cursor-pointer rounded-xs border-1 border-gray-700 p-1 hover:bg-gray-100"
@@ -216,21 +246,22 @@ export default function ShopProducts(){
                                             <li
                                                 className="px-2 py-1 cursor-pointer hover:bg-gray-200"
                                                 onClick={() => {
-                                                    window.open(`/product/${encodeURIComponent(product.name.replace(/\s+/g, "-"))}.${product.id}`, '_blank')
+                                                    window.open(`/preview/${product.id}`, '_blank')
                                                 }}
                                             >
-                                                Xem trang
+                                                Xem trước
                                             </li>
 
                                             <li
                                                 className="px-2 py-1 cursor-pointer hover:bg-gray-200"
-                                                onClick={() => changeProductVisible(product.id)}
+                                                onClick={() => setChangeVisibleProductId(product.id)}
                                             >
                                                 {product.visible ? 'Ẩn' : 'Hiện'}
                                             </li>
 
                                             <li
                                                 className="px-2 py-1 cursor-pointer text-red-500 hover:bg-gray-200"
+                                                onClick={() => setDeleteProductId(product.id)}   
                                             >
                                                 Xóa
                                             </li>
@@ -252,11 +283,63 @@ export default function ShopProducts(){
                                 ))}
                                 SKU: {skuProduct.sku}
                             </td>
-                            <td className="border border-gray-300 p-2 text-center">{skuProduct.price}</td>
+                            <td className="border border-gray-300 p-2 text-center">{skuProduct.price.toLocaleString()} VND</td>
                             <td className="border border-gray-300 p-2 text-center">{skuProduct.quantity}</td>
                             </tr>
                             ))
                         )}
+
+                        <Dialog
+                            open={changeVisibleProductId !== null}
+                            onclose={() => setChangeVisibleProductId(null)}
+                            aria-labelledby="alert-dialog-title"
+                            aria-describedby="alert-dialog-description"
+                        >
+                            <DialogTitle id="alert-dialog-title">
+                                {"Thay đổi hiển thị sản phẩm?"}
+                            </DialogTitle>
+                            <DialogContent>
+                                <DialogContentText id="alert-dialog-description">
+                                    Người mua sẽ không nhìn thấy và mua được sản phẩm của bạn nếu bạn ẩn đi,
+                                    và ngược lại
+                                </DialogContentText>
+                            </DialogContent>
+                            <DialogActions>
+                                <Button onClick={() => setChangeVisibleProductId(null)}>Hủy</Button>
+                                <Button onClick={() => {
+                                    changeProductVisible(changeVisibleProductId)
+                                    setChangeVisibleProductId(null)
+                                }} autoFocus>
+                                Đồng ý
+                                </Button>
+                            </DialogActions>
+                        </Dialog>
+
+                        <Dialog
+                            open={deleteProductId !== null}
+                            onclose={() => setDeleteProductId(null)}
+                            aria-labelledby="alert-dialog-title"
+                            aria-describedby="alert-dialog-description"
+                        >
+                            <DialogTitle id="alert-dialog-title">
+                                {"Xóa sản phẩm?"}
+                            </DialogTitle>
+                            <DialogContent>
+                                <DialogContentText id="alert-dialog-description">
+                                    Thao tác này sẽ xóa hoàn toàn sản phẩm của bạn, và không thể hoàn tác
+                                </DialogContentText>
+                            </DialogContent>
+                            <DialogActions>
+                                <Button onClick={() => setDeleteProductId(null)}>Hủy</Button>
+                                <Button onClick={() => {
+                                    handleDeleteProduct(deleteProductId)
+                                    setDeleteProductId(null)
+                                }} autoFocus>
+                                Đồng ý
+                                </Button>
+                            </DialogActions>
+                        </Dialog>
+
                         </React.Fragment>
                     ))}
                     </tbody>

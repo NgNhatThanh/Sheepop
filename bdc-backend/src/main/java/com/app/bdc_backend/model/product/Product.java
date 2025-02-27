@@ -52,4 +52,6 @@ public class Product {
 
     private Date updatedAt;
 
+    private boolean deleted = false;
+
 }

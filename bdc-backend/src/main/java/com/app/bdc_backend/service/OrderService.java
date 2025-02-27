@@ -4,6 +4,7 @@ import com.app.bdc_backend.dao.order.OrderItemRepository;
 import com.app.bdc_backend.dao.order.OrderRerpository;
 import com.app.bdc_backend.dao.shop.ShopOrderRepository;
 import com.app.bdc_backend.model.dto.ShopOrderPageImpl;
+import com.app.bdc_backend.model.dto.response.ProductSaleInfo;
 import com.app.bdc_backend.model.enums.PaymentStatus;
 import com.app.bdc_backend.model.enums.ShopOrderStatus;
 import com.app.bdc_backend.model.order.Order;
@@ -47,6 +48,10 @@ public class OrderService {
 
     public ShopOrder getShopOrderById(String id){
         return shopOrderRepository.findById(id).orElse(null);
+    }
+
+    public ProductSaleInfo getProductSaleInfo(ObjectId productId){
+        return orderItemRepository.getProductSaleInfo(productId);
     }
 
     public List<Order> getLastByUser(User user, int offset, int limit){

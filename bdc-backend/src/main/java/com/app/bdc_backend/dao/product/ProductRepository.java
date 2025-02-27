@@ -11,10 +11,10 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ProductRepository extends MongoRepository<Product, String> {
 
-    int countByShop(ObjectId shopId);
+    int countByShopAndVisibleAndDeleted(ObjectId shopId, boolean visible, boolean deleted);
 
-    Page<Product> findByShop(Shop shop, Pageable pageable);
+    Page<Product> findByShopAndDeleted(Shop shop, boolean deleted, Pageable pageable);
 
-    Page<Product> findAllByVisible(boolean visible, Pageable pageable);
+    Page<Product> findAllByVisibleAndDeleted(boolean visible, boolean deleted, Pageable pageable);
 
 }

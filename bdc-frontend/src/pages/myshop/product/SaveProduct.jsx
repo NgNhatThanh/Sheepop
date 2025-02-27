@@ -7,16 +7,16 @@ import { uploadImage } from "../../../util/UploadUtil.js"
 import { FaUpload, FaTimes, FaPlus, FaTrash } from "react-icons/fa"
 import { ToastContainer, toast } from "react-toastify"
 
-export default function AddProduct() {
-  
+export default function SaveProduct({ curProduct }) {
+
   const [productDetails, setProductDetails] = useState({
-    name: "",
-    description: "",
-    thumbnailUrl: "",
-    price: "",
-    quantity: "",
-    weight: "",
-    visible: true,
+    name: curProduct ? curProduct.name : "",
+    description: curProduct ? curProduct.description : "",
+    thumbnailUrl: curProduct ? curProduct.thumbnailUrl : "",
+    price: curProduct ? curProduct.price : "",
+    quantity: curProduct ? curProduct.quantity : "",
+    weight: curProduct ? curProduct.weight : "",
+    visible: curProduct ? curProduct.visible : true,
   })
 
   const updateProductDetails = (field, value) => {
@@ -26,13 +26,42 @@ export default function AddProduct() {
     }))
   }
 
-  const [galleryImages, setGalleryImages] = useState([])
-  const [variantAttributes, setVariantAttributes] = useState([])
-  const [variants, setVariants] = useState([])
+  const [galleryImages, setGalleryImages] = useState(
+    curProduct ? curProduct.mediaList.map(media => media.url) : []
+  )
+  const [variantAttributes, setVariantAttributes] = useState(
+    curProduct ? extractAttributes(curProduct.skuList) : []
+  )
+  const [variants, setVariants] = useState(
+    curProduct ? curProduct.skuList.map(sku => ({
+      attributes: sku.attributes,
+      price: sku.price,
+      quantity: sku.quantity,
+      sku: sku.sku
+    })) : []
+  )
   const [categorySearch, setCategorySearch] = useState("")
   const [categories, setCategories] = useState([])
-  const [selectedCategory, setSelectedCategory] = useState(null)
+  const [selectedCategory, setSelectedCategory] = useState(curProduct ? curProduct.category : null)
   const [isDropdownVisible, setDropdownVisible] = useState(false)
+
+  function extractAttributes(skuList) {
+    const attributeMap = new Map();
+
+    skuList.forEach(sku => {
+        sku.attributes.forEach(attr => {
+            if (!attributeMap.has(attr.name)) {
+                attributeMap.set(attr.name, new Set());
+            }
+            attributeMap.get(attr.name).add(attr.value);
+        });
+    });
+
+    return Array.from(attributeMap, ([name, values]) => ({
+        name,
+        values: Array.from(values),
+    }));
+  } 
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -157,12 +186,13 @@ export default function AddProduct() {
 
     const product = {
       ...productDetails,
+      productId: curProduct ? curProduct.id: null,
       mediaList: mediaList,
       category: selectedCategory,
       skuList: variants,
     }
 
-    fetchWithAuth(`${BASE_API_URL}/v1/shop/product/add`, window.location, true, {
+    fetchWithAuth(`${BASE_API_URL}/v1/shop/product/${curProduct ? 'update' : 'add'}`, window.location, true, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -185,8 +215,9 @@ export default function AddProduct() {
 
   return (
     <div className="container px-4 py-8 bg-white rounded-sm">
+
       <div className="mb-6">
-        <h2 className="text-2xl font-bold">Sản phẩm mới</h2>
+        <h2 className="text-2xl font-bold">Thông tin sản phẩm</h2>
       </div>
 
       <div className="mb-4">
@@ -383,7 +414,7 @@ export default function AddProduct() {
                   <td className="px-4 py-2">
                     <input
                       type="text"
-                      value={variant.price}
+                      value={variant.price.toLocaleString()}
                       onChange={(e) => handleVariantChange(index, "price", e.target.value)}
                       placeholder="Giá"
                       className="w-full px-2 py-1 border border-gray-300 rounded"
@@ -420,7 +451,7 @@ export default function AddProduct() {
               <label className="block text-sm font-medium text-gray-700 mb-1">Price</label>
               <input
                 type="number"
-                value={productDetails.price}
+                value={productDetails.price.toLocaleString()}
                 onChange={(e) => updateProductDetails("price", e.target.value)}
                 placeholder="Giá"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -480,12 +511,15 @@ export default function AddProduct() {
         </div>
       </div>
 
-      <button
-        onClick={handleAddProduct}
-        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-      >
-        Thêm
-      </button>
+      <div className="flex justify-center">
+        <button
+          onClick={handleAddProduct}
+          className="bg-blue-500 w-50 cursor-pointer hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        >
+          Lưu
+        </button>
+      </div>
+      
       <ToastContainer
         position="bottom-right"
       />

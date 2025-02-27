@@ -10,7 +10,7 @@ const RegisterPage = lazy(() => import("./pages/register/index.jsx"))
 const HandleRedirect = lazy(() => import("./pages/login/HandleOauthRedirect.jsx"))
 const MyShopLayout = lazy(() => import ('./pages/myshop/MyShopLayout.jsx'))
 const ShopProducts = lazy(() => import('./pages/myshop/product/ShopProducts.jsx'));
-const AddProduct = lazy(() => import('./pages/myshop/product/AddProduct.jsx'));
+const SaveProduct = lazy(() => import('./pages/myshop/product/SaveProduct.jsx'));
 const ShopOrder = lazy(() => import('./pages/myshop/order/ShopOrder.jsx'));
 const ShopDashboard = lazy(() => import('./pages/myshop/ShopDashboard.jsx'));
 const ProductPage = lazy(() => import('./pages/product/ProductPage.jsx'));
@@ -25,6 +25,8 @@ const OrdersPage = lazy(() => import('./pages/profile/OrdersPage.jsx'));
 const OrderDetail = lazy(() => import('./pages/profile/OrderDetail.jsx'));
 const ShopShipping = lazy(() => import('./pages/myshop/setting/ShopShipping.jsx'));
 const ShopProfile = lazy(() => import('./pages/myshop/setting/ShopProfile.jsx'));
+const PreviewProductPage = lazy(() => import('./pages/myshop/product/PreviewProductPage.jsx'))
+const ProductEdit = lazy(() => import('./pages/myshop/product/ProductEdit.jsx'));
 
 function App() {
 
@@ -56,7 +58,8 @@ function App() {
           <Route path='/redirect/:target' element={<HandleRedirect/>}/>
           <Route path='/myshop' element={<MyShopLayout isAuthenticated={isAuthenticated}/>}>
             <Route path='dashboard' element={<ShopDashboard/>}/>
-            <Route path='add-product' element={<AddProduct/>}/>
+            <Route path='add-product' element={<SaveProduct/>}/>
+            <Route path='product/:productId' element={<ProductEdit/>}/>
             <Route path='product-list' element={<ShopProducts/>}/>
             <Route path='order-list' element={<ShopOrder/>}/>
             <Route path="setting">
@@ -66,6 +69,7 @@ function App() {
           </Route>
           <Route path='/' element={<MainLayout isAuthenticated={isAuthenticated}/>}>
             <Route path='' element={<HomePage/>}/>
+            <Route path='preview/:productId' element={<PreviewProductPage/>}/>
             <Route path='product/:productInfo' element={<ProductPage/>}/>
             <Route path='cart' element={<CartPage/>}/>
             <Route path='checkout/success' element={<SuccessPage/>}/>

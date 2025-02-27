@@ -1,10 +1,7 @@
 package com.app.bdc_backend.model.order;
 
-import com.app.bdc_backend.model.enums.OrderStatus;
 import com.app.bdc_backend.model.product.Product;
 import com.app.bdc_backend.model.product.ProductAttribute;
-import com.app.bdc_backend.model.product.ProductSKU;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;

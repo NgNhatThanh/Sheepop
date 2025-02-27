@@ -50,7 +50,7 @@ public class CartFacadeService {
     public void addToCart(AddToCartDTO dto) throws Exception{
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         Product product = productService.findById(dto.getProductId());
-        if(product == null){
+        if(product == null || !product.isVisible()){
             log.warn("Add to cart error: Product not found");
             throw new Exception("Product not found");
         }
@@ -84,6 +84,10 @@ public class CartFacadeService {
         else{
             List<CartItem> uptList = new ArrayList<>();
             for(CartItem item : cart.getItems()){
+                if(!item.getProduct().isVisible()){
+                    cart.getItems().remove(item);
+                    continue;
+                }
                 item.setProduct(productService.findById(item.getProduct().getId().toString()));
                 if(item.getQuantity() > getItemStock(item)){
                     item.setSelected(false);
