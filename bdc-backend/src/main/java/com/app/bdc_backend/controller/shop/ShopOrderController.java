@@ -8,8 +8,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/shop/order")
@@ -23,34 +21,22 @@ public class ShopOrderController {
                                               @RequestParam(value = "keyword", defaultValue = "") String keyword,
                                               @RequestParam(value = "page") int page,
                                               @RequestParam (value = "limit") int limit){
-        try{
-            Page<ShopOrderDTO> shopOrderDTOS = shopFacadeService.getShopOrders(
-                    type,
-                    filterType,
-                    keyword,
-                    page,
-                    limit
-            );
-            PageResponse<ShopOrderDTO> response = new PageResponse<>(shopOrderDTOS);
-            return ResponseEntity.ok(response);
-        }
-        catch (Exception e){
-            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
-        }
+        Page<ShopOrderDTO> shopOrderDTOS = shopFacadeService.getShopOrders(
+                type,
+                filterType,
+                keyword,
+                page,
+                limit
+        );
+        PageResponse<ShopOrderDTO> response = new PageResponse<>(shopOrderDTOS);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/update")
     public ResponseEntity<?> updateOrderStatus(@RequestParam(value = "shopOrderId") String shopOrderId,
-                                               @RequestParam(value = "currentStatus") int currentStatus){
-        try{
-            shopFacadeService.updateOrder(shopOrderId, currentStatus);
-            return ResponseEntity.ok().build();
-        }
-        catch (Exception e){
-            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
-        }
+                                               @RequestParam(value = "currentStatus") int currentStatus) {
+        shopFacadeService.updateOrder(shopOrderId, currentStatus);
+        return ResponseEntity.ok().build();
     }
-
-
 
 }

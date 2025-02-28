@@ -1,5 +1,6 @@
 package com.app.bdc_backend.service;
 
+import com.app.bdc_backend.exception.ServerException;
 import com.app.bdc_backend.model.dto.response.OauthUserDTO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -33,7 +34,7 @@ public class Oauth2Service {
     @Value("${google.redirect-uri}")
     private String googleRedirectUri;
 
-    public OauthUserDTO getOauth2Profile(String code, String provider) throws Exception {
+    public OauthUserDTO getOauth2Profile(String code, String provider) throws ServerException {
         RestTemplate restTemplate = new RestTemplate();
         String oauth2AccessToken;
         switch (provider){
@@ -49,8 +50,8 @@ public class Oauth2Service {
                 headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
                 HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(requestBody, headers);
-                ResponseEntity<String> response = restTemplate.postForEntity(googleTokenEndpoint, requestEntity, String.class);
-                if (response.getStatusCode() == HttpStatus.OK) {
+                try{
+                    ResponseEntity<String> response = restTemplate.postForEntity(googleTokenEndpoint, requestEntity, String.class);
                     Map<String, Object> tokenInfo = convertJsonToMap(response.getBody());
                     oauth2AccessToken = tokenInfo.get("access_token").toString();
                     restTemplate.getInterceptors().add((req, body, executionContext) -> {
@@ -64,8 +65,9 @@ public class Oauth2Service {
                     userDTO.setUsername(userDTO.getEmail().split("@")[0]);
                     userDTO.setAvatarUrl((String) res.get("picture"));
                     return userDTO;
-                } else {
-                    throw new Exception("Failed to get tokens: " + response.getStatusCode());
+                }
+                catch (Exception e){
+                    throw new ServerException("Server Error");
                 }
         }
         return null;

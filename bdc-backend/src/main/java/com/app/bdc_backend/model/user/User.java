@@ -9,6 +9,7 @@ import lombok.Setter;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.DocumentReference;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -41,8 +42,13 @@ public class User {
 
     private Date createdAt;
 
+    @DocumentReference
+    private Role role;
+
     private boolean fromSocial = false;
 
     private Date dob;
+
+    private boolean deleted = false;
 
 }

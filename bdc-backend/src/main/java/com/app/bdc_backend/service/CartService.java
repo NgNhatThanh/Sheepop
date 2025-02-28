@@ -2,7 +2,7 @@ package com.app.bdc_backend.service;
 
 import com.app.bdc_backend.dao.cart.CartItemRepository;
 import com.app.bdc_backend.dao.cart.CartRepository;
-import com.app.bdc_backend.exception.AddToCartException;
+import com.app.bdc_backend.exception.RequestException;
 import com.app.bdc_backend.model.cart.Cart;
 import com.app.bdc_backend.model.cart.CartItem;
 import com.app.bdc_backend.model.product.Product;
@@ -34,21 +34,21 @@ public class CartService {
 
     public Cart addToCart(Cart cart, Product product, int quantity, List<ProductAttribute> attributes){
         if(product.getSkuList().isEmpty() && quantity > product.getQuantity())
-            throw new AddToCartException("Không thể thêm sản phẩm do số lượng vượt quá số lượng còn lại: " + product.getQuantity());
+            throw new RequestException("Không thể thêm sản phẩm do số lượng vượt quá số lượng còn lại: " + product.getQuantity());
         for(ProductSKU sku : product.getSkuList()){
             if(new HashSet<>(sku.getAttributes()).containsAll(attributes)){
                 if(quantity > sku.getQuantity())
-                    throw new AddToCartException("Không thể thêm sản phẩm do số lượng vượt quá số lượng còn lại: " + sku.getQuantity());
+                    throw new RequestException("Không thể thêm sản phẩm do số lượng vượt quá số lượng còn lại: " + sku.getQuantity());
             }
         }
         for(CartItem it : cart.getItems()){
             if(it.getProduct().equals(product) && new HashSet<>(it.getAttributes()).containsAll(attributes)){
                 if(product.getSkuList().isEmpty() && it.getQuantity() + quantity > product.getQuantity())
-                    throw new AddToCartException("Không thể thêm sản phẩm do tổng số lượng vượt quá số lượng còn lại: " + product.getQuantity());
+                    throw new RequestException("Không thể thêm sản phẩm do tổng số lượng vượt quá số lượng còn lại: " + product.getQuantity());
                 for(ProductSKU sku : product.getSkuList()){
                     if(new HashSet<>(sku.getAttributes()).containsAll(attributes)){
                         if(it.getQuantity() + quantity > sku.getQuantity())
-                            throw new AddToCartException("Không thể thêm sản phẩm do tổng số lượng vượt quá số lượng còn lại: " + sku.getQuantity());
+                            throw new RequestException("Không thể thêm sản phẩm do tổng số lượng vượt quá số lượng còn lại: " + sku.getQuantity());
                     }
                 }
                 it.setQuantity(it.getQuantity() + quantity);

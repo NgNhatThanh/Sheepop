@@ -6,7 +6,7 @@ import { IoSettings } from "react-icons/io5";
 
 const menuList = [
   {
-    title: "Dashboard",
+    title: "Trang chủ",
     icon: <FaTachometerAlt/>,
     to: 'dashboard' 
   },

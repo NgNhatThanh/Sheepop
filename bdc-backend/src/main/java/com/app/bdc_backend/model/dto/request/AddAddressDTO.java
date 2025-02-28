@@ -12,6 +12,8 @@ public class AddAddressDTO {
 
     private String receiverName;
 
+    private String senderName;
+
     private String phoneNumber;
 
     private String province;

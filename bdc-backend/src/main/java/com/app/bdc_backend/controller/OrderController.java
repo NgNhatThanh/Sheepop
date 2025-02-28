@@ -20,69 +20,34 @@ public class OrderController {
 
     @PostMapping("/place_order")
     public ResponseEntity<?> placeOrder(@RequestBody Map<String, Object> body) {
-        try{
-            Order order = orderFacadeService.placeOrder(body);
-            return ResponseEntity.ok().body(Map.of(
-                    "order_id", order.getId().toString()
-            ));
-        }
-        catch (Exception e){
-            return ResponseEntity.badRequest().body(Map.of(
-                    "message", e.getMessage()
-            ));
-        }
+        Order order = orderFacadeService.placeOrder(body);
+        return ResponseEntity.ok().body(Map.of(
+                "order_id", order.getId().toString()
+        ));
     }
 
     @GetMapping("/get_order_list")
     public ResponseEntity<?> getOrderList(@RequestParam(value = "type") int type,
                                           @RequestParam(value = "limit") int limit,
                                           @RequestParam(value = "offset") int offset) {
-        try{
-            return ResponseEntity.ok(orderFacadeService.getOrderList(type, limit, offset));
-        }
-        catch (Exception e){
-            return ResponseEntity.badRequest().body(Map.of(
-                    "message", e.getMessage()
-            ));
-        }
+        return ResponseEntity.ok(orderFacadeService.getOrderList(type, limit, offset));
     }
 
     @GetMapping("/detail")
     public ResponseEntity<?> detail(@RequestParam("shopOrderId") String shopOrderId) {
-        try{
-            return ResponseEntity.ok(orderFacadeService.getOrderDetail(shopOrderId));
-        }
-        catch (Exception e){
-            return ResponseEntity.badRequest().body(Map.of(
-                    "message", e.getMessage()
-            ));
-        }
+        return ResponseEntity.ok(orderFacadeService.getOrderDetail(shopOrderId));
     }
 
     @PostMapping("/mark_as_received")
     public ResponseEntity<?> markOrderAsReceived(@RequestParam(value = "shopOrderId") String shopOrderId){
-        try{
-            orderFacadeService.markOrderAsReceived(shopOrderId);
-            return ResponseEntity.ok().build();
-        }
-        catch (Exception e){
-            return ResponseEntity.badRequest().body(Map.of(
-                    "message", e.getMessage()
-            ));
-        }
+        orderFacadeService.markOrderAsReceived(shopOrderId);
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/cancel")
     public ResponseEntity<?> cancelOrder(@RequestBody OrderCancelationDTO dto) {
-        try{
-            orderFacadeService.cancelOrder(dto);
-            return ResponseEntity.ok().build();
-        }
-        catch (Exception e){
-            return ResponseEntity.badRequest().body(Map.of(
-                    "message", e.getMessage()
-            ));
-        }
+        orderFacadeService.cancelOrder(dto);
+        return ResponseEntity.ok().build();
     }
 
 }

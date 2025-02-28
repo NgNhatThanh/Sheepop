@@ -25,15 +25,10 @@ public class CartController {
 
     @PostMapping("/add-to-cart")
     public ResponseEntity<?> addToCart(@RequestBody AddToCartDTO dto) {
-        try{
-            cartFacadeService.addToCart(dto);
-            return ResponseEntity.ok().body(Map.of(
-                    "msg", "Successfully added to cart"
-            ));
-        }
-        catch (Exception e){
-            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
-        }
+        cartFacadeService.addToCart(dto);
+        return ResponseEntity.ok().body(Map.of(
+                "msg", "Successfully added to cart"
+        ));
     }
 
     @GetMapping("/get")

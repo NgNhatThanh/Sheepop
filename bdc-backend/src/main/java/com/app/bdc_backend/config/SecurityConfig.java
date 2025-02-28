@@ -1,17 +1,14 @@
 package com.app.bdc_backend.config;
 
 import com.app.bdc_backend.filter.JwtAuthFilter;
-import com.app.bdc_backend.service.MyUserDetailService;
+import com.app.bdc_backend.model.enums.RoleName;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -34,6 +31,15 @@ public class SecurityConfig {
 
     private CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
+    private static final String[] PUBLIC_ENDPOINTS = {
+            "/api/v1/auth/**",
+            "/api/v1/shop/info/**",
+            "/api/v1/shop/base/**",
+            "/api/v1/common/**",
+            "/api/v1/product/**",
+            "/api/v1/homepage/**",
+            "/api/v1/review/get_review_list"};
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -49,14 +55,10 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers("/api/v1/admin/**").hasAuthority(RoleName.ADMIN.toString())
                         .requestMatchers("/api/v1/auth/ping").authenticated()
-                        .requestMatchers("/api/v1/auth/**", "/api/v1/shop/info/**",
-                                "/api/v1/shop/base/**",
-                                "/api/v1/common/**",
-                                "/api/v1/product/**",
-                                "/api/v1/homepage/**",
-                                "/api/v1/review/get_review_list").permitAll()
                         .requestMatchers("/api/v1/auth/logout").authenticated()
+                        .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
                         .anyRequest().authenticated())
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session ->

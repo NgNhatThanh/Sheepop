@@ -20,36 +20,22 @@ public class ShopProductController {
     private final ShopFacadeService shopFacadeService;
 
     @PostMapping("/add")
-    public ResponseEntity<?> addProduct(@RequestBody SaveProductDTO productDTO) {
-        try{
-            shopFacadeService.addProduct(productDTO);
-            return ResponseEntity.ok().build();
-        }
-        catch (RuntimeException e){
-            return ResponseEntity.badRequest().body(Map.of(
-                    "message", e.getMessage()
-            ));
-        }
+    public ResponseEntity<?> addProduct(@RequestBody SaveProductDTO productDTO) throws RuntimeException {
+        shopFacadeService.addProduct(productDTO);
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/update")
-    public ResponseEntity<?> updateProduct(@RequestBody SaveProductDTO productDTO) {
-        try{
-            if(productDTO.getProductId() == null){
-                throw new RuntimeException("Product ID is null");
-            }
-            shopFacadeService.updateProduct(productDTO);
-            return ResponseEntity.ok().build();
+    public ResponseEntity<?> updateProduct(@RequestBody SaveProductDTO productDTO) throws RuntimeException {
+        if(productDTO.getProductId() == null){
+            throw new RuntimeException("Product ID is null");
         }
-        catch (RuntimeException e){
-            return ResponseEntity.badRequest().body(Map.of(
-                    "message", e.getMessage()
-            ));
-        }
+        shopFacadeService.updateProduct(productDTO);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/{productId}")
-    public ResponseEntity<?> getProductForEdit(@PathVariable String productId) {
+    public ResponseEntity<?> getProductForEdit(@PathVariable String productId) throws RuntimeException {
         Product product = shopFacadeService.getProductForEdit(productId);
         if(product == null){
             return ResponseEntity.notFound().build();
@@ -66,31 +52,19 @@ public class ShopProductController {
     }
 
     @PostMapping("/change_visible")
-    public ResponseEntity<?> changeVisible(@RequestParam String productId){
-        try{
-            shopFacadeService.changeProductVisible(productId);
-            return ResponseEntity.ok().build();
-        }
-        catch (Exception e){
-            return ResponseEntity.badRequest().body(Map.of(
-                    "message", e.getMessage()
-            ));
-        }
+    public ResponseEntity<?> changeVisible(@RequestParam String productId) {
+        shopFacadeService.changeProductVisible(productId);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/preview/{productId}")
-    public ResponseEntity<?> preview(@PathVariable String productId) {
+    public ResponseEntity<?> preview(@PathVariable String productId){
         if(productId == null || productId.isEmpty()){
             return ResponseEntity.badRequest().body(Map.of(
                 "message", "Invalid request: param"
             ));
         }
-        try{
-            return ResponseEntity.ok(shopFacadeService.previewProduct(productId));
-        }
-        catch (RuntimeException e){
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(shopFacadeService.previewProduct(productId));
     }
 
     @PostMapping("/delete/{productId}")
@@ -100,15 +74,8 @@ public class ShopProductController {
                     "message", "Invalid request: param"
             ));
         }
-        try{
-            shopFacadeService.deleteProduct(productId);
-            return ResponseEntity.ok().build();
-        }
-        catch (RuntimeException e){
-            return ResponseEntity.badRequest().body(Map.of(
-                    "message", e.getMessage()
-            ));
-        }
+        shopFacadeService.deleteProduct(productId);
+        return ResponseEntity.ok().build();
     }
 
 }

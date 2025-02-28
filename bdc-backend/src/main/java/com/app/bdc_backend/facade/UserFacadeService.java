@@ -1,5 +1,6 @@
 package com.app.bdc_backend.facade;
 
+import com.app.bdc_backend.exception.RequestException;
 import com.app.bdc_backend.model.address.District;
 import com.app.bdc_backend.model.address.Province;
 import com.app.bdc_backend.model.address.Ward;
@@ -36,10 +37,10 @@ public class UserFacadeService {
         return response;
     }
 
-    public UserResponseDTO updateProfile(UpdateProfileDTO dto) throws Exception{
+    public UserResponseDTO updateProfile(UpdateProfileDTO dto){
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         if(!username.equals(dto.getUsername())){
-            throw new Exception("Invalid request: username");
+            throw new RequestException("Invalid request: username");
         }
         User user = userService.findByUsername(username);
         user.setDob(dto.getDob());
@@ -55,7 +56,7 @@ public class UserFacadeService {
         return userAddressService.getAddressListByUser(username);
     }
 
-    public UserAddress addAddress(AddAddressDTO dto) throws RuntimeException {
+    public UserAddress addAddress(AddAddressDTO dto)  {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         UserAddress userAddress;
         userAddress = fromDTOtoAddress(dto);
@@ -77,7 +78,7 @@ public class UserFacadeService {
         return userAddress;
     }
 
-    private UserAddress fromDTOtoAddress(AddAddressDTO dto) throws RuntimeException {
+    private UserAddress fromDTOtoAddress(AddAddressDTO dto)  {
         UserAddress userAddress = new UserAddress();
         userAddress.setPrimary(dto.isPrimary());
         userAddress.setDetail(dto.getDetail());
@@ -85,7 +86,7 @@ public class UserFacadeService {
         userAddress.setReceiverName(dto.getReceiverName());
         Province province = addressService.findProvinceByName(dto.getProvince());
         if(province == null){
-            throw new RuntimeException("Địa chỉ không hợp lệ");
+            throw new RequestException("Địa chỉ không hợp lệ");
         }
         userAddress.setProvince(province);
         List<District> districts = addressService.findDistrictByName(dto.getDistrict());
@@ -98,7 +99,7 @@ public class UserFacadeService {
             }
         }
         if(!okDistrict){
-            throw new RuntimeException("Địa chỉ không hợp lệ");
+            throw new RequestException("Địa chỉ không hợp lệ");
         }
         List<Ward> ward = addressService.findWardByName(dto.getWard());
         boolean okWard = false;
@@ -110,7 +111,7 @@ public class UserFacadeService {
             }
         }
         if(!okWard){
-            throw new RuntimeException("Địa chỉ không hợp lệ");
+            throw new RequestException("Địa chỉ không hợp lệ");
         }
         return userAddress;
     }

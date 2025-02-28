@@ -1,11 +1,12 @@
 package com.app.bdc_backend.facade;
 
-import com.app.bdc_backend.exception.DataNotExistException;
+import com.app.bdc_backend.exception.RequestException;
 import com.app.bdc_backend.model.address.District;
 import com.app.bdc_backend.model.address.Province;
 import com.app.bdc_backend.model.address.Ward;
 import com.app.bdc_backend.model.dto.request.AddAddressDTO;
 import com.app.bdc_backend.model.dto.request.SaveProductDTO;
+import com.app.bdc_backend.model.dto.request.UpdateShopProfileDTO;
 import com.app.bdc_backend.model.dto.response.*;
 import com.app.bdc_backend.model.enums.PaymentStatus;
 import com.app.bdc_backend.model.enums.PaymentType;
@@ -47,11 +48,50 @@ public class ShopFacadeService {
 
     private final ProductFacadeService productFacadeService;
 
-    public ProductResponseDTO previewProduct(String productId) throws RuntimeException {
+    public ShopProfileDTO getShopProfile(String username) {
+        User user = userService.findByUsername(username);
+        if(user == null)
+            throw new RequestException("User not found");
+        Shop shop = shopService.findByUser(user);
+        if(!shop.isActive())
+            throw new RequestException("Shop is not active");
+        if(shop.isDeleted())
+            throw new RequestException("Shop was banned");
+        return toShopProfileDTO(shop);
+    }
+
+    public ShopProfileDTO updateShopProfile(UpdateShopProfileDTO dto) {
+        if(dto.getShopName() == null || dto.getShopName().isEmpty())
+            throw new RequestException("Shop name is empty");
+        if(dto.getId() == null || dto.getId().isEmpty())
+            throw new RequestException("Shop id is empty");
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userService.findByUsername(username);
+        Shop shop = shopService.findByUser(user);
+        if(!shop.getId().toString().equals(dto.getId()))
+            throw new RequestException("Invalid request: unknown shop owner");
+        shop.setName(dto.getShopName());
+        shop.setDescription(dto.getDescription());
+        shop.setAvatarUrl(dto.getAvatarUrl());
+        shopService.save(shop);
+        return toShopProfileDTO(shop);
+    }
+
+    public ShopAddress getShopAddress(String username) {
+        User user = userService.findByUsername(username);
+        Shop shop = shopService.findByUser(user);
+        if(!shop.isActive())
+            throw new RequestException("Shop is not active");
+        if(shop.isDeleted())
+            throw new RequestException("Shop was banned");
+        return shopService.findAddressByShopId(shop.getId().toString());
+    }
+
+    public ProductResponseDTO previewProduct(String productId) {
         Product product = productService.findById(productId);
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         if(!product.getShop().getUser().getUsername().equals(username)) {
-            throw new RuntimeException("Invalid request: not your shop's product");
+            throw new RequestException("Invalid request: not your shop's product");
         }
         return productFacadeService.getProduct(productId, true);
     }
@@ -60,7 +100,7 @@ public class ShopFacadeService {
         return productService.findById(productId);
     }
 
-    public ShopAddress addAddress(AddAddressDTO addressDTO) {
+    public ShopAddress setAddress(AddAddressDTO addressDTO) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userService.findByUsername(username);
         Shop shop = shopService.findByUser(user);
@@ -68,6 +108,8 @@ public class ShopFacadeService {
         if(address == null) address = fromDTOtoAddress(addressDTO);
         else{
             ShopAddress tmp = fromDTOtoAddress(addressDTO);
+            address.setSenderName(tmp.getSenderName());
+            address.setPhoneNumber(tmp.getPhoneNumber());
             address.setProvince(tmp.getProvince());
             address.setDistrict(tmp.getDistrict());
             address.setWard(tmp.getWard());
@@ -78,13 +120,13 @@ public class ShopFacadeService {
         return address;
     }
 
-    public void deleteProduct(String productId) throws RuntimeException {
+    public void deleteProduct(String productId) {
         Product product = productService.findById(productId);
         if(product == null)
-            throw new DataNotExistException("Invalid reques: Product not found");
+            throw new RequestException("Invalid reques: Product not found");
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         if(!product.getShop().getUser().getUsername().equals(username)) {
-            throw new RuntimeException("Invalid request: not your shop's product");
+            throw new RequestException("Invalid request: not your shop's product");
         }
         productService.delete(product);
     }
@@ -93,12 +135,12 @@ public class ShopFacadeService {
                                             int filterType,
                                             String keyword,
                                             int page,
-                                            int limit) throws Exception{
+                                            int limit){
         if(filterType < 0 || filterType > 3){
-            throw new Exception("Invalid request: filter type");
+            throw new RequestException("Invalid request: filter type");
         }
         if(filterType >= 1 && (keyword == null || keyword.isEmpty())){
-            throw new Exception("Invalid request: filter data");
+            throw new RequestException("Invalid request: filter data");
         }
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userService.findByUsername(username);
@@ -150,22 +192,22 @@ public class ShopFacadeService {
                 break;
         }
         if(data == null){
-            throw new Exception("Invalid request");
+            throw new RequestException("Invalid request");
         }
         return data.map(this::toShopOrderDTO);
     }
 
     public void updateOrder(String shopOrderId,
-                            int currentStatus) throws Exception{
+                            int currentStatus) {
         if(currentStatus > 2){
-            throw new Exception("Invalid request: status");
+            throw new RequestException("Invalid request: status");
         }
         ShopOrder shopOrder = orderService.getShopOrderById(shopOrderId);
         if(shopOrder == null){
-            throw new Exception("Invalid shop order id");
+            throw new RequestException("Invalid shop order id");
         }
         if(shopOrder.getStatus() != currentStatus){
-            throw new Exception( "Invalid current status");
+            throw new RequestException( "Invalid current status");
         }
         if(currentStatus == ShopOrderStatus.PENDING){
             shopOrder.setStatus(ShopOrderStatus.PREPARING);
@@ -176,10 +218,13 @@ public class ShopFacadeService {
         orderService.saveAllShopOrders(List.of(shopOrder));
     }
 
-    public void addProduct(SaveProductDTO productDTO) throws RuntimeException {
+    public void addProduct(SaveProductDTO productDTO) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userService.findByUsername(username);
         Shop shop = shopService.findByUser(user);
+        ShopAddress address = shopService.findAddressByShopId(shop.getId().toString());
+        if(address == null)
+            throw new RequestException("Invalid request: shop hasn't have address yet");
         Product product = ModelMapper.getInstance().map(productDTO, Product.class);
         product.setShop(shop);
         product.setCreatedAt(new Date());
@@ -194,14 +239,14 @@ public class ShopFacadeService {
         productService.saveProduct(product);
     }
 
-    public void updateProduct(SaveProductDTO dto) throws RuntimeException {
+    public void updateProduct(SaveProductDTO dto) {
         Product product = productService.findById(dto.getProductId());
         if(product == null){
-            throw new DataNotExistException("Invalid request: product not found");
+            throw new RequestException("Invalid request: product not found");
         }
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         if(!product.getShop().getUser().getUsername().equals(username)){
-            throw new RuntimeException("Invalid request: not your shop's product");
+            throw new RequestException("Invalid request: not your shop's product");
         }
         Product updatedProd = ModelMapper.getInstance().map(dto, Product.class);
         updatedProd.setId(product.getId());
@@ -228,10 +273,10 @@ public class ShopFacadeService {
         );
     }
 
-    public void changeProductVisible(String productId) throws RuntimeException{
+    public void changeProductVisible(String productId) {
         Product product = productService.findById(productId);
         if(product == null){
-            throw new DataNotExistException("Invalid request: Product not found");
+            throw new RequestException("Invalid request: Product not found");
         }
         product.setVisible(!product.isVisible());
         productService.saveProduct(product);
@@ -261,12 +306,14 @@ public class ShopFacadeService {
         return dto;
     }
 
-    private ShopAddress fromDTOtoAddress(AddAddressDTO dto) throws RuntimeException{
+    private ShopAddress fromDTOtoAddress(AddAddressDTO dto){
         ShopAddress address = new ShopAddress();
+        address.setSenderName(dto.getSenderName());
+        address.setPhoneNumber(dto.getPhoneNumber());
         address.setDetail(dto.getDetail());
         Province province = addressService.findProvinceByName(dto.getProvince());
         if(province == null){
-            throw new RuntimeException("Địa chỉ không hợp lệ");
+            throw new RequestException("Địa chỉ không hợp lệ");
         }
         address.setProvince(province);
         List<District> districts = addressService.findDistrictByName(dto.getDistrict());
@@ -279,7 +326,7 @@ public class ShopFacadeService {
             }
         }
         if(!okDistrict){
-            throw new RuntimeException("Địa chỉ không hợp lệ");
+            throw new RequestException("Địa chỉ không hợp lệ");
         }
         List<Ward> ward = addressService.findWardByName(dto.getWard());
         boolean okWard = false;
@@ -291,7 +338,7 @@ public class ShopFacadeService {
             }
         }
         if(!okWard){
-            throw new RuntimeException("Địa chỉ không hợp lệ");
+            throw new RequestException("Địa chỉ không hợp lệ");
         }
         return address;
     }
@@ -320,6 +367,18 @@ public class ShopFacadeService {
         }
         dtoShopOrder.setItems(itemDtos);
         return dtoShopOrder;
+    }
+
+    private ShopProfileDTO toShopProfileDTO(Shop shop){
+        ShopProfileDTO dto = new ShopProfileDTO();
+        dto.setId(shop.getId().toString());
+        dto.setShopName(shop.getName());
+        dto.setDescription(shop.getDescription());
+        dto.setEmail(shop.getUser().getEmail());
+        dto.setAvatarUrl(shop.getAvatarUrl());
+        dto.setPhoneNumber(shop.getUser().getPhoneNumber());
+        dto.setCreatedAt(shop.getCreatedAt());
+        return dto;
     }
 
 }

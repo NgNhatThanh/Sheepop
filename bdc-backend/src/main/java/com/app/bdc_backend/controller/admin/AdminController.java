@@ -1,4 +1,4 @@
-package com.app.bdc_backend.controller;
+package com.app.bdc_backend.controller.admin;
 
 import com.app.bdc_backend.model.product.Category;
 import com.app.bdc_backend.service.CategoryService;

@@ -1,5 +1,6 @@
 package com.app.bdc_backend.facade;
 
+import com.app.bdc_backend.exception.RequestException;
 import com.app.bdc_backend.model.dto.request.CreateReviewDTO;
 import com.app.bdc_backend.model.dto.response.ProductReviewDTO;
 import com.app.bdc_backend.model.dto.response.ReviewListDTO;
@@ -32,20 +33,20 @@ public class ReviewFacadeService {
 
     private final ProductService productService;
 
-    public void createReview(CreateReviewDTO dto) throws Exception {
+    public void createReview(CreateReviewDTO dto) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         ShopOrder shopOrder = orderService.getShopOrderById(dto.getShopOrderId());
         if(shopOrder == null){
-            throw new Exception("Invalid request: shop order id");
+            throw new RequestException("Invalid request: shop order id");
         }
         if(shopOrder.getStatus() != ShopOrderStatus.COMPLETED){
-            throw new Exception("Invalid request: order status");
+            throw new RequestException("Invalid request: order status");
         }
         if(shopOrder.getItems().size() != dto.getItemReviews().size()){
-            throw new Exception("Invalid request: items amount");
+            throw new RequestException("Invalid request: items amount");
         }
         if(!shopOrder.getUser().getUsername().equals(username)){
-            throw new Exception("Invalid request: reviewer");
+            throw new RequestException("Invalid request: reviewer");
         }
         boolean ok = true;
         for(OrderItem item : shopOrder.getItems()){
@@ -62,7 +63,7 @@ public class ReviewFacadeService {
             }
         }
         if(!ok){
-            throw new Exception("Invalid request: invalid item(s)");
+            throw new RequestException("Invalid request: invalid item(s)");
         }
         List<ProductReview> reviews = new ArrayList<>();
         List<ProductReviewMedia> medias = new ArrayList<>();
@@ -89,13 +90,13 @@ public class ReviewFacadeService {
                                                        int rating,
                                                        int filterType,
                                                        int page,
-                                                       int limit) throws Exception {
+                                                       int limit) {
         Product product = productService.findById(productId);
         if(product == null){
-            throw new Exception("Invalid request: Product not found");
+            throw new RequestException("Invalid request: Product not found");
         }
         if(rating < 0 || rating > 5 || filterType < 0 || filterType > 2){
-            throw new Exception("Invalid request: rating || filterType");
+            throw new RequestException("Invalid request: rating || filterType");
         }
         List<ProductReview> reviewList;
         if(filterType == ReviewFilter.ALL){

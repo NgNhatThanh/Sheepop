@@ -1,6 +1,6 @@
 package com.app.bdc_backend.facade;
 
-import com.app.bdc_backend.exception.DataNotExistException;
+import com.app.bdc_backend.exception.RequestException;
 import com.app.bdc_backend.model.dto.BasicReviewInfo;
 import com.app.bdc_backend.model.dto.request.SelectVariationDTO;
 import com.app.bdc_backend.model.dto.response.ProductResponseDTO;
@@ -31,18 +31,18 @@ public class ProductFacadeService {
 
     private final OrderService orderService;
 
-    public ProductResponseDTO getProduct(String productId, boolean preview) throws DataNotExistException{
+    public ProductResponseDTO getProduct(String productId, boolean preview) throws RequestException{
         Product product = productService.findById(productId);
         if(product == null || (!preview && !product.isVisible())) {
-            throw new DataNotExistException("Product not found");
+            throw new RequestException("Product not found");
         }
         return toProductResponseDTO(product);
     }
 
-    public SelectVariationResponseDTO selectVariation(SelectVariationDTO selectVariationDTO) throws DataNotExistException{
+    public SelectVariationResponseDTO selectVariation(SelectVariationDTO selectVariationDTO) throws RequestException{
         Product product = productService.findById(selectVariationDTO.getProductId());
         if(product == null || !product.isVisible() || product.getSkuList().isEmpty()) {
-            throw new DataNotExistException("Product not found");
+            throw new RequestException("Product not found");
         }
         return toSelectVariationResponseDTO(product, selectVariationDTO);
     }

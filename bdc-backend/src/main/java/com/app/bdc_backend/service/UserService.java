@@ -1,7 +1,7 @@
 package com.app.bdc_backend.service;
 
 import com.app.bdc_backend.dao.UserRepository;
-import com.app.bdc_backend.exception.DataExistedException;
+import com.app.bdc_backend.exception.RequestException;
 import com.app.bdc_backend.model.user.User;
 import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,12 +20,12 @@ public class UserService {
 
     public void register(User user) {
         if(userRepository.existsByUsername(user.getUsername())) {
-            throw new DataExistedException("Username already exists");
+            throw new RequestException("Username already exists");
         }
         if(user.getPhoneNumber() != null
                 && !user.getPhoneNumber().isEmpty()
                 && userRepository.existsByPhoneNumber(user.getPhoneNumber())){
-            throw new DataExistedException("Phone number already exists");
+            throw new RequestException("Phone number already exists");
         }
         user.setCreatedAt(new Date());
         String hassPassword = passwordEncoder.encode(user.getPassword());

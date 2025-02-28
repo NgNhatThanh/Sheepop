@@ -43,17 +43,6 @@ public class ShopController {
 //        return ResponseEntity.ok(toShopResponseDTO(shop));
 //    }
 
-    @PostMapping("/address/save")
-    public ResponseEntity<?> saveAddress(@RequestBody AddAddressDTO addressDTO) {
-        try{
-            return ResponseEntity.ok(shopFacadeService.addAddress(addressDTO));
-        }
-        catch (Exception e){
-            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
-        }
-    }
-
-
 
 //    private ShopResponseDTO toShopResponseDTO(Shop shop) {
 //        int followerCount = followService.getShopFollowCount(shop.getId().toString());

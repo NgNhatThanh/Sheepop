@@ -1,5 +1,6 @@
 package com.app.bdc_backend.facade;
 
+import com.app.bdc_backend.exception.RequestException;
 import com.app.bdc_backend.model.cart.Cart;
 import com.app.bdc_backend.model.cart.CartItem;
 import com.app.bdc_backend.model.dto.request.OrderCancelationDTO;
@@ -45,7 +46,7 @@ public class OrderFacadeService {
 
     private final PaymentService paymentService;
 
-    public Order placeOrder(Map<String, Object> body) throws Exception {
+    public Order placeOrder(Map<String, Object> body){
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userService.findByUsername(username);
         Cart cart = cartRedisService.findByUser(username);
@@ -61,10 +62,10 @@ public class OrderFacadeService {
         for(CartItem item : cart.getItems()){
             if(item.isSelected()){
                 if(item.getProduct().getShop().getUser().getUsername().equals(username)){
-                    throw new Exception("Invalid request: cannot buy your own product");
+                    throw new RequestException("Invalid request: cannot buy your own product");
                 }
                 if(item.getQuantity() > cartService.getItemStock(item)){
-                    throw new Exception("Invalid request: exceeded quantity");
+                    throw new RequestException("Invalid request: exceeded quantity");
                 }
                 else{
                     checkoutList.add(item);
@@ -90,14 +91,14 @@ public class OrderFacadeService {
         order.setUser(user);
         Object rawShops = body.get("shop_orders");
         if (rawShops == null) {
-            throw new Exception("Invalid request: shop orders data is missing");
+            throw new RequestException("Invalid request: shop orders data is missing");
         }
         List<Map<String, Object>> shops;
         try{
             shops = (List<Map<String, Object>>) body.get("shop_orders");
         }
         catch (ClassCastException e){
-            throw new Exception("Invalid request: invalid shop orders data");
+            throw new RequestException("Invalid request: invalid shop orders data");
         }
         long totalPay = 0;
         for(Map<String, Object> shop : shops){
@@ -142,7 +143,7 @@ public class OrderFacadeService {
         return order;
     }
 
-    public OrderPageResponse getOrderList(int type, int limit, int offset) throws Exception {
+    public OrderPageResponse getOrderList(int type, int limit, int offset){
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userService.findByUsername(username);
         return switch (type) {
@@ -168,19 +169,19 @@ public class OrderFacadeService {
                     List.of(ShopOrderStatus.CANCELLED),
                     offset,
                     limit);
-            default -> throw new Exception("Invalid request");
+            default -> throw new RequestException("Invalid request");
         };
     }
 
-    public ShopOrderDetailDTO getOrderDetail(String shopOrderId) throws Exception {
+    public ShopOrderDetailDTO getOrderDetail(String shopOrderId) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userService.findByUsername(username);
         ShopOrder shopOrder = orderService.getShopOrderById(shopOrderId);
         if(shopOrder == null){
-            throw new Exception("Invalid request: order not found");
+            throw new RequestException("Invalid request: order not found");
         }
         if(!shopOrder.getUser().equals(user)){
-            throw new Exception("Invalid request: user");
+            throw new RequestException("Invalid request: user");
         }
         return toShopOrderDetailDTO(shopOrder);
     }
@@ -209,16 +210,16 @@ public class OrderFacadeService {
         return response;
     }
 
-    public void markOrderAsReceived(String shopOrderId) throws Exception {
+    public void markOrderAsReceived(String shopOrderId){
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userService.findByUsername(username);
         ShopOrder shopOrder = orderService.getShopOrderById(shopOrderId);
         if(!shopOrder.getUser().equals(user)){
-            throw new Exception("Invalid request: user");
+            throw new RequestException("Invalid request: user");
         }
         if(shopOrder.getStatus() != ShopOrderStatus.SENT
                 && shopOrder.getStatus() != ShopOrderStatus.DELIVERING){
-            throw new Exception("Invalid request: status");
+            throw new RequestException("Invalid request: status");
         }
         for(OrderItem item : shopOrder.getItems()){
             item.setSuccess(true);
@@ -228,27 +229,27 @@ public class OrderFacadeService {
         orderService.saveAllShopOrders(List.of(shopOrder));
     }
 
-    public void cancelOrder(OrderCancelationDTO dto) throws Exception {
+    public void cancelOrder(OrderCancelationDTO dto){
         if(dto.getCancelReason() == null || dto.getCancelReason().isEmpty()){
-            throw new Exception("Invalid request: cancel reason mustn't be empty");
+            throw new RequestException("Invalid request: cancel reason mustn't be empty");
         }
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         List<ShopOrder> cancelList = new ArrayList<>();
         if(dto.getWhoCancel() == CommonEntity.USER){
             if(dto.getOrderId() == null){
-                throw new Exception("Invalid request: order id mustn't be null");
+                throw new RequestException("Invalid request: order id mustn't be null");
             }
             Order order = orderService.getOrderById(dto.getOrderId());
             if(order == null){
-                throw new Exception("Invalid request: order not found");
+                throw new RequestException("Invalid request: order not found");
             }
             if(!order.getUser().getUsername().equals(username)){
-                throw new Exception("Invalid request: user");
+                throw new RequestException("Invalid request: user");
             }
             List<ShopOrder> shopOrders = orderService.getAllShopOrderByOrder(order);
             if(order.getPayment().getStatus() == PaymentStatus.PENDING){
                 if(dto.getShopOrderIds().size() != shopOrders.size()){
-                    throw new Exception("Invalid request: invalid shop orders amount");
+                    throw new RequestException("Invalid request: invalid shop orders amount");
                 }
                 order.getPayment().setStatus(PaymentStatus.CANCELLED);
                 cancelList = shopOrders;
@@ -268,16 +269,16 @@ public class OrderFacadeService {
         else if(dto.getWhoCancel() == CommonEntity.SHOP){
             ShopOrder shopOrder = orderService.getShopOrderById(dto.getShopOrderIds().get(0));
             if(dto.getShopOrderIds().isEmpty()){
-                throw new Exception("Invalid request: shopOrderIds mustn't be empty");
+                throw new RequestException("Invalid request: shopOrderIds mustn't be empty");
             }
             if(shopOrder == null){
-                throw new Exception("Invalid request: shopOrder not found");
+                throw new RequestException("Invalid request: shopOrder not found");
             }
             if(!shopOrder.getShop().getUser().getUsername().equals(username)){
-                throw new Exception("Invalid request: invalid shop owner");
+                throw new RequestException("Invalid request: invalid shop owner");
             }
             if(shopOrder.getStatus() != ShopOrderStatus.PENDING){
-                throw new Exception("Invalid request: this order cannot be canceled");
+                throw new RequestException("Invalid request: this order cannot be canceled");
             }
             cancelList = List.of(shopOrder);
         }
@@ -285,7 +286,7 @@ public class OrderFacadeService {
             // code for admin
         }
         else{
-            throw new Exception("Invalid request: entity");
+            throw new RequestException("Invalid request: entity");
         }
         orderService.cancelAllShopOrders(cancelList, dto.getWhoCancel(), dto.getCancelReason());
     }

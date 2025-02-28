@@ -8,10 +8,9 @@ export default function ProfilePage(){
     const [profile, setProfile] = useState(null);
 
     const fetchProfile = () => {
-        fetchWithAuth(`${BASE_API_URL}/v1/user/profile`, window.localtion, true)
+        fetchWithAuth(`${BASE_API_URL}/v1/user/profile`, window.location, true)
             .then(res => res.json())
             .then(res => {
-                console.log(res)
                 setProfile(res)
             })
     }   

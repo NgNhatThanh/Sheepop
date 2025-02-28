@@ -1,5 +1,6 @@
 package com.app.bdc_backend.facade;
 
+import com.app.bdc_backend.exception.RequestException;
 import com.app.bdc_backend.model.cart.Cart;
 import com.app.bdc_backend.model.cart.CartItem;
 import com.app.bdc_backend.model.dto.request.AddToCartDTO;
@@ -47,15 +48,15 @@ public class CartFacadeService {
         return toCartMiniResponseDTO(cart);
     }
 
-    public void addToCart(AddToCartDTO dto) throws Exception{
+    public void addToCart(AddToCartDTO dto) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         Product product = productService.findById(dto.getProductId());
         if(product == null || !product.isVisible()){
             log.warn("Add to cart error: Product not found");
-            throw new Exception("Product not found");
+            throw new RequestException("Product not found");
         }
         if(product.getShop().getUser().getUsername().equals(username)){
-            throw new Exception("Invalid request: cannot buy your own product");
+            throw new RequestException("Invalid request: cannot buy your own product");
         }
         Cart cart = cartRedisService.findByUser(username);
         if(cart == null){
@@ -66,8 +67,8 @@ public class CartFacadeService {
         try{
             cart = cartService.addToCart(cart, product, dto.getQuantity(), dto.getAttributes());
         }
-        catch (RuntimeException e){
-            throw new Exception("Failed to add to cart: " + e.getMessage());
+        catch (RequestException e){
+            throw new RequestException("Failed to add to cart: " + e.getMessage());
         }
         finally {
             cartRedisService.save(cart);

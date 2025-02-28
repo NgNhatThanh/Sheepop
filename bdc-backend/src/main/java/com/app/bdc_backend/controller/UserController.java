@@ -25,13 +25,7 @@ public class UserController {
 
     @PostMapping("/profile/update")
     public ResponseEntity<?> updateProfile(@RequestBody UpdateProfileDTO dto) {
-        try{
-            return ResponseEntity.ok(userFacadeService.updateProfile(dto));
-        }
-        catch (Exception e){
-            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
-        }
-
+        return ResponseEntity.ok(userFacadeService.updateProfile(dto));
     }
 
     @GetMapping("/address/get-list")
@@ -41,12 +35,7 @@ public class UserController {
 
     @PostMapping("/address/add")
     public ResponseEntity<?> addAddress(@RequestBody AddAddressDTO dto){
-        try{
-            return ResponseEntity.ok(userFacadeService.addAddress(dto));
-        }
-        catch (Exception e){
-            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
-        }
+        return ResponseEntity.ok(userFacadeService.addAddress(dto));
     }
 
 }

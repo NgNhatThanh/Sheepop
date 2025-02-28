@@ -16,13 +16,8 @@ public class ReviewController {
 
     @PostMapping("/create_review")
     public ResponseEntity<?> createReview(@RequestBody CreateReviewDTO dto){
-        try{
-            reviewFacadeService.createReview(dto);
-            return ResponseEntity.ok().build();
-        }
-        catch (Exception e){
-            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
-        }
+        reviewFacadeService.createReview(dto);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/get_review_list")
@@ -31,20 +26,13 @@ public class ReviewController {
                                            @RequestParam("filterType") int filterType,
                                            @RequestParam("page") int page,
                                            @RequestParam("limit") int limit){
-        try{
-            return ResponseEntity.ok(reviewFacadeService.getProductReviewList(
-                    productId,
-                    rating,
-                    filterType,
-                    page,
-                    limit
-            ));
-        }
-        catch (Exception e){
-            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
-        }
+        return ResponseEntity.ok(reviewFacadeService.getProductReviewList(
+                productId,
+                rating,
+                filterType,
+                page,
+                limit
+        ));
     }
-
-
 
 }

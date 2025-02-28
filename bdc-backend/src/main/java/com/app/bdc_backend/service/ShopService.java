@@ -16,7 +16,7 @@ public class ShopService {
 
     private final ShopAddressRepository shopAddressRepository;
 
-    public void addShop(Shop shop) {
+    public void save(Shop shop) {
         shopRepository.save(shop);
     }
 

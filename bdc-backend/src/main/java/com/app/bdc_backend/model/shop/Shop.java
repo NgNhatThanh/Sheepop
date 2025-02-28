@@ -31,4 +31,8 @@ public class Shop {
 
     private Date createdAt;
 
+    private boolean active = true;
+
+    private boolean deleted = false;
+
 }
