@@ -56,6 +56,7 @@ export default function LoginPage({isAuthenticated}) {
           .then(data => {
             localStorage.setItem('access_token', data.token)
             setUserData(data.token)
+            if(data.admin) window.location.assign("/admin")
           })
           window.location.assign(from ? from : '/')
       }

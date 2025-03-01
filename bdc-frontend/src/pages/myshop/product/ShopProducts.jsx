@@ -17,7 +17,8 @@ const tabs = [
     "Tất cả",
     "Đang kích hoạt",
     "Vi phạm",
-    "Chưa được đăng"
+    "Chưa được đăng",
+    "Hết hàng"
 ];
 
 export default function ShopProducts(){

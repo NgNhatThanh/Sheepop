@@ -4,10 +4,7 @@ import com.app.bdc_backend.dao.product.ProductAttributeRepository;
 import com.app.bdc_backend.dao.product.ProductMediaRepository;
 import com.app.bdc_backend.dao.product.ProductRepository;
 import com.app.bdc_backend.dao.product.ProductSKURepository;
-import com.app.bdc_backend.model.product.Product;
-import com.app.bdc_backend.model.product.ProductAttribute;
-import com.app.bdc_backend.model.product.ProductMedia;
-import com.app.bdc_backend.model.product.ProductSKU;
+import com.app.bdc_backend.model.product.*;
 import com.app.bdc_backend.model.shop.Shop;
 import lombok.AllArgsConstructor;
 import org.bson.types.ObjectId;
@@ -71,6 +68,10 @@ public class ProductService {
         product.setVisible(false);
         product.setDeleted(true);
         saveProduct(product);
+    }
+
+    public int countByCategory(Category cat){
+        return productRepository.countByCategory(cat);
     }
 
 }

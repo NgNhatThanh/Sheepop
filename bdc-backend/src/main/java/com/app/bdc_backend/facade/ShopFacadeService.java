@@ -46,6 +46,8 @@ public class ShopFacadeService {
 
     private final OrderService orderService;
 
+    private final CategoryService categoryService;
+
     private final ProductFacadeService productFacadeService;
 
     public ShopProfileDTO getShopProfile(String username) {
@@ -234,6 +236,7 @@ public class ShopFacadeService {
             sku.setProduct(product);
             productService.addProductAttributeList(sku.getAttributes());
         }
+        categoryService.increaseProductCount(category);
         productService.addProductMediaList(product.getMediaList());
         productService.addProductSKUList(product.getSkuList());
         productService.saveProduct(product);

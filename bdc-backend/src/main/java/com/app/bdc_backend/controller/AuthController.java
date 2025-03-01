@@ -45,9 +45,14 @@ public class AuthController{
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginDTO dto) {
-        UsernamePasswordAuthenticationToken authToken =
-                new UsernamePasswordAuthenticationToken(dto.getUsername(), dto.getPassword());
-        authenticationManager.authenticate(authToken);
+        try{
+            UsernamePasswordAuthenticationToken authToken =
+                    new UsernamePasswordAuthenticationToken(dto.getUsername(), dto.getPassword());
+            authenticationManager.authenticate(authToken);
+        }
+        catch (Exception e){
+            throw new RequestException("Invalid username or password");
+        }
         AuthResponseDTO res = authFacadeService.login(dto);
         Map<String, Object> resMap = new HashMap<>();
         resMap.put("token", res.getAccessToken());

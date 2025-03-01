@@ -27,6 +27,11 @@ const ShopShipping = lazy(() => import('./pages/myshop/setting/ShopShipping.jsx'
 const ShopProfile = lazy(() => import('./pages/myshop/setting/ShopProfile.jsx'));
 const PreviewProductPage = lazy(() => import('./pages/myshop/product/PreviewProductPage.jsx'))
 const ProductEdit = lazy(() => import('./pages/myshop/product/ProductEdit.jsx'));
+const ProductList = lazy(() => import('./pages/admin/product/ProductList.jsx'));
+const CategoryPage = lazy(() => import('./pages/admin/product/CategoryPage.jsx'));
+
+
+const AdminPageLayout = lazy(() => import('./pages/admin/AdminPageLayout.jsx'))
 
 function App() {
 
@@ -66,6 +71,10 @@ function App() {
               <Route path="shipping" element={<ShopShipping/>}/>
               <Route path="profile" element={<ShopProfile/>}/>
             </Route>
+          </Route>
+          <Route path='admin' element={<AdminPageLayout isAuthenticated={isAuthenticated}/>}>
+            <Route path='product' element={<ProductList/>}/>
+            <Route path='category' element={<CategoryPage/>}/>
           </Route>
           <Route path='/' element={<MainLayout isAuthenticated={isAuthenticated}/>}>
             <Route path='' element={<HomePage/>}/>

@@ -1,5 +1,6 @@
 package com.app.bdc_backend.dao.product;
 
+import com.app.bdc_backend.model.product.Category;
 import com.app.bdc_backend.model.product.Product;
 import com.app.bdc_backend.model.shop.Shop;
 import org.bson.types.ObjectId;
@@ -17,4 +18,5 @@ public interface ProductRepository extends MongoRepository<Product, String> {
 
     Page<Product> findAllByVisibleAndDeleted(boolean visible, boolean deleted, Pageable pageable);
 
+    int countByCategory(Category category);
 }
