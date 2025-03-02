@@ -29,7 +29,10 @@ const PreviewProductPage = lazy(() => import('./pages/myshop/product/PreviewProd
 const ProductEdit = lazy(() => import('./pages/myshop/product/ProductEdit.jsx'));
 const ProductList = lazy(() => import('./pages/admin/product/ProductList.jsx'));
 const CategoryPage = lazy(() => import('./pages/admin/product/CategoryPage.jsx'));
-
+const SearchPage = lazy(() => import('./pages/searchpage/SearchPage.jsx'));
+const UserList = lazy(() => import('./pages/admin/user/UserList.jsx'))
+const ShopList = lazy(() => import('./pages/admin/user/ShopList.jsx'))
+const OrderList = lazy(() => import('./pages/admin/order/OrderList.jsx'))
 
 const AdminPageLayout = lazy(() => import('./pages/admin/AdminPageLayout.jsx'))
 
@@ -75,6 +78,9 @@ function App() {
           <Route path='admin' element={<AdminPageLayout isAuthenticated={isAuthenticated}/>}>
             <Route path='product' element={<ProductList/>}/>
             <Route path='category' element={<CategoryPage/>}/>
+            <Route path='user' element={<UserList/>}/>
+            <Route path='shop' element={<ShopList/>}/>
+            <Route path='order' element={<OrderList/>}/>
           </Route>
           <Route path='/' element={<MainLayout isAuthenticated={isAuthenticated}/>}>
             <Route path='' element={<HomePage/>}/>
@@ -89,6 +95,7 @@ function App() {
               <Route exact path='orders' element={<OrdersPage/>}/>
               <Route path='orders/:shopOrderId' element={<OrderDetail/>}/>
             </Route>
+            <Route path='search' element={<SearchPage/>}/>
           </Route>
           <Route path="*" element={<ErrorPage errorType={ERROR_TYPE.NOT_FOUND}/>}/>
         </Routes>

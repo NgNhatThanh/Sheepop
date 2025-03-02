@@ -42,13 +42,19 @@ export async function fetchWithAuth(url, from, isCompulsory, options = {}){
             ...options.headers,
             'Authorization': `Bearer ${localStorage.getItem("access_token")}`,
         }
-    });
+    })
+        .catch(err => {
+            console.log(err.status)
+            if(err.status === 403) window.location.assign("/error?error=UNAUTHORIZED")
+        })
     if(!res.ok){
         if(res.status === 401){
             const ref = await fetch(`${BASE_API_URL}/v1/auth/refreshToken`, {
                 credentials: "include"
             })
             if(ref.status !== 200){
+                if(ref.status === 403)
+                    window.location.assign("/")
                 if(isCompulsory){
                     localStorage.setItem('from', from)
                     window.location.assign('/login' + `${from ? '?from=' + from : ''}`)

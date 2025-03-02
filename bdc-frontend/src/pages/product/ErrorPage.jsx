@@ -1,11 +1,18 @@
+import { useSearchParams } from "react-router-dom";
+
 export const ERROR_TYPE = {
     INFOMATION_MISSING: 'Something is missing...',
     PRODUCT_NOT_EXIST: 'Product doesn\'t exist',
     UNKNOWN_ERROR: 'Something wrong, try again later!',
-    NOT_FOUND: 'Not found!'
+    NOT_FOUND: 'Not found!',
+    UNAUTHORIZED: "Unauthorized"
 }
 
 export default function ErrorPage({errorType = ERROR_TYPE.UNKNOWN_ERROR}){
+    const [params] = useSearchParams()
+    const error = params.get('error')
+    if(ERROR_TYPE[error]) errorType = ERROR_TYPE[error]
+
     return (
         <div className="flex items-center justify-center h-screen bg-gray-100">
             <div className="text-center bg-white p-10 rounded-2xl shadow-lg max-h-[60vh] flex flex-col justify-center">

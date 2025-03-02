@@ -40,8 +40,12 @@ public class CategoryService {
         return categoryRepository.findById(id).orElse(null);
     }
 
-    public int countByParent(Category parent){
-        return categoryRepository.countByParent(parent);
+    public List<Category> getByParent(Category parent){
+        return categoryRepository.findAllByParent(parent);
+    }
+
+    public Category save(Category category){
+        return categoryRepository.save(category);
     }
 
 }

@@ -6,6 +6,7 @@ import com.app.bdc_backend.facade.AuthFacadeService;
 import com.app.bdc_backend.model.dto.AuthResponseDTO;
 import com.app.bdc_backend.model.dto.request.LoginDTO;
 import com.app.bdc_backend.model.dto.request.RegistrationDTO;
+import com.app.bdc_backend.model.enums.RoleName;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +15,8 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;

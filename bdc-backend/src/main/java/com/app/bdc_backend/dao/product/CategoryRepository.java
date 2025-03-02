@@ -13,5 +13,5 @@ public interface CategoryRepository extends MongoRepository<Category, String> {
 
     List<Category> findByNameContainingIgnoreCase(String name);
 
-    int countByParent(Category parent);
+    List<Category> findAllByParent(Category parent);
 }

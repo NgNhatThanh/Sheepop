@@ -56,9 +56,10 @@ export default function Header({isAuthenticated}){
                         placeholder="Mua Hàng Xuyên Tết"
                         className="w-full p-2 rounded-l-md border-none focus:ring-0 text-black bg-white"
                     />
-                    <button className="p-2 bg-red-600 rounded-r-md cursor-pointer">
+                    <Link to={'search'} className="flex items-center p-2 bg-red-600 rounded-r-md cursor-pointer">
                         <FaSearch className="text-white" />
-                    </button>
+                    </Link>
+                    
                 </div>
 
                 {/* Cart Icon */}

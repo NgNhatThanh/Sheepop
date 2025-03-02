@@ -3,6 +3,7 @@ package com.app.bdc_backend.controller.admin;
 import com.app.bdc_backend.model.product.Category;
 import com.app.bdc_backend.service.CategoryService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,6 +21,11 @@ public class AdminController {
     @GetMapping("/categories")
     public List<Category> getAllCategories() {
         return categoryService.findAll();
+    }
+
+    @GetMapping("/ping")
+    public ResponseEntity<?> ping(){
+        return ResponseEntity.ok().build();
     }
 
 }

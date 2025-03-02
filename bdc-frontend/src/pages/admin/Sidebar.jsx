@@ -6,7 +6,6 @@ import { IoSettings } from "react-icons/io5";
 const menuList = [
   {
     title: "Sản phẩm",
-    icon: <FaClipboardList/>,
     subMenu:[
       {
         title: "Danh sách",
@@ -15,6 +14,57 @@ const menuList = [
       {
         title: "Quản lý danh mục",
         to: "category"
+      }
+    ]
+  },
+  {
+    title: "Đơn hàng",
+    icon: "",
+    subMenu: [
+      {
+        title: "Danh sách",
+        to: "order"
+      }
+    ]
+  },
+  {
+    title: "Người dùng",
+    icon: "",
+    subMenu: [
+      {
+        title: "Danh sách",
+        to: "user"
+      },
+      {
+        title: "Cửa hàng",
+        to: "shop"
+      }
+    ]
+  },
+  {
+    title: "Thanh toán",
+    icon: "",
+    subMenu: [
+      {
+        title: "Thống kê",
+        to: ""
+      },
+      {
+        title: "Danh sách",
+        to: ""
+      },
+      {
+        title: "Chưa trả",
+        to: ""
+      }
+    ]
+  },
+  {
+    title: "Nội dung",
+    subMenu: [
+      {
+        title: "Trang chủ",
+        to: ""
       }
     ]
   }
@@ -54,7 +104,6 @@ export default function Sidebar() {
                           onClick={() => toggleSubMenu(index)}
                         >
                           <div className="flex items-center gap-2">
-                            {item.icon}
                             <span>{item.title}</span>
                           </div>
                           <FaChevronDown className={`transform transition-transform duration-300 ${openSubMenus[index] ? "rotate-180" : ""}`} />
@@ -83,7 +132,6 @@ export default function Sidebar() {
                         to={item.to}
                         className={({ isActive }) => `flex items-center gap-2 p-2 rounded transition  ${isActive ? "font-semibold text-blue-700" : "text-gray-600 hover:text-blue-500"}`}
                       >
-                        {item.icon}
                         <span>{item.title}</span>
                       </NavLink>
                     )}

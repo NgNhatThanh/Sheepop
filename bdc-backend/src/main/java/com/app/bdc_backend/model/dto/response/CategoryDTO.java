@@ -11,6 +11,8 @@ public class CategoryDTO {
 
     private String id;
 
+    private String parentId;
+
     private String name;
 
     private String description;

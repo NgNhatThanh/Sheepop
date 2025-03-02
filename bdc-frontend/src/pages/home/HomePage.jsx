@@ -3,6 +3,7 @@ import { BASE_API_URL } from "../../constants";
 import { useSearchParams, Link } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import { FaStar } from "react-icons/fa";
+import BannerSlider from "./BannerSlider";
 
 export default function HomePage() {
     const [searchParams] = useSearchParams();
@@ -28,7 +29,10 @@ export default function HomePage() {
 
     return (
         <div className="container mx-auto px-4 py-6">
-            <h2 className="text-2xl font-bold mb-4">Danh sách sản phẩm</h2>
+
+            <BannerSlider/>
+
+            <h2 className="text-2xl font-bold mb-4 mt-5">Danh sách sản phẩm</h2>
 
             {productList.length === 0 ? (
                 <p>Không có sản phẩm nào.</p>
@@ -45,7 +49,7 @@ export default function HomePage() {
                                 className="w-full h-40 object-contain rounded-md" 
                             />
                             <p className="text-sm h-10 font-medium line-clamp-2 overflow-hidden mt-2">{product.name}</p>
-                            <p className="text-red-500 font-bold">{product.price.toLocaleString()}₫</p>
+                            <p className="text-blue-500 font-bold">{product.price.toLocaleString()}₫</p>
                             <div className="flex">
                                 <div className="flex gap-1 border-r border-gray-300 p-1 items-center">
                                     <FaStar className="text-sm text-blue-500" />
