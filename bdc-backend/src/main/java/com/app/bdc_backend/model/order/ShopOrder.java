@@ -43,6 +43,8 @@ public class ShopOrder {
 
     private int canceledBy;
 
+    private long total;
+
     private Date createdAt = new Date();
 
     public void setStatus(int status) {

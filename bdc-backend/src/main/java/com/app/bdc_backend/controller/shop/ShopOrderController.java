@@ -19,12 +19,14 @@ public class ShopOrderController {
     public ResponseEntity<?> getShopOrderList(@RequestParam(value = "type") int type,
                                               @RequestParam(value = "filterType", defaultValue = "0") int filterType,
                                               @RequestParam(value = "keyword", defaultValue = "") String keyword,
+                                              @RequestParam int sortType,
                                               @RequestParam(value = "page") int page,
                                               @RequestParam (value = "limit") int limit){
         Page<ShopOrderDTO> shopOrderDTOS = shopFacadeService.getShopOrders(
                 type,
                 filterType,
                 keyword,
+                sortType,
                 page,
                 limit
         );

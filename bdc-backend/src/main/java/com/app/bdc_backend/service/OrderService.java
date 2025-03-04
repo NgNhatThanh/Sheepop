@@ -4,8 +4,11 @@ import com.app.bdc_backend.dao.order.OrderItemRepository;
 import com.app.bdc_backend.dao.order.OrderRerpository;
 import com.app.bdc_backend.dao.shop.ShopOrderRepository;
 import com.app.bdc_backend.model.dto.ShopOrderPageImpl;
+import com.app.bdc_backend.model.dto.response.OrderItemDTO;
 import com.app.bdc_backend.model.dto.response.ProductSaleInfo;
+import com.app.bdc_backend.model.dto.response.ShopOrderDTO;
 import com.app.bdc_backend.model.enums.PaymentStatus;
+import com.app.bdc_backend.model.enums.PaymentType;
 import com.app.bdc_backend.model.enums.ShopOrderStatus;
 import com.app.bdc_backend.model.order.Order;
 import com.app.bdc_backend.model.order.OrderItem;
@@ -91,40 +94,100 @@ public class OrderService {
                                                        int filterType,
                                                        String keyword){
          if(filterType == 0)
-             return shopOrderRepository.findLastByShopAndStatusInOrderByCreatedAtDesc(shop, statusList, pageable);
+             return shopOrderRepository.findLastByShopAndStatusIn(shop, statusList, pageable);
          else {
              if(filterType == 1)
                  return shopOrderRepository
-                         .findLastByShopAndIdAndStatusInOrderByCreatedAtDesc(
+                         .findLastByShopAndIdAndStatusIn(
                                  shop,
                                  keyword,
                                  statusList,
                                  pageable);
              else if(filterType == 2){
-                 ShopOrderPageImpl pageRes = shopOrderRepository.findByShopAndUserFullNameContainingIgnoreCaseAndStatusInOrderByCreatedAtDesc(
+                 Sort sort = pageable.getSort();
+                 String sortBy = sort.get().toList().get(0).getProperty();
+                 Sort.Direction direction = sort.get().toList().get(0).getDirection();
+                 ShopOrderPageImpl pageRes = shopOrderRepository.findByShopAndUserFullNameContainingIgnoreCaseAndStatusIn(
                          shop.getId(),
                          keyword,
                          statusList,
                          pageable.getOffset(),
-                         pageable.getPageSize()
+                         pageable.getPageSize(),
+                         sortBy,
+                         direction == Sort.Direction.DESC ? -1 : 1
                  );
                  if(pageRes == null)
                      return new PageImpl<>(new ArrayList<>());
                  return new PageImpl<>(pageRes.getContent(), pageable, pageRes.getTotalElements());
              }
              else{
-                ShopOrderPageImpl pageRes = shopOrderRepository.findShopOrderThatProductNameContainingIgnoreCaseAndStatusInOrderByCreatedAtDesc(
+                Sort sort = pageable.getSort();
+                String sortBy = sort.get().toList().get(0).getProperty();
+                Sort.Direction direction = sort.get().toList().get(0).getDirection();
+                ShopOrderPageImpl pageRes = shopOrderRepository.findShopOrderThatProductNameContainingIgnoreCaseAndStatusIn(
                         shop.getId(),
                         keyword,
                         statusList,
                         pageable.getOffset(),
-                        pageable.getPageSize()
+                        pageable.getPageSize(),
+                        sortBy,
+                        direction == Sort.Direction.DESC ? -1 : 1
                 );
                 if(pageRes == null)
                     return new PageImpl<>(new ArrayList<>());
                 return new PageImpl<>(pageRes.getContent(), pageable, pageRes.getTotalElements());
              }
          }
+    }
+
+    public Page<ShopOrder> getShopOrdersByStatus(List<Integer> statusList,
+                                                 Pageable pageable,
+                                                 int filterType,
+                                                 String keyword){
+        if(filterType == 0)
+            return shopOrderRepository.findLastByStatusIn(statusList, pageable);
+        else {
+            if(filterType == 1)
+                return shopOrderRepository
+                        .findLastByIdAndStatusIn(
+                                keyword,
+                                statusList,
+                                pageable);
+            else if(filterType == 2){
+                Sort sort = pageable.getSort();
+                String sortBy = sort.get().toList().get(0).getProperty();
+                Sort.Direction direction = sort.get().toList().get(0).getDirection();
+                ShopOrderPageImpl pageRes = shopOrderRepository.findByShopAndUserFullNameContainingIgnoreCaseAndStatusIn(
+                        null,
+                        keyword,
+                        statusList,
+                        pageable.getOffset(),
+                        pageable.getPageSize(),
+                        sortBy,
+                        direction == Sort.Direction.DESC ? -1 : 1
+                );
+                if(pageRes == null)
+                    return new PageImpl<>(new ArrayList<>());
+                return new PageImpl<>(pageRes.getContent(), pageable, pageRes.getTotalElements());
+            }
+            else{
+                Sort sort = pageable.getSort();
+                String sortBy = sort.get().toList().get(0).getProperty();
+                Sort.Direction direction = sort.get().toList().get(0).getDirection();
+                ShopOrderPageImpl pageRes = shopOrderRepository.findShopOrderThatProductNameContainingIgnoreCaseAndStatusIn(
+                        null,
+                        keyword,
+                        statusList,
+                        pageable.getOffset(),
+                        pageable.getPageSize(),
+                        sortBy,
+                        direction == Sort.Direction.DESC ? -1 : 1
+                );
+                if(pageRes == null)
+                    return new PageImpl<>(new ArrayList<>());
+                return new PageImpl<>(pageRes.getContent(), pageable, pageRes.getTotalElements());
+            }
+        }
     }
 
     public List<ShopOrder> getAllShopOrderByOrder(Order order){
@@ -141,6 +204,40 @@ public class OrderService {
 
     public int countShopSold(ObjectId shopId){
         return shopOrderRepository.countShopSold(shopId);
+    }
+
+    public List<ShopOrder> getAllShopOrder(){
+        return shopOrderRepository.findAll();
+    }
+
+    public ShopOrderDTO toShopOrderDTO(ShopOrder shopOrder) {
+        ShopOrderDTO dtoShopOrder = new ShopOrderDTO();
+        dtoShopOrder.setId(shopOrder.getId().toString());
+        dtoShopOrder.setUsername(shopOrder.getShop().getUser().getUsername());
+        dtoShopOrder.setName(shopOrder.getShop().getName());
+        dtoShopOrder.setCompletedPayment(shopOrder.getOrder().getPayment().getStatus() != PaymentStatus.PENDING
+                || shopOrder.getOrder().getPayment().getType() == PaymentType.COD);
+        dtoShopOrder.setBuyerName(shopOrder.getUser().getFullName());
+        dtoShopOrder.setBuyerUsername(shopOrder.getUser().getUsername());
+        dtoShopOrder.setStatus(shopOrder.getStatus());
+        dtoShopOrder.setCreatedAt(shopOrder.getCreatedAt());
+        dtoShopOrder.setShippingFee(shopOrder.getShippingFee());
+        dtoShopOrder.setTotal(shopOrder.getTotal());
+        dtoShopOrder.setPaymentType(shopOrder.getOrder().getPayment().getType());
+        List<OrderItemDTO> itemDtos = new ArrayList<>();
+        for(OrderItem item : shopOrder.getItems()){
+            OrderItemDTO dtoItem = new OrderItemDTO();
+            dtoItem.setId(item.getId().toString());
+            dtoItem.setQuantity(item.getQuantity());
+            dtoItem.setPrice(item.getPrice());
+            dtoItem.setAttributes(item.getAttributes());
+            dtoItem.getProduct().setId(item.getProduct().getId().toString());
+            dtoItem.getProduct().setName(item.getProduct().getName());
+            dtoItem.getProduct().setThumbnailUrl(item.getProduct().getThumbnailUrl());
+            itemDtos.add(dtoItem);
+        }
+        dtoShopOrder.setItems(itemDtos);
+        return dtoShopOrder;
     }
 
 }

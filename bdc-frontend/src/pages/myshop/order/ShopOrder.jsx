@@ -43,6 +43,11 @@ const cancelReasons = [
     "Hết hàng"
 ]
 
+const paymentTypeMap = {
+    'cash_on_delivery': 'COD',
+    'bank_transfer': 'Chuyển khoản ngân hàng'
+}
+
 const filters = [
     "Tất cả",
     "Mã đơn hàng",
@@ -66,14 +71,17 @@ export default function ShopOrder(){
     const [orders, setOrders] = useState([])
 
     const [filterType, setFilterType] = useState(0);
+    const [selectedFilterType, setSelectedFilterType] = useState(0)
     const [searchQuery, setSearchQuery] = useState("");
     const [openFilter, setOpenFilter] = useState(false);
+
+    const [sortType, setSortType] = useState(0)
 
     const fetchShopOrders = (type, reset = false) => {
         setIsEmpty(false)
         setOrders([])
         setIsLoading(true)
-        fetchWithAuth(`${BASE_API_URL}/v1/shop/order/get_list?type=${type}&page=${page - 1}&limit=${limit}&filterType=${filterType}&keyword=${searchQuery}`, 
+        fetchWithAuth(`${BASE_API_URL}/v1/shop/order/get_list?type=${type}&page=${page - 1}&limit=${limit}&filterType=${filterType}&sortType=${sortType}&keyword=${searchQuery}`, 
             window.location, 
             true)
             .then(res => res.json())
@@ -102,6 +110,9 @@ export default function ShopOrder(){
     }
 
     const resetFilter = () => {
+        setSearchQuery("");
+        setSelectedFilterType(0)
+        setFilterType(0)
         setPage(1)
         fetchShopOrders(currentType, true)
     }
@@ -112,7 +123,16 @@ export default function ShopOrder(){
 
     useEffect(() => {
         fetchShopOrders(currentType, true)
-    }, [page, limit])
+    }, [page, limit, filterType, sortType])
+
+    const sortIcons = (t1, t2) => {
+        return (
+            <div>
+                <p className={`${sortType === t1 ? 'text-gray-800' : 'text-gray-300'}`}>⏶</p>
+                <p className={`${sortType === t2 ? 'text-gray-800' : 'text-gray-300'}`}>⏷</p>
+            </div>
+        )
+    }
 
     return (
         <div>
@@ -141,7 +161,7 @@ export default function ShopOrder(){
                         onClick={() => setOpenFilter(!openFilter)}
                         className="flex cursor-pointer justify-between border border-gray-300 transtion-all duration-200 px-3 py-2 rounded flex items-center gap-2 w-44 hover:border-blue-500"
                     >
-                    {filters[filterType]}
+                    {filters[selectedFilterType]}
                     <FaChevronDown className={`transition-transform ${openFilter ? "rotate-180" : "rotate-0"}`} />
                     </button>
                     {openFilter && (
@@ -150,11 +170,11 @@ export default function ShopOrder(){
                         <li
                             key={item}
                             className={`px-3 py-2 cursor-pointer ${
-                                item === filters[filterType] ? "text-blue-500 font-semibold" : "text-gray-700"
+                                item === filters[selectedFilterType] ? "text-blue-500 font-semibold" : "text-gray-700"
                             } hover:bg-gray-100`}
                             onClick={() => {
                                 setSearchQuery("")
-                                setFilterType(index);
+                                setSelectedFilterType(index);
                                 setOpenFilter(false);
                             }}
                         >
@@ -167,9 +187,9 @@ export default function ShopOrder(){
 
                 <input
                     type="text"
-                    disabled={filterType === 0}
-                    placeholder={filterType === 0 ? 'Tìm kiếm...' : `Nhập ${filters[filterType].toLowerCase()}...`}
-                    className={`border border-gray-300 px-3 py-2 rounded w-60 ${filterType === 0 && 'bg-gray-100 cursor-not-allowed'}`}
+                    disabled={selectedFilterType === 0}
+                    placeholder={selectedFilterType === 0 ? 'Tìm kiếm...' : `Nhập ${filters[selectedFilterType].toLowerCase()}...`}
+                    className={`border border-gray-300 px-3 py-2 rounded w-60 ${selectedFilterType === 0 && 'bg-gray-100 cursor-not-allowed'}`}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                 />
@@ -177,9 +197,7 @@ export default function ShopOrder(){
                 <button 
                     className="bg-blue-500 cursor-pointer text-white px-4 py-2 rounded hover:bg-blue-600 transition"
                     onClick={() => {
-                        setIsEmpty(false)
-                        setOrders([])
-                        fetchShopOrders(currentType, true)
+                        setFilterType(selectedFilterType)
                     }}    
                 >
                     Áp dụng
@@ -188,8 +206,6 @@ export default function ShopOrder(){
                 <button
                     className="border cursor-pointer border-gray-400 px-4 py-2 rounded hover:bg-gray-100 transition"
                     onClick={() => {
-                        setSearchQuery("");
-                        setFilterType(0);
                         resetFilter()
                     }}
                 >
@@ -203,9 +219,25 @@ export default function ShopOrder(){
                 <table className="table-fixed w-full border-collapse border border-gray-300">
                     <thead>
                         <tr className=" w-full">
-                            <th className="border border-gray-300 p-2 w-1/14">Ngày tạo đơn</th>
+                            <th className="border border-gray-300 p-2 w-1/14">
+                                <div 
+                                    className="cursor-pointer flex gap-2 justify-center items-center"
+                                    onClick={() => setSortType(sortType === 1 ? 0 : 1)}
+                                >
+                                    Ngày tạo đơn
+                                    {sortIcons(1, 0)}
+                                </div>
+                            </th>
                             <th className="border border-gray-300 p-2 w-2/3">Sản phẩm</th>
-                            <th className="border border-gray-300 p-2 w-2/15">Tổng đơn hàng</th>
+                            <th className="border border-gray-300 p-2 w-2/15">
+                                <div 
+                                    className="cursor-pointer flex gap-2 justify-center items-center"
+                                    onClick={() => setSortType(sortType === 3 ? 2 : 3)}
+                                >
+                                    Tổng đơn hàng
+                                    {sortIcons(3, 2)}
+                                </div>
+                            </th>
                             <th className="border border-gray-300 p-2 w-1/15">Trạng thái</th>
                             <th className="border border-gray-300 p-2 w-1/15">Thao tác</th>
                         </tr>
@@ -217,45 +249,49 @@ export default function ShopOrder(){
                                     {formatDate(shopOrder.createdAt)}
                                 </td>
                                 <td className="items-center border-r border-gray-300">
-                                    {shopOrder.items.map((item) => (
-                                        <div key={item.id} className="flex p-5">
-                                            <img
-                                                src={item.product.thumbnailUrl}
-                                                alt={item.product.name}
-                                                className="w-16 h-16 object-cover rounded-lg"
-                                            />
-                                            <div className="ml-4 flex-1">
-                                                <Link to="#">
-                                                    <p className="font-medium text-gray-800 line-clamp-2 hover:text-blue-500">
-                                                        {item.product.name}
-                                                    </p>
-                                                </Link>
-                                                
-                                                <div className="flex gap-5">
-                                                    <div>
-                                                    {item.attributes?.map((attr) => (
-                                                        <p key={attr.name} className="text-gray-500 text-sm">
-                                                            {attr.name}: {attr.value} &nbsp;
+                                    <div className="p-5">
+                                        <p href="#" className="mb-2 font-semibold text-gray-600 hover:text-gray-800">
+                                            Người mua: {shopOrder.buyerName}
+                                        </p>
+                                        {shopOrder.items.map((item) => (
+                                            <div key={item.id} className="flex">
+                                                <img
+                                                    src={item.product.thumbnailUrl}
+                                                    alt={item.product.name}
+                                                    className="w-16 h-16 object-cover rounded-lg"
+                                                />
+                                                <div className="ml-4 flex-1">
+                                                    <Link to={`../product/${item.product.id}`}>
+                                                        <p className="font-medium text-gray-800 line-clamp-2 hover:text-blue-500">
+                                                            {item.product.name}
                                                         </p>
-                                                    ))}
+                                                    </Link>
+                                                    
+                                                    <div className="flex gap-5">
+                                                        <div>
+                                                        {item.attributes?.map((attr) => (
+                                                            <p key={attr.name} className="text-gray-500 text-sm">
+                                                                {attr.name}: {attr.value} &nbsp;
+                                                            </p>
+                                                        ))}
+                                                        </div>
+                                                        <p className="text-gray-500 text-sm">
+                                                        x {item.quantity}
+                                                        </p>
                                                     </div>
-                                                    <p className="text-gray-500 text-sm">
-                                                    x {item.quantity}
-                                                    </p>
                                                 </div>
+                                                <p className="text-blue-600 font-semibold">
+                                                    {item.price.toLocaleString()} VND
+                                                </p>
                                             </div>
-                                            <p className="text-blue-600 font-semibold">
-                                                {item.price.toLocaleString()} VND
-                                            </p>
-                                        </div>
-                                    ))}
-                                    <p className="text-sm text-gray-600 ml-5 mb-2">Mã đơn: {shopOrder.id.toUpperCase()}</p>
+                                        ))}
+                                        <p className="text-sm text-gray-600 mt-1">Mã đơn: {shopOrder.id.toUpperCase()}</p>
+                                        <p className="text-sm text-gray-600 mt-1">Phương thức thanh toán: {paymentTypeMap[shopOrder.paymentType]}</p>
+                                    </div>
                                 </td>
                                 <td className="text-center border-r border-gray-300">
                                     <p className="text-blue-600 font-semibold">
-                                        {(shopOrder.items.
-                                            reduce((total, item) => total + item.price * item.quantity, 0) + shopOrder.shippingFee)
-                                                .toLocaleString()} VND
+                                        {shopOrder.total.toLocaleString()} VND
                                     </p> 
                                 </td>
                                 <td className="text-center border-r border-gray-300">
@@ -313,7 +349,7 @@ export default function ShopOrder(){
                         
                     </tbody>
                 </table>
-                {!isEmpty && (
+                {orders.length > 0 && (
                     <Pagination
                         page={page}
                         setPage={setPage}

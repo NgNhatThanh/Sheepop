@@ -1,6 +1,8 @@
 package com.app.bdc_backend.facade;
 
 import com.app.bdc_backend.model.dto.response.ProductSaleInfo;
+import com.app.bdc_backend.model.order.OrderItem;
+import com.app.bdc_backend.model.order.ShopOrder;
 import com.app.bdc_backend.model.product.Product;
 import com.app.bdc_backend.model.product.ProductSKU;
 import com.app.bdc_backend.service.OrderService;
@@ -41,6 +43,18 @@ public class ScheduledService {
         }
         productService.saveAllProducts(products);
         log.info("Recalculated product data");
+    }
+
+    @Scheduled(fixedDelay = 300000)
+    private void recalculateShopOrderData(){
+        List<ShopOrder> shopOrders = orderService.getAllShopOrder();
+        for(ShopOrder shopOrder : shopOrders){
+            long total = 0;
+            for(OrderItem item : shopOrder.getItems()) total += item.getPrice() * item.getQuantity();
+            total += shopOrder.getShippingFee();
+            shopOrder.setTotal(total);
+        }
+        orderService.saveAllShopOrders(shopOrders);
     }
 
 }

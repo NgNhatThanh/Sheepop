@@ -141,6 +141,7 @@ public class ShopFacadeService {
     public Page<ShopOrderDTO> getShopOrders(int type,
                                             int filterType,
                                             String keyword,
+                                            int sortType,
                                             int page,
                                             int limit){
         if(filterType < 0 || filterType > 3){
@@ -149,10 +150,17 @@ public class ShopFacadeService {
         if(filterType >= 1 && (keyword == null || keyword.isEmpty())){
             throw new RequestException("Invalid request: filter data");
         }
+        if(sortType < 0 || sortType > 3)
+            throw new RequestException("Invalid request: sort type");
+        Sort sort;
+        String sortBy;
+        if(sortType < 2) sortBy = "createdAt";
+        else sortBy = "total";
+        sort = Sort.by(sortType % 2 == 0 ? Sort.Direction.DESC : Sort.Direction.ASC, sortBy);
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userService.findByUsername(username);
         Shop shop = shopService.findByUser(user);
-        Pageable pageable = PageRequest.of(page, limit);
+        Pageable pageable = PageRequest.of(page, limit, sort);
         Page<ShopOrder> data = null;
         switch (type){
             case 0:
@@ -201,7 +209,7 @@ public class ShopFacadeService {
         if(data == null){
             throw new RequestException("Invalid request");
         }
-        return data.map(this::toShopOrderDTO);
+        return data.map(orderService::toShopOrderDTO);
     }
 
     public void updateOrder(String shopOrderId,
@@ -410,32 +418,6 @@ public class ShopFacadeService {
             throw new RequestException("Địa chỉ không hợp lệ");
         }
         return address;
-    }
-
-    private ShopOrderDTO toShopOrderDTO(ShopOrder shopOrder) {
-        ShopOrderDTO dtoShopOrder = new ShopOrderDTO();
-        dtoShopOrder.setId(shopOrder.getId().toString());
-        dtoShopOrder.setUsername(shopOrder.getShop().getUser().getUsername());
-        dtoShopOrder.setName(shopOrder.getShop().getName());
-        dtoShopOrder.setCompletedPayment(shopOrder.getOrder().getPayment().getStatus() != PaymentStatus.PENDING
-                || shopOrder.getOrder().getPayment().getType() == PaymentType.COD);
-        dtoShopOrder.setStatus(shopOrder.getStatus());
-        dtoShopOrder.setCreatedAt(shopOrder.getCreatedAt());
-        dtoShopOrder.setShippingFee(shopOrder.getShippingFee());
-        List<OrderItemDTO> itemDtos = new ArrayList<>();
-        for(OrderItem item : shopOrder.getItems()){
-            OrderItemDTO dtoItem = new OrderItemDTO();
-            dtoItem.setId(item.getId().toString());
-            dtoItem.setQuantity(item.getQuantity());
-            dtoItem.setPrice(item.getPrice());
-            dtoItem.setAttributes(item.getAttributes());
-            dtoItem.getProduct().setId(item.getProduct().getId().toString());
-            dtoItem.getProduct().setName(item.getProduct().getName());
-            dtoItem.getProduct().setThumbnailUrl(item.getProduct().getThumbnailUrl());
-            itemDtos.add(dtoItem);
-        }
-        dtoShopOrder.setItems(itemDtos);
-        return dtoShopOrder;
     }
 
     private ShopProfileDTO toShopProfileDTO(Shop shop){
