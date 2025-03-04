@@ -1,5 +1,6 @@
 package com.app.bdc_backend.model.product;
 
+import com.app.bdc_backend.model.enums.RestrictStatus;
 import com.app.bdc_backend.model.shop.Shop;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -46,11 +47,21 @@ public class Product {
     @DocumentReference
     private List<ProductMedia> mediaList;
 
+    private long revenue;
+
+    private int sold;
+
     private boolean visible;
 
     private Date createdAt;
 
     private Date updatedAt;
+
+    private boolean restricted;
+
+    private String restrictedReason;
+
+    private RestrictStatus restrictStatus;
 
     private boolean deleted = false;
 

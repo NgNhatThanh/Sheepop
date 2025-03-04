@@ -223,6 +223,7 @@ public class OrderFacadeService {
         }
         for(OrderItem item : shopOrder.getItems()){
             item.setSuccess(true);
+            recalculateProductData(item.getProduct());
         }
         orderService.saveAllItems(shopOrder.getItems());
         shopOrder.setStatus(ShopOrderStatus.COMPLETED);
@@ -293,6 +294,24 @@ public class OrderFacadeService {
 
     private void refund(){
         log.info("Need to refund");
+    }
+
+    public void recalculateProductData(Product product){
+        ProductSaleInfo saleInfo = orderService.getProductSaleInfo(product.getId());
+        product.setRevenue(saleInfo.getRevenue());
+        product.setSold(saleInfo.getSold());
+        if(!product.getSkuList().isEmpty()){
+            long minPrice = product.getSkuList().get(0).getPrice();
+            int totalQuantity = 0;
+            for(ProductSKU sku : product.getSkuList()){
+                minPrice = Math.min(minPrice, sku.getPrice());
+                totalQuantity += sku.getQuantity();
+            }
+            product.setPrice(minPrice);
+            product.setQuantity(totalQuantity);
+        }
+        productService.saveProduct(product);
+        log.info("Recalculated product data {}", product.getId().toString());
     }
 
 

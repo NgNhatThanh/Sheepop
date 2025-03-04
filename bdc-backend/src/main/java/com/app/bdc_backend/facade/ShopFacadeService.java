@@ -10,6 +10,7 @@ import com.app.bdc_backend.model.dto.request.UpdateShopProfileDTO;
 import com.app.bdc_backend.model.dto.response.*;
 import com.app.bdc_backend.model.enums.PaymentStatus;
 import com.app.bdc_backend.model.enums.PaymentType;
+import com.app.bdc_backend.model.enums.RestrictStatus;
 import com.app.bdc_backend.model.enums.ShopOrderStatus;
 import com.app.bdc_backend.model.order.OrderItem;
 import com.app.bdc_backend.model.order.ShopOrder;
@@ -22,9 +23,12 @@ import com.app.bdc_backend.model.user.User;
 import com.app.bdc_backend.service.*;
 import com.app.bdc_backend.util.ModelMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
@@ -34,6 +38,7 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class ShopFacadeService {
 
     private final UserService userService;
@@ -230,6 +235,7 @@ public class ShopFacadeService {
         Product product = ModelMapper.getInstance().map(productDTO, Product.class);
         product.setShop(shop);
         product.setCreatedAt(new Date());
+        product.setUpdatedAt(new Date());
         Category category = ModelMapper.getInstance().map(productDTO.getCategory(), Category.class);
         if(category.isHasChildren())
             throw new RequestException("Invalid request: category has children");
@@ -264,16 +270,63 @@ public class ShopFacadeService {
         }
         productService.addProductMediaList(updatedProd.getMediaList());
         productService.addProductSKUList(updatedProd.getSkuList());
+        if(product.isRestricted()){
+            updatedProd.setRestrictedReason(product.getRestrictedReason());
+            updatedProd.setRestrictStatus(RestrictStatus.PENDING);
+            updatedProd.setRestricted(true);
+        }
+        updatedProd.setDeleted(product.isDeleted());
         productService.saveProduct(updatedProd);
     }
 
-    public Page<ShopProductTableResponseDTO> getProductList(int page, int limit){
+    public Page<ShopProductTableResponseDTO> getProductList(int type,
+                                                            String keyword,
+                                                            String categoryId,
+                                                            int sortType,
+                                                            int page,
+                                                            int limit){
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userService.findByUsername(username);
         Shop shop = shopService.findByUser(user);
-        Pageable pageable = PageRequest.of(page, limit);
-        Page<Product> productList = productService.findForShopProductTable(shop, pageable);
-        return productList.map(
+        if(!shop.getUser().getUsername().equals(username))
+            throw new RequestException("Invalid request: not your shop's product");
+        if(sortType < 0 || sortType > 9)
+            throw new RequestException("Invalid sort type");
+        Sort sort;
+        String sortBy;
+        if(sortType < 2) sortBy = "revenue";
+        else if(sortType < 4) sortBy = "quantity";
+        else if(sortType < 6) sortBy = "price";
+        else if(sortType < 8) sortBy = "createdAt";
+        else sortBy = "sold";
+        sort = Sort.by(sortType % 2 == 0 ? Sort.Direction.DESC : Sort.Direction.ASC, sortBy);
+        Pageable pageable = PageRequest.of(page, limit, sort);
+        Category category = null;
+        if(!categoryId.isEmpty()) {
+            category = categoryService.findById(categoryId);
+            if(category == null)
+                throw new RequestException("Invalid request: category not found");
+        }
+        Page<Product> products;
+        if(type == 0){
+            products = productService.getActiveProductsForShop(shop, keyword, category, pageable);
+        }
+        else if(type == 1){
+            products = productService.getRestrictedProductForShop(shop, keyword, category, pageable);
+        }
+        else if(type == 2){
+            products = productService.getPendingRestrictProductsForShop(shop, keyword, category, pageable);
+        }
+        else if(type == 3){
+            products = productService.getHiddenProductsForShop(shop, keyword, category, pageable);
+        }
+        else if(type == 4){
+            products = productService.getOutOfStockProductsForShop(shop, keyword, category, pageable);
+        }
+        else{
+            throw new RequestException("Invalid request: invalid type");
+        }
+        return products.map(
                 this::toProductTableDTO
         );
     }
@@ -287,6 +340,13 @@ public class ShopFacadeService {
         productService.saveProduct(product);
     }
 
+    public List<Category> getShopCategories(){
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userService.findByUsername(username);
+        Shop shop = shopService.findByUser(user);
+        return shopService.getShopCategories(shop).getCategories();
+    }
+
     private ShopProductTableResponseDTO toProductTableDTO(Product product) {
         ShopProductTableResponseDTO dto = new ShopProductTableResponseDTO();
         dto.setId(product.getId().toString());
@@ -295,19 +355,23 @@ public class ShopFacadeService {
         dto.setVisible(product.isVisible());
         dto.setCreatedAt(product.getCreatedAt());
         dto.setUpdatedAt(product.getUpdatedAt());
-        ProductSaleInfo saleInfo = orderService.getProductSaleInfo(product.getId());
-        dto.setRevenue(saleInfo.getRevenue());
-        dto.setSold(saleInfo.getSold());
+        dto.setRevenue(product.getRevenue());
+        dto.setSold(product.getSold());
         if(!product.getSkuList().isEmpty()){
+            long minPrice = 999999999999L;
             for(ProductSKU sku : product.getSkuList()){
                 dto.setQuantity(dto.getQuantity() + sku.getQuantity());
                 dto.getSkuList().add(ModelMapper.getInstance().map(sku, ProductSKUResponseDTO.class));
+                minPrice = Math.min(minPrice, sku.getPrice());
             }
+            dto.setPrice(minPrice);
         }
         else{
             dto.setQuantity(product.getQuantity());
             dto.setPrice(product.getPrice());
         }
+        dto.setRestricted(product.isRestricted());
+        dto.setRestrictReason(product.getRestrictedReason());
         return dto;
     }
 

@@ -25,7 +25,13 @@ public class CartService {
     private final CartItemRepository cartItemRepository;
 
     public Cart findByUser(User user){
-        return cartRepository.findByUser(user);
+        Cart cart = cartRepository.findByUser(user);
+        if(cart == null){
+            cart = new Cart();
+            cart.setUser(user);
+            cartRepository.save(cart);
+        }
+        return cart;
     }
 
     public Cart save(Cart cart){

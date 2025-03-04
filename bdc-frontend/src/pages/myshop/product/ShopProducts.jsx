@@ -1,4 +1,4 @@
-import { useLocation, Link } from "react-router-dom";
+import { useLocation, Link, useNavigate } from "react-router-dom";
 import React from "react";
 import { useState, useEffect } from "react";
 import { fetchWithAuth } from '../../../util/AuthUtil'
@@ -12,17 +12,20 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
+import { LuPackageX } from "react-icons/lu";
+import TableLoading from '../../common/TableLoading'
 
 const tabs = [
-    "Tất cả",
     "Đang kích hoạt",
     "Vi phạm",
+    "Chờ kiểm duyệt",
     "Chưa được đăng",
     "Hết hàng"
 ];
 
 export default function ShopProducts(){
 
+    const navigate = useNavigate()
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
     const currentType = parseInt(searchParams.get("type")) || 0;
@@ -35,19 +38,35 @@ export default function ShopProducts(){
     const [products, setProducts] = useState([]);
     const [totalPages, setTotalPages] = useState(1)
     const [totalProducts, setTotalProducts] = useState(0)
-    const [isLoadingProduct, setIsLoadingProduct] = useState(false)
+    const [isLoading, setIsLoading] = useState(false)
     const [isShowingSKUList, setIsShowingSKUList] = useState({})
+
+    const [keyword, setKeyword] = useState("")
+    const [categoryId, setCategoryId] = useState("")
+    const [sortType, setSortType] = useState(0)
+
+    const [searchInputKeyword, setSearchInputKeyword] = useState("")
+    const [selectedSearchCategory, setSelectedCategory] = useState(null)
+
+    const [shopCategories, setShopCategories] = useState([])
+    const [openOpenCategoriesDropdown, setOpenCategoriesDropdown] = useState(false)
     
     const loadProduct = async () => {
-        setIsLoadingProduct(true)
-        const res = await fetchWithAuth(`${BASE_API_URL}/v1/shop/product/list?page=${page - 1}&limit=${limit}`)
+        setIsLoading(true)
+        const res = await fetchWithAuth(`${BASE_API_URL}/v1/shop/product/list?type=${currentType}&sortType=${sortType}&keyword=${keyword}&categoryId=${categoryId}&page=${page - 1}&limit=${limit}`)
         await res.json()
-        .then(page => {
-            setTotalPages(page.totalPages)
-            setTotalProducts(page.totalElements)
-            setProducts(page.content)
-        })
-        setIsLoadingProduct(false)
+            .then(res => {
+                console.log(products)
+                if(res.message){
+                    toast.error("Có lỗi xảy ra, vui lòng thử lại sau")
+                }
+                else{
+                    setTotalPages(res.totalPages)
+                    setTotalProducts(res.totalElements)
+                    setProducts(res.content)
+                }
+            })
+        setIsLoading(false)
     }
     
     const toggleShowSKUList = (productId) => {
@@ -95,7 +114,36 @@ export default function ShopProducts(){
     
     useEffect(() => {
         loadProduct()
+    }, [currentType, page, limit, sortType, keyword, categoryId])
+
+    useEffect(() => {   
+        const fetchShopCategory = () => {
+            fetchWithAuth(`${BASE_API_URL}/v1/shop/product/get_categories`)
+                .then(res => res.json())
+                .then(res => setShopCategories(res))
+        }
+
+        fetchShopCategory()
     }, [])
+
+    const displayCategory = (cat) => {
+        let disp = cat.name
+        cat = cat.parent
+        while(cat){
+            disp += ' > ' + cat.name 
+            cat = cat.parent
+        }
+        return disp
+    }
+
+    const sortIcons = (t1, t2) => {
+        return (
+            <div>
+                <p className={`${sortType === t1 ? 'text-gray-800' : 'text-gray-300'}`}>⏶</p>
+                <p className={`${sortType === t2 ? 'text-gray-800' : 'text-gray-300'}`}>⏷</p>
+            </div>
+        )
+    }
     
     return (
         <div>
@@ -119,7 +167,7 @@ export default function ShopProducts(){
                         ? "text-blue-600 border-b-2 border-blue-600"
                         : "text-gray-900"
                     } hover:text-blue-500`}
-                    onClick={() => navigate(`/myshop/order-list?type=${index}`)}
+                    onClick={() => navigate(`/myshop/product-list?type=${index}`)}
                 >
                     {tab}
                 </button>
@@ -128,23 +176,60 @@ export default function ShopProducts(){
 
             <div className="flex items-center justify-center space-x-3 bg-white p-4 rounded mt-4 shadow-md">
                 <input
+                    value={searchInputKeyword}
                     type="text"
                     placeholder="Tìm tên sản phẩm"
+                    onChange={e => setSearchInputKeyword(e.target.value)}
                     className={`border border-gray-300 px-3 py-2 rounded w-60`}
                 />
 
-                <input
-                    type="text"
-                    placeholder="Tìm theo ngành hàng"
-                    className={`border border-gray-300 px-3 py-2 rounded w-60`}
-                />
+                <div className="relative">
+                    <button
+                        type="text"
+                        placeholder="Tìm theo ngành hàng"
+                        className={`border border-gray-300 px-3 py-2 rounded min-w-60 flex gap-2 justify-between items-center transtion-all duration-200 cursor-pointer hover:border-blue-600`}
+                        onClick={() => setOpenCategoriesDropdown(!openOpenCategoriesDropdown)}
+                    >
+                        {selectedSearchCategory ? displayCategory(selectedSearchCategory) : "Tất cả ngành hàng"}
+                        <span className={`transform transition-transform ${!openOpenCategoriesDropdown ? "rotate-180" : "rotate-0"}`}>
+                            ▲
+                        </span>
+                    </button>
+
+                    <ul
+                        className={`absolute right-0 top-full mb-1 w-full bg-white border border-gray-300 rounded shadow-md overflow-hidden transition-all duration-300 ${
+                            openOpenCategoriesDropdown ? "opacity-100 max-h-40" : "opacity-0 max-h-0"
+                        }`}
+                    >
+                         <li
+                            className="px-2 py-1 cursor-pointer hover:bg-gray-200"
+                            onClick={() => {
+                                setSelectedCategory(null)
+                                setOpenCategoriesDropdown(false);
+                            }}
+                        >
+                            Tất cả
+                        </li>
+                        {shopCategories.map((cat, index) => (
+                            <li
+                                key={index}
+                                className="px-2 py-1 cursor-pointer hover:bg-gray-200"
+                                onClick={() => {
+                                    setSelectedCategory(cat);
+                                    setOpenCategoriesDropdown(false);
+                                }}
+                            >
+                                {displayCategory(cat)}
+                            </li>
+                        ))}
+                    </ul>
+                </div>
 
                 <button 
                     className="bg-blue-500 cursor-pointer text-white px-4 py-2 rounded hover:bg-blue-600 transition"
                     onClick={() => {
-                        setIsEmpty(false)
-                        setOrders([])
-                        fetchShopOrders(currentType, true)
+                        setKeyword(searchInputKeyword)
+                        setCategoryId(selectedSearchCategory ? selectedSearchCategory.id : "")
                     }}    
                 >
                     Áp dụng
@@ -153,9 +238,10 @@ export default function ShopProducts(){
                 <button
                     className="border cursor-pointer border-gray-400 px-4 py-2 rounded hover:bg-gray-100 transition"
                     onClick={() => {
-                        setSearchQuery("");
-                        setFilterType(0);
-                        resetFilter()
+                        setSelectedCategory(null)
+                        setSearchInputKeyword("")
+                        setKeyword("")
+                        setCategoryId("")
                     }}
                 >
                     Đặt lại
@@ -163,29 +249,71 @@ export default function ShopProducts(){
             </div>
 
             <p className="text-xl font-semibold mb-2 mt-4">{totalProducts} sản phẩm</p>
-            <div className="container mx-auto bg-white rounded-sm ">
+            <div className="container m-auto bg-white rounded-sm ">
                 <table className="table-auto w-full border-collapse border border-gray-300">
                     <thead>
-                        <tr className="bg-white">
-                            <th className="border border-gray-300 p-2">STT</th>
-                            <th className="border border-gray-300 p-2">Tên</th>
-                            <th className="border border-gray-300 p-2">Giá</th>
-                            <th className="border border-gray-300 p-2">Kho hàng</th>
-                            <th className="border border-gray-300 p-2">Doanh thu</th>
-                            <th className="border border-gray-300 p-2">Đã bán</th>
-                            <th className="border border-gray-300 p-2">Thời gian tạo</th>
+                        <tr className="bg-white w-full">
+                            <th className="border border-gray-300 p-2 w-fit">STT</th>
+                            <th className="border border-gray-300 p-2 w-3/7">Tên</th>
+                            <th className="border border-gray-300 p-2 w-1/11">
+                                <div 
+                                    className="cursor-pointer flex gap-2 justify-center items-center"
+                                    onClick={() => {
+                                        setSortType(sortType === 5 ? 4 : 5)
+                                    }}
+                                >
+                                    Giá
+                                    {sortIcons(5, 4)}
+                                </div>
+                            </th>
+                            <th className="border border-gray-300 p-2 w-1/11">
+                                <div 
+                                    className="cursor-pointer flex gap-2 justify-center items-center"
+                                    onClick={() => {
+                                        setSortType(sortType === 3 ? 2 : 3)
+                                    }}
+                                >
+                                    Kho hàng
+                                    {sortIcons(3, 2)}
+                                </div>
+                            </th>
+                            <th className="border border-gray-300 p-2 w-1/11">
+                                <div 
+                                    className="cursor-pointer flex gap-2 justify-center items-center"
+                                    onClick={() => {
+                                        setSortType(sortType === 1 ? 0 : 1)
+                                    }}
+                                >
+                                    Doanh số
+                                    {sortIcons(1, 0)}
+                                </div>
+                            </th>
+                            <th className="border border-gray-300 p-2 w-1/11">
+                                <div 
+                                    className="cursor-pointer flex gap-2 justify-center items-center"
+                                    onClick={() => {
+                                        setSortType(sortType === 9 ? 8 : 9)
+                                    }}
+                                >
+                                    Đã bán
+                                    {sortIcons(9, 8)}
+                                </div>
+                            </th>
+                            <th className="border border-gray-300 p-2 w-1/11">
+                                <div 
+                                    className="cursor-pointer flex gap-2 justify-center items-center"
+                                    onClick={() => {
+                                        setSortType(sortType === 7 ? 6 : 7)
+                                    }}
+                                >
+                                    Thời gian tạo
+                                    {sortIcons(7, 6)}
+                                </div>
+                            </th>
                             <th className="border border-gray-300 p-2">Thao tác</th>
                         </tr>
                     </thead>
 
-                    {isLoadingProduct ? (
-                    <tbody>
-                        <tr>
-                        <td>Loading...</td>
-                        </tr>
-                        
-                    </tbody>
-                    ) : (
                     <tbody>
                     {products.map((product, index) => (
                         <React.Fragment key={product.id}>
@@ -207,8 +335,15 @@ export default function ShopProducts(){
                                     />
                                     <p className="mr-auto">{product.name}</p>
                                 </div>
+                                
+                                {product.restricted && (
+                                    <div className="flex gap-1">
+                                        <p className="text-red-500 font-semibold">Đình chỉ: </p>
+                                        <p>{product.restrictReason}</p>
+                                    </div>
+                                )}
                             </td>
-                            <td className="border border-gray-300 p-2 text-center">{product.skuList.length > 0 ? '---' : product.price.toLocaleString() + ' VND'}</td>
+                            <td className="border border-gray-300 p-2 text-center">{product.price.toLocaleString()} VND</td>
                             <td className="border border-gray-300 p-2 text-center">{product.quantity}</td>
                             <td className="border border-gray-300 p-2 text-center">{product.revenue.toLocaleString()} VND</td>
                             <td className="border border-gray-300 p-2 text-center">{product.sold}</td>
@@ -344,16 +479,27 @@ export default function ShopProducts(){
                         </React.Fragment>
                     ))}
                     </tbody>
-                    )}
                 </table>
-                <Pagination
+
+                {products.length > 0 && <Pagination
                     page={page}
                     setPage={setPage}
                     limit={limit}
                     setLimit={setLimit}
                     maxPage={totalPages}
-                />
+                />}
             </div>
+
+            {isLoading && <TableLoading/>}
+
+            {products.length === 0 && (
+                <div className="w-full bg-white shadow-md rounded-sm h-80 mt-3 flex items-center justify-center">
+                    <div className="text-center">
+                    <LuPackageX className="text-blue-300 text-8xl mx-auto mb-2"/>
+                    <p className="text-xl">Không có sản phẩm nào</p>
+                    </div>
+                </div>
+            )}
             <ToastContainer
                 position="bottom-right"
             />

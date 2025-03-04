@@ -1,25 +1,32 @@
-import { useState } from "react"
-import { fetchWithAuth } from "../../util/AuthUtil"
-import { BASE_API_URL } from "../../constants"
+import { useState } from "react" 
 import { ToastContainer, toast } from "react-toastify"
+import { fetchWithAuth } from "../../../util/AuthUtil"
+import { BASE_API_URL } from "../../../constants"
 
-export default function CancelOrderForm({ reasons, whoCancel, closeForm, order }){
+const restrictReasons = [
+    "Nội dung đăng bán không hợp lệ",
+    "Hàng giả, hàng nhái",
+    "Spam",
+    "Hình ảnh không phù hợp",
+    "Cần bổ sung thông tin",
+]
+
+export default function RestrictProductForm({closeForm, productId, onSuccess}){
 
     const [otherReason, setOtherReason] = useState('')
     const [selectedReasonIdx, setselectedReasonIdx] = useState(null)
 
-    const handleCancelOrder = () => {
-        if(selectedReasonIdx === null || (selectedReasonIdx == reasons.length && !otherReason)){
-            toast.warning("Vui lòng chọn lý do hủy đơn hàng")
+    const handleRestrictProduct = () => {
+        const reason = selectedReasonIdx === restrictReasons.length ? otherReason : restrictReasons[selectedReasonIdx]
+        if(selectedReasonIdx === null || (selectedReasonIdx == restrictReasons.length && !otherReason)){
+            toast.warn("Vui lòng chọn lý do")
             return
         }
         const body = {
-            whoCancel,
-            orderId: order.id,
-            shopOrderIds: order.shopOrders ? order.shopOrders.map(shopOrder => shopOrder.id) : [order.id],
-            cancelReason: selectedReasonIdx < reasons.length ? reasons[selectedReasonIdx] : otherReason
+            productId,
+            reason
         }
-        fetchWithAuth(`${BASE_API_URL}/v1/order/cancel`, window.location, true, {
+        fetchWithAuth(`${BASE_API_URL}/v1/admin/product/restrict`, "/", true, {
             method: "POST",
             headers: {
                 'content-type': 'application/json'
@@ -27,18 +34,21 @@ export default function CancelOrderForm({ reasons, whoCancel, closeForm, order }
             body: JSON.stringify(body)
         })
             .then(() => {
-                window.location.reload()
+                onSuccess()
             })
-            .catch(() => toast.error("Có lỗi xảy ra, vui lòng thử lại sau!"))
+            .catch(err => {
+                console.log("Err: ", err)
+                toast.error("Có lỗi xảy ra, vui lòng thử lại sau")
+            })
     }
 
     return (
-        <div className="fixed inset-0 z-10 flex items-center justify-center bg-gray-100/60">
-            <div className="bg-white w-120 rounded-sm p-6 border border-gray-600">
-                <h2 className="text-2xl font-bold mb-10"> Hủy đơn hàng </h2>
+        <div className="fixed inset-0 z-10 flex justify-center items-center bg-gray-100/80">
+            <div className="bg-white rounded-sm p-6">
+                <h2 className="text-2xl font-bold mb-10"> Đình chỉ sản phẩm </h2>
 
                 <div className="flex flex-col gap-5 mb-10">
-                    {reasons.map((reason, index) => (
+                    {restrictReasons.map((reason, index) => (
                         <label 
                             key={index}
                             className="flex gap-2 items-center cursor-pointer"
@@ -56,13 +66,13 @@ export default function CancelOrderForm({ reasons, whoCancel, closeForm, order }
                     <label className="flex gap-2 items-center cursor-pointer">
                         <input
                             type="radio"
-                            checked={selectedReasonIdx === reasons.length}
+                            checked={selectedReasonIdx === restrictReasons.length}
                             className="w-5 h-5 accent-blue-400"
-                            onChange={() => setselectedReasonIdx(reasons.length)}
+                            onChange={() => setselectedReasonIdx(restrictReasons.length)}
                         />
                         <span>Lý do khác</span>
                     </label>
-                    {selectedReasonIdx === reasons.length && (
+                    {selectedReasonIdx === restrictReasons.length && (
                         <input
                             type="text"
                             placeholder="Lý do khác..."
@@ -71,19 +81,20 @@ export default function CancelOrderForm({ reasons, whoCancel, closeForm, order }
                         />
                     )}
                 </div>
+
                 <div className="flex justify-evenly">
                     <button 
                         className="cursor-pointer w-30 p-2 text-l text-white font-semibold rounded-sm bg-blue-400 hover:bg-blue-500"
                         onClick={closeForm}
                     >
-                        Thoát
+                        Hủy
                     </button>
 
                     <button 
                         className="cursor-pointer w-30 p-2 text-l font-semibold rounded-sm bg-white border border-red-500 hover:bg-gray-100"
-                        onClick={handleCancelOrder}    
+                        onClick={handleRestrictProduct}
                     >
-                        Hủy đơn
+                        Đình chỉ
                     </button>
                 </div>
             </div>

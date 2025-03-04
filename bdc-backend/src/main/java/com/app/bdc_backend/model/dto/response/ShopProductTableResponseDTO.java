@@ -33,4 +33,8 @@ public class ShopProductTableResponseDTO {
 
     private Date updatedAt;
 
+    private boolean restricted;
+
+    private String restrictReason;
+
 }

@@ -1,4 +1,4 @@
-package com.app.bdc_backend.facade;
+package com.app.bdc_backend.facade.admin;
 
 import com.app.bdc_backend.exception.RequestException;
 import com.app.bdc_backend.model.dto.request.AddCategoryDTO;

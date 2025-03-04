@@ -20,13 +20,13 @@ public class ShopProductController {
     private final ShopFacadeService shopFacadeService;
 
     @PostMapping("/add")
-    public ResponseEntity<?> addProduct(@RequestBody SaveProductDTO productDTO) throws RuntimeException {
+    public ResponseEntity<?> addProduct(@RequestBody SaveProductDTO productDTO) {
         shopFacadeService.addProduct(productDTO);
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/update")
-    public ResponseEntity<?> updateProduct(@RequestBody SaveProductDTO productDTO) throws RuntimeException {
+    public ResponseEntity<?> updateProduct(@RequestBody SaveProductDTO productDTO) {
         if(productDTO.getProductId() == null){
             throw new RuntimeException("Product ID is null");
         }
@@ -34,8 +34,13 @@ public class ShopProductController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/get_categories")
+    public ResponseEntity<?> getShopCategories() {
+        return ResponseEntity.ok().body(shopFacadeService.getShopCategories());
+    }
+
     @GetMapping("/{productId}")
-    public ResponseEntity<?> getProductForEdit(@PathVariable String productId) throws RuntimeException {
+    public ResponseEntity<?> getProductForEdit(@PathVariable String productId) {
         Product product = shopFacadeService.getProductForEdit(productId);
         if(product == null){
             return ResponseEntity.notFound().build();
@@ -44,9 +49,15 @@ public class ShopProductController {
     }
 
     @GetMapping("/list")
-    public ResponseEntity<PageResponse<ShopProductTableResponseDTO>> getProductList(@RequestParam(value = "page", defaultValue = "0") int page,
-                                                                                    @RequestParam(value = "limit", defaultValue = "10") int limit) {
-        Page<ShopProductTableResponseDTO> responseDTOS = shopFacadeService.getProductList(page, limit);
+    public ResponseEntity<PageResponse<ShopProductTableResponseDTO>> getProductList(
+            @RequestParam int type,
+            @RequestParam(required = false, defaultValue = "") String keyword,
+            @RequestParam(required = false, defaultValue = "") String categoryId,
+            @RequestParam int sortType,
+            @RequestParam int page,
+            @RequestParam int limit) {
+        Page<ShopProductTableResponseDTO> responseDTOS = shopFacadeService.getProductList(
+                type, keyword, categoryId, sortType, page, limit);
         PageResponse<ShopProductTableResponseDTO> response = new PageResponse<>(responseDTOS);
         return ResponseEntity.ok(response);
     }

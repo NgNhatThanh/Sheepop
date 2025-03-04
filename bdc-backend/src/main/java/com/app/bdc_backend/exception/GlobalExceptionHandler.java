@@ -23,4 +23,10 @@ public class GlobalExceptionHandler {
         return ResponseEntity.internalServerError().body(Map.of("message", e.getMessage()));
     }
 
+    @ExceptionHandler(value = RuntimeException.class)
+    public ResponseEntity<?> runtimeExHandling(RuntimeException e){
+        log.warn("Runtime Exception: {}", e.getMessage());
+        return ResponseEntity.internalServerError().body(Map.of("message", "Exception happened"));
+    }
+
 }

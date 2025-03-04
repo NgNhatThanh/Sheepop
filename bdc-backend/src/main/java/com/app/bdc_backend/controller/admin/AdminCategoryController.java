@@ -1,6 +1,6 @@
 package com.app.bdc_backend.controller.admin;
 
-import com.app.bdc_backend.facade.AdminCategoryFacadeService;
+import com.app.bdc_backend.facade.admin.AdminCategoryFacadeService;
 import com.app.bdc_backend.model.dto.request.AddCategoryDTO;
 import com.app.bdc_backend.model.dto.request.UpdateCategoryDTO;
 import com.app.bdc_backend.model.dto.response.CategoryDTO;
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/admin/category")
-public class CategoryController {
+public class AdminCategoryController {
 
     private final AdminCategoryFacadeService adminCategoryFacadeService;
 
