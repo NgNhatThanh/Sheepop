@@ -58,6 +58,7 @@ export default function Pagination({ page, setPage, limit, setLimit, maxPage }) 
               key={num}
               className="px-2 py-1 cursor-pointer hover:bg-gray-200"
               onClick={() => {
+                setPage(1)
                 setLimit(num);
                 setOpen(false);
               }}
