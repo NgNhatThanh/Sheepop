@@ -18,11 +18,12 @@ public class AdminProductController {
 
     @GetMapping("/get_list")
     public ResponseEntity<?> getProductList(@RequestParam int type,
-                                            @RequestParam String keyword,
+                                            @RequestParam String productName,
+                                            @RequestParam String shopName,
                                             @RequestParam int page,
                                             @RequestParam int limit){
         return ResponseEntity.ok(new PageResponse<>(
-                adminProductFacadeService.getProductList(type, keyword, page, limit)
+                adminProductFacadeService.getProductList(type, productName, shopName, page, limit)
         ));
     }
 

@@ -28,6 +28,10 @@ public class UserResponseDTO {
 
     private Date dob;
 
+    private boolean deleted;
+
+    private String deleteReason;
+
     private Date createdAt;
 
 }

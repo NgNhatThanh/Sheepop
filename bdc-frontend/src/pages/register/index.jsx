@@ -4,7 +4,7 @@ import React, { useState } from "react"
 import { BASE_API_URL, GOOGLE_LOGIN_URL } from "../../constants"
 import { setUserData } from "../../util/AuthUtil"
 import { FaGoogle } from "react-icons/fa";
-import { Navigate, useSearchParams, Link } from "react-router-dom"
+import { useSearchParams, Link } from "react-router-dom"
 
 
 export default function RegisterPage({isAuthenticated}) {
@@ -14,7 +14,7 @@ export default function RegisterPage({isAuthenticated}) {
     const from = searchParams.get('from')
 
     if(isAuthenticated == true){
-        return <Navigate to={from ? `/${from}` : '/'} />
+        window.location.assign(from ? `/${from}` : '/')
     }
 
     const [fullname, setFullname] = useState("")

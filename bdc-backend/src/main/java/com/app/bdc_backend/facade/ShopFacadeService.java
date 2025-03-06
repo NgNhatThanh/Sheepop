@@ -31,6 +31,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -60,8 +61,6 @@ public class ShopFacadeService {
         if(user == null)
             throw new RequestException("User not found");
         Shop shop = shopService.findByUser(user);
-        if(!shop.isActive())
-            throw new RequestException("Shop is not active");
         if(shop.isDeleted())
             throw new RequestException("Shop was banned");
         return toShopProfileDTO(shop);
@@ -87,8 +86,6 @@ public class ShopFacadeService {
     public ShopAddress getShopAddress(String username) {
         User user = userService.findByUsername(username);
         Shop shop = shopService.findByUser(user);
-        if(!shop.isActive())
-            throw new RequestException("Shop is not active");
         if(shop.isDeleted())
             throw new RequestException("Shop was banned");
         return shopService.findAddressByShopId(shop.getId().toString());
@@ -127,6 +124,7 @@ public class ShopFacadeService {
         return address;
     }
 
+    @Transactional
     public void deleteProduct(String productId) {
         Product product = productService.findById(productId);
         if(product == null)
@@ -135,6 +133,8 @@ public class ShopFacadeService {
         if(!product.getShop().getUser().getUsername().equals(username)) {
             throw new RequestException("Invalid request: not your shop's product");
         }
+        product.getShop().setProductCount(product.getShop().getProductCount() - 1);
+        shopService.save(product.getShop());
         productService.delete(product);
     }
 
@@ -233,6 +233,7 @@ public class ShopFacadeService {
         orderService.saveAllShopOrders(List.of(shopOrder));
     }
 
+    @Transactional
     public void addProduct(SaveProductDTO productDTO) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userService.findByUsername(username);
@@ -252,6 +253,8 @@ public class ShopFacadeService {
             sku.setProduct(product);
             productService.addProductAttributeList(sku.getAttributes());
         }
+        shop.setProductCount(shop.getProductCount() + 1);
+        shopService.save(shop);
         categoryService.increaseProductCount(category);
         productService.addProductMediaList(product.getMediaList());
         productService.addProductSKUList(product.getSkuList());

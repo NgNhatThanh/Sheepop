@@ -1,16 +1,22 @@
 package com.app.bdc_backend.facade;
 
+import com.app.bdc_backend.model.dto.BasicReviewInfo;
 import com.app.bdc_backend.model.dto.response.ProductSaleInfo;
+import com.app.bdc_backend.model.dto.response.ShopProductAndRevenue;
 import com.app.bdc_backend.model.order.OrderItem;
 import com.app.bdc_backend.model.order.ShopOrder;
 import com.app.bdc_backend.model.product.Product;
 import com.app.bdc_backend.model.product.ProductSKU;
+import com.app.bdc_backend.model.shop.Shop;
 import com.app.bdc_backend.service.OrderService;
 import com.app.bdc_backend.service.ProductService;
+import com.app.bdc_backend.service.ReviewService;
+import com.app.bdc_backend.service.ShopService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -22,6 +28,10 @@ public class ScheduledService {
     private final ProductService productService;
 
     private final OrderService orderService;
+
+    private final ShopService shopService;
+
+    private final ReviewService reviewService;
 
     @Scheduled(fixedDelay = 300000)
     private void recalculateProductData(){
@@ -55,6 +65,22 @@ public class ScheduledService {
             shopOrder.setTotal(total);
         }
         orderService.saveAllShopOrders(shopOrders);
+        log.info("Recalculated shop order data");
+    }
+
+    @Scheduled(fixedDelay = 300000)
+    private void recalculateShopData(){
+        List<Shop> shops = shopService.getAll();
+        for(Shop shop : shops){
+            BasicReviewInfo reviewInfo = reviewService.getShopReviewInfo(shop.getId());
+            ShopProductAndRevenue productAndRevenue = productService.getShopProductAndRevenue(shop.getId());
+            shop.setTotalReviews(reviewInfo.getTotalReviews());
+            shop.setAverageRating(reviewInfo.getAverageRating());
+            shop.setProductCount(productAndRevenue.getProductCount());
+            shop.setRevenue(productAndRevenue.getRevenue());
+        }
+        shopService.saveAll(shops);
+        log.info("Recalculated shop data");
     }
 
 }

@@ -1,8 +1,6 @@
 package com.app.bdc_backend.model.user;
 
 import com.app.bdc_backend.model.enums.Gender;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,9 +9,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.DocumentReference;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 @Document(collection = "users")
 @Setter
@@ -50,5 +46,7 @@ public class User {
     private Date dob;
 
     private boolean deleted = false;
+
+    private String deleteReason;
 
 }

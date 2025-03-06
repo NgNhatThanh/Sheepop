@@ -5,7 +5,7 @@ import { useState } from "react"
 import {BASE_API_URL, GOOGLE_LOGIN_URL} from "../../constants/index.js"
 import { setUserData } from "../../util/AuthUtil.js"
 import { FaGoogle } from "react-icons/fa";
-import { Navigate, useSearchParams, Link } from "react-router-dom"
+import { useSearchParams, Link } from "react-router-dom"
 
 export default function LoginPage({isAuthenticated}) {
 
@@ -14,7 +14,7 @@ export default function LoginPage({isAuthenticated}) {
   const from = searchParams.get("from")
 
   if(isAuthenticated == true){
-    return <Navigate to={from ? `/${from}` : '/'} />
+    window.location.assign(from ? `/${from}` : '/')
   }
 
   const [username, setUsername] = useState("")

@@ -1,9 +1,11 @@
 package com.app.bdc_backend.dao.shop;
 
+import com.app.bdc_backend.annotation.LogExecutionTime;
 import com.app.bdc_backend.model.dto.ShopOrderPageImpl;
 import com.app.bdc_backend.model.order.Order;
 import com.app.bdc_backend.model.order.ShopOrder;
 import com.app.bdc_backend.model.shop.Shop;
+import lombok.extern.java.Log;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -54,8 +56,9 @@ public interface ShopOrderRepository extends MongoRepository<ShopOrder, String> 
     Page<ShopOrder> findLastByIdAndStatusIn(String id, List<Integer> status, Pageable pageable);
 
     @Aggregation(pipeline = {
+        "{ $match: { $expr: { $or: [ { $eq: [?0, null] }, { $eq: ['$shop', ?0] } ] }, status: { $in: ?2 } } }",
         "{ $lookup: { from: 'users', localField: 'user', foreignField: '_id', as: 'buyer' }}",
-        "{ $match: { $expr: { $or: [ { $eq: [?0, null] }, { $eq: ['$shop', ?0] } ] }, 'buyer.fullName': { $regex: ?1, $options: 'i'}, status: { $in: ?2 }}}",
+        "{ $match: { 'buyer.fullName': { $regex: ?1, $options: 'i'}}}",
         "{ $sort: { ?5: ?6 } }",
         "{ $group: { _id: null, totalElements: { $sum: 1 }, content: { $push: '$$ROOT' }}}",
         "{ $project: { _id: 0, totalElements: 1, content: { $slice: ['$content', ?3, ?4] } }}"
@@ -71,14 +74,33 @@ public interface ShopOrderRepository extends MongoRepository<ShopOrder, String> 
     );
 
     @Aggregation(pipeline = {
+        "{ $match: { $expr: { $or: [ { $eq: [?0, null] }, { $eq: ['$shop', ?0] } ] }, status: { $in: ?2 } } }",
         "{ $lookup: { from: 'order_items', localField: 'items', foreignField: '_id', as: 'order_items' }}",
         "{ $lookup: { from: 'products', localField: 'order_items.product', foreignField: '_id', as: 'products' }}",
-        "{ $match: { $expr: { $or: [ { $eq: [?0, null] }, { $eq: ['$shop', ?0] } ] }, 'products.name': { $regex: ?1, $options: 'i' }, status: { $in: ?2 } }}",
+        "{ $match: { 'products.name': { $regex: ?1, $options: 'i' } }}",
         "{ $sort: { ?5: ?6 } }",
         "{ $group: { _id: null, totalElements: { $sum: 1 }, content: { $push: '$$ROOT' } }}",
         "{ $project: { _id: 0, totalElements: 1, content: { $slice: ['$content', ?3, ?4] } }}"
     })
     ShopOrderPageImpl findShopOrderThatProductNameContainingIgnoreCaseAndStatusIn(
+            ObjectId shopId,
+            String keyword,
+            List<Integer> status,
+            long offset,
+            int limit,
+            String sortBy,
+            int sortDirection
+    );
+
+    @Aggregation(pipeline = {
+            "{ $match: {$expr: { $or: [ { $eq: [?0, null] }, { $eq: ['$shop', ?0] } ] }, status: { $in: ?2 }  } }",
+            "{ $lookup: { from: 'shops', localField: 'shop', foreignField: '_id', as: 'shop_ori' }}",
+            "{ $match: { 'shop_ori.name': { $regex: ?1, $options: 'i' }}}",
+            "{ $sort: { ?5: ?6 } }",
+            "{ $group: { _id: null, totalElements: { $sum: 1 }, content: { $push: '$$ROOT' } }}",
+            "{ $project: { _id: 0, totalElements: 1, content: { $slice: ['$content', ?3, ?4] } }}"
+    })
+    ShopOrderPageImpl findShopOrderThatShopnameContainingIgnoreCaseAndStatusIn(
             ObjectId shopId,
             String keyword,
             List<Integer> status,

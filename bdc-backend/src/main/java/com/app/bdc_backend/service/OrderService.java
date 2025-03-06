@@ -170,11 +170,28 @@ public class OrderService {
                     return new PageImpl<>(new ArrayList<>());
                 return new PageImpl<>(pageRes.getContent(), pageable, pageRes.getTotalElements());
             }
-            else{
+            else if(filterType == 3){
                 Sort sort = pageable.getSort();
                 String sortBy = sort.get().toList().get(0).getProperty();
                 Sort.Direction direction = sort.get().toList().get(0).getDirection();
                 ShopOrderPageImpl pageRes = shopOrderRepository.findShopOrderThatProductNameContainingIgnoreCaseAndStatusIn(
+                        null,
+                        keyword,
+                        statusList,
+                        pageable.getOffset(),
+                        pageable.getPageSize(),
+                        sortBy,
+                        direction == Sort.Direction.DESC ? -1 : 1
+                );
+                if(pageRes == null)
+                    return new PageImpl<>(new ArrayList<>());
+                return new PageImpl<>(pageRes.getContent(), pageable, pageRes.getTotalElements());
+            }
+            else{
+                Sort sort = pageable.getSort();
+                String sortBy = sort.get().toList().get(0).getProperty();
+                Sort.Direction direction = sort.get().toList().get(0).getDirection();
+                ShopOrderPageImpl pageRes = shopOrderRepository.findShopOrderThatShopnameContainingIgnoreCaseAndStatusIn(
                         null,
                         keyword,
                         statusList,

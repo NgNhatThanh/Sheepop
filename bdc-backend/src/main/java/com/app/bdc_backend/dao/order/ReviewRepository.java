@@ -26,7 +26,7 @@ public interface ReviewRepository extends MongoRepository<ProductReview, String>
         "{ $lookup: { from: 'products', localField: 'order_item.product', foreignField: '_id', as: 'product' } }",
         "{ $lookup: { from: 'shops', localField: 'product.shop', foreignField: '_id', as: 'shop' } }",
         "{ $match: { 'shop._id': ?0 } }",
-        "{ $group: { _id: '$shop._id', averageRating: { $avg: '$rating' }, totalReviews: { $sum: 1 } }}"
+        "{ $group: { _id: '$shop._id', averageRating: { $avg: '$rating' }, totalReviews: { $sum: 1 } }}",
     })
     BasicReviewInfo findBasicReviewInfoByShopId(ObjectId shopId);
 

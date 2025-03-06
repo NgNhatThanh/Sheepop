@@ -47,7 +47,8 @@ const filters = [
     "Tất cả",
     "Mã đơn hàng",
     "Tên người mua",
-    "Tên sản phẩm"
+    "Tên sản phẩm",
+    "Tên cửa hàng"
 ];
 
 export default function ShopOrder(){
@@ -65,7 +66,7 @@ export default function ShopOrder(){
     const [orders, setOrders] = useState([])
 
     const [filterType, setFilterType] = useState(0);
-    const [selectedFilterType, setSelectedFilterType] = useState(0)
+    const [keyword, setKeyword] = useState('')
     const [searchQuery, setSearchQuery] = useState("");
     const [openFilter, setOpenFilter] = useState(false);
 
@@ -91,19 +92,14 @@ export default function ShopOrder(){
 
     const resetFilter = () => {
         setSearchQuery("");
-        setSelectedFilterType(0)
         setFilterType(0)
+        setKeyword("")
         setPage(1)
-        fetchShopOrders(currentType, true)
     }
 
     useEffect(() => {
-        resetFilter()
-    }, [currentType])
-
-    useEffect(() => {
         fetchShopOrders(currentType, true)
-    }, [page, limit, filterType, sortType])
+    }, [page, limit, currentType , sortType, keyword])
 
     const sortIcons = (t1, t2) => {
         return (
@@ -141,7 +137,7 @@ export default function ShopOrder(){
                         onClick={() => setOpenFilter(!openFilter)}
                         className="flex cursor-pointer justify-between border border-gray-300 transtion-all duration-200 px-3 py-2 rounded flex items-center gap-2 w-44 hover:border-blue-500"
                     >
-                    {filters[selectedFilterType]}
+                    {filters[filterType]}
                     <FaChevronDown className={`transition-transform ${openFilter ? "rotate-180" : "rotate-0"}`} />
                     </button>
                     {openFilter && (
@@ -150,11 +146,11 @@ export default function ShopOrder(){
                         <li
                             key={item}
                             className={`px-3 py-2 cursor-pointer ${
-                                item === filters[selectedFilterType] ? "text-blue-500 font-semibold" : "text-gray-700"
+                                item === filters[filterType] ? "text-blue-500 font-semibold" : "text-gray-700"
                             } hover:bg-gray-100`}
                             onClick={() => {
                                 setSearchQuery("")
-                                setSelectedFilterType(index);
+                                setFilterType(index);
                                 setOpenFilter(false);
                             }}
                         >
@@ -167,9 +163,9 @@ export default function ShopOrder(){
 
                 <input
                     type="text"
-                    disabled={selectedFilterType === 0}
-                    placeholder={selectedFilterType === 0 ? 'Tìm kiếm...' : `Nhập ${filters[selectedFilterType].toLowerCase()}...`}
-                    className={`border border-gray-300 px-3 py-2 rounded w-60 ${selectedFilterType === 0 && 'bg-gray-100 cursor-not-allowed'}`}
+                    disabled={filterType === 0}
+                    placeholder={filterType === 0 ? 'Tìm kiếm...' : `Tìm theo ${filters[filterType].toLowerCase()}...`}
+                    className={`border border-gray-300 px-3 py-2 rounded w-60 ${filterType === 0 && 'bg-gray-100 cursor-not-allowed'}`}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                 />
@@ -177,7 +173,8 @@ export default function ShopOrder(){
                 <button 
                     className="bg-blue-500 cursor-pointer text-white px-4 py-2 rounded hover:bg-blue-600 transition"
                     onClick={() => {
-                        setFilterType(selectedFilterType)
+                        setFilterType(filterType)
+                        setKeyword(searchQuery)
                     }}    
                 >
                     Áp dụng

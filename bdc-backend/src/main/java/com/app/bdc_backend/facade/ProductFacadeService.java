@@ -9,6 +9,7 @@ import com.app.bdc_backend.model.dto.response.VariationDisplayIndicator;
 import com.app.bdc_backend.model.product.Product;
 import com.app.bdc_backend.model.product.ProductAttribute;
 import com.app.bdc_backend.model.product.ProductSKU;
+import com.app.bdc_backend.model.shop.Shop;
 import com.app.bdc_backend.service.OrderService;
 import com.app.bdc_backend.service.ProductService;
 import com.app.bdc_backend.service.ReviewService;
@@ -118,20 +119,19 @@ public class ProductFacadeService {
         setVariationDisplayIndicator(variations, dto.getVariationDisplayIndicators());
 
         BasicReviewInfo productReviewInfo = reviewService.getProductReviewInfo(product.getId());
-        BasicReviewInfo shopReviewInfo = reviewService.getShopReviewInfo(product.getShop().getId());
         int soldCount = orderService.countProductSold(product.getId());
-        int shopProductCount = productService.countProductOfShop(product.getShop().getId());
         dto.setAverageRating(productReviewInfo.getAverageRating());
         dto.setTotalReviews(productReviewInfo.getTotalReviews());
         dto.setSoldCount(soldCount);
 
-        dto.getShop().setId(product.getShop().getId().toString());
-        dto.getShop().setName(product.getShop().getName());
-        dto.getShop().setAvatarUrl(product.getShop().getAvatarUrl());
-        dto.getShop().setAverageRating(shopReviewInfo.getAverageRating());
-        dto.getShop().setTotalReviews(shopReviewInfo.getTotalReviews());
-        dto.getShop().setCreatedAt(product.getShop().getCreatedAt());
-        dto.getShop().setTotalProducts(shopProductCount);
+        Shop shop = product.getShop();
+        dto.getShop().setId(shop.getId().toString());
+        dto.getShop().setName(shop.getName());
+        dto.getShop().setAvatarUrl(shop.getAvatarUrl());
+        dto.getShop().setAverageRating(shop.getAverageRating());
+        dto.getShop().setTotalReviews(shop.getTotalReviews());
+        dto.getShop().setCreatedAt(shop.getCreatedAt());
+        dto.getShop().setTotalProducts(shop.getProductCount());
         return dto;
     }
 

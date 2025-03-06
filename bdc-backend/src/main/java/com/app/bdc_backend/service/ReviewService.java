@@ -31,11 +31,17 @@ public class ReviewService {
     }
 
     public BasicReviewInfo getProductReviewInfo(ObjectId productId){
-        return reviewRepository.findAverageRatingAndTotalReviewsByProductId(productId);
+        BasicReviewInfo reviewInfo = reviewRepository.findAverageRatingAndTotalReviewsByProductId(productId);
+        if(reviewInfo == null)
+            return new BasicReviewInfo();
+        return reviewInfo;
     }
 
     public BasicReviewInfo getShopReviewInfo(ObjectId shopId){
-        return reviewRepository.findBasicReviewInfoByShopId(shopId);
+        BasicReviewInfo reviewInfo = reviewRepository.findBasicReviewInfoByShopId(shopId);
+        if(reviewInfo == null)
+            return new BasicReviewInfo();
+        return reviewInfo;
     }
 
     public ReviewSummary getProductReviewSummary(ObjectId productId){

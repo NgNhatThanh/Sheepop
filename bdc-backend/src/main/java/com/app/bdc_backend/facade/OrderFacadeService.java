@@ -24,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -45,6 +46,7 @@ public class OrderFacadeService {
     private final ProductService productService;
 
     private final PaymentService paymentService;
+    private final ShopService shopService;
 
     public Order placeOrder(Map<String, Object> body){
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -227,6 +229,8 @@ public class OrderFacadeService {
         }
         orderService.saveAllItems(shopOrder.getItems());
         shopOrder.setStatus(ShopOrderStatus.COMPLETED);
+        shopOrder.getShop().setRevenue(shopOrder.getShop().getRevenue() + (shopOrder.getTotal() - shopOrder.getShippingFee()));
+        shopService.save(shopOrder.getShop());
         orderService.saveAllShopOrders(List.of(shopOrder));
     }
 

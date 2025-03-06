@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useLocation, Link, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { fetchWithAuth } from '../../../util/AuthUtil'
 import { BASE_API_URL } from "../../../constants";
 import Pagination from '../../../pages/common/Pagination'
@@ -29,8 +29,10 @@ export default function ProductList(){
     const currentType = parseInt(searchParams.get("type")) || 0;
 
     const [isLoading, setIsLoading] = useState(false)
-    const [keyword, setKeyword] = useState("")
-    const [inputSearchKey, setInputSearchKey] = useState("")
+    const [productName, setProductName] = useState("")
+    const [shopName, setShopName] = useState("")
+    const [productNameSearchKey, setProductNameSearchKey] = useState("")
+    const [shopNameSearchKey, setShopNameSearchKey] = useState("")
     const [page, setPage] = useState(1)
     const [limit, setLimit] = useState(10)
     const [maxPage, setMaxPage] = useState(1)
@@ -72,7 +74,7 @@ export default function ProductList(){
 
     const fetchProducts = () => {
         setIsLoading(true)
-        fetchWithAuth(`${BASE_API_URL}/v1/admin/product/get_list?type=${currentType}&keyword=${keyword}&page=${page-1}&limit=${limit}`)
+        fetchWithAuth(`${BASE_API_URL}/v1/admin/product/get_list?type=${currentType}&productName=${productName}&shopName=${shopName}&page=${page-1}&limit=${limit}`)
             .then(res => res.json())
             .then(res => {
                 setMaxPage(res.totalPages)
@@ -88,7 +90,7 @@ export default function ProductList(){
 
     useEffect(() => {
         fetchProducts()
-    }, [currentType, page, limit, keyword])
+    }, [currentType, page, limit, productName, shopName])
 
     const displayCategory = (cat) => {
         let disp = cat.name
@@ -107,7 +109,7 @@ export default function ProductList(){
     }
 
     return (
-        <div className="h-100">
+        <div>
             <div className="w-full bg-white shadow-md sticky top-12 z-1 flex justify-center rounded-sm">
                 {tabs.map((tab, index) => (
                 <button
@@ -127,16 +129,25 @@ export default function ProductList(){
             <div className="flex items-center justify-center space-x-3 bg-white p-4 rounded mt-4 shadow-md">
                 <input
                     type="text"
-                    value={inputSearchKey}
-                    placeholder="Tìm tên sản phẩm"
-                    onChange={e => setInputSearchKey(e.target.value)}
+                    value={productNameSearchKey}
+                    placeholder="Tìm theo tên sản phẩm"
+                    onChange={e => setProductNameSearchKey(e.target.value)}
+                    className={`border border-gray-300 px-3 py-2 rounded w-60`}
+                />
+
+                <input
+                    type="text"
+                    value={shopNameSearchKey}
+                    placeholder="Tìm theo tên cửa hàng"
+                    onChange={e => setShopNameSearchKey(e.target.value)}
                     className={`border border-gray-300 px-3 py-2 rounded w-60`}
                 />
 
                 <button 
                     className="bg-blue-500 cursor-pointer text-white px-4 py-2 rounded hover:bg-blue-600 transition"
                     onClick={() => {
-                        setKeyword(inputSearchKey)
+                        setProductName(productNameSearchKey)
+                        setShopName(shopNameSearchKey)
                     }}    
                 >
                     Áp dụng
@@ -145,8 +156,10 @@ export default function ProductList(){
                 <button
                     className="border cursor-pointer border-gray-400 px-4 py-2 rounded hover:bg-gray-100 transition"
                     onClick={() => {
-                        setKeyword('')
-                        setInputSearchKey('')
+                        setProductName('')
+                        setShopName('')
+                        setProductNameSearchKey('')
+                        setShopNameSearchKey('')
                     }}
                 >
                     Đặt lại
@@ -202,7 +215,7 @@ export default function ProductList(){
                                             Chi tiết
                                         </button>
 
-                                        {!product.restricted && (
+                                        {(!product.restricted || product.restrictStatus !== 'RESTRICTED') && (
                                             <button 
                                                 className="text-white text-center cursor-pointer rounded-xs bg-red-400 p-1 hover:bg-red-500"
                                                 onClick={() => setRestrictProductId(product.id)}

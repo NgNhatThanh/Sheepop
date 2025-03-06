@@ -11,9 +11,11 @@ import com.app.bdc_backend.model.order.ShopOrder;
 import com.app.bdc_backend.model.product.Product;
 import com.app.bdc_backend.model.product.ProductReview;
 import com.app.bdc_backend.model.product.ProductReviewMedia;
+import com.app.bdc_backend.model.shop.Shop;
 import com.app.bdc_backend.service.OrderService;
 import com.app.bdc_backend.service.ProductService;
 import com.app.bdc_backend.service.ReviewService;
+import com.app.bdc_backend.service.ShopService;
 import com.app.bdc_backend.util.ModelMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -32,6 +34,7 @@ public class ReviewFacadeService {
     private final OrderService orderService;
 
     private final ProductService productService;
+    private final ShopService shopService;
 
     public void createReview(CreateReviewDTO dto) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -84,6 +87,14 @@ public class ReviewFacadeService {
         reviewService.saveAllReview(reviews);
         shopOrder.setStatus(ShopOrderStatus.RATED);
         orderService.saveAllShopOrders(List.of(shopOrder));
+        Shop shop = shopOrder.getShop();
+        int sumCurRating = (int) (shop.getTotalReviews() * shop.getAverageRating());
+        for(CreateReviewDTO.ItemReview itemReview : dto.getItemReviews()){
+            sumCurRating += itemReview.getRating();
+        }
+        shop.setTotalReviews(shop.getTotalReviews() + reviews.size());
+        shop.setAverageRating((double) sumCurRating / shop.getTotalReviews());
+        shopService.save(shop);
     }
 
     public ReviewListDTO getProductReviewList(String productId,

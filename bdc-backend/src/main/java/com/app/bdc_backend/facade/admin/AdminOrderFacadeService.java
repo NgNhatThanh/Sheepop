@@ -4,17 +4,12 @@ import com.app.bdc_backend.exception.RequestException;
 import com.app.bdc_backend.model.dto.response.ShopOrderDTO;
 import com.app.bdc_backend.model.enums.ShopOrderStatus;
 import com.app.bdc_backend.model.order.ShopOrder;
-import com.app.bdc_backend.model.shop.Shop;
-import com.app.bdc_backend.model.user.User;
 import com.app.bdc_backend.service.OrderService;
-import com.app.bdc_backend.service.ShopService;
-import com.app.bdc_backend.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -31,11 +26,8 @@ public class AdminOrderFacadeService {
                                             int sortType,
                                             int page,
                                             int limit){
-        if(filterType < 0 || filterType > 3){
+        if(filterType < 0 || filterType > 4){
             throw new RequestException("Invalid request: filter type");
-        }
-        if(filterType >= 1 && (keyword == null || keyword.isEmpty())){
-            throw new RequestException("Invalid request: filter data");
         }
         if(sortType < 0 || sortType > 3)
             throw new RequestException("Invalid request: sort type");

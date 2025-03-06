@@ -16,18 +16,19 @@ public class AdminProductFacadeService {
     private final ProductService productService;
 
     public Page<AdminProductDTO> getProductList(int type,
-                                                String keyword,
+                                                String productName,
+                                                String shopName,
                                                 int page,
                                                 int limit){
         Page<Product> res;
         if(type == 0){
-            res = productService.getActiveProductsForAdmin(keyword, page, limit);
+            res = productService.getActiveProductsForAdmin(productName, shopName, page, limit);
         }
         else if(type == 1){
-            res = productService.getRestrictedProductsForAdmin(keyword, page, limit);
+            res = productService.getRestrictedProductsForAdmin(productName, shopName, page, limit);
         }
         else if(type == 2){
-            res = productService.getPendingRestrictProductsForAdmin(keyword, page, limit);
+            res = productService.getPendingRestrictProductsForAdmin(productName, shopName, page, limit);
         }
         else{
             throw new RequestException("Invalid request: list type");

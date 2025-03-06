@@ -31,7 +31,13 @@ public class Shop {
 
     private Date createdAt;
 
-    private boolean active = true;
+    private int productCount;
+
+    private long revenue;
+
+    private double averageRating;
+
+    private int totalReviews;
 
     private boolean deleted = false;
 
