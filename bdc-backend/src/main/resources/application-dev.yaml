@@ -2,8 +2,9 @@ spring:
   data:
     mongodb:
       database: ${MONGO_DATABASE}
+      port: 27018
       username: ${MONGO_USERNAME}
-      password: ${MONGO_PASSWORD}
+      password: ${MONGO_PASSWORD}   
 
 redis:
   host: localhost

@@ -34,3 +34,6 @@ build/
 
 .env
 .m2/
+
+/db_docker/*_data
+/db_docker/monstache/logs

@@ -1,0 +1,31 @@
+mongo-url = "mongodb://mongo1/?replicaSet=my-mongo-set"
+
+elasticsearch-urls = ["http://host.docker.internal:9200"]
+
+# những collections được sync
+change-stream-namespaces = ["bdc.products"]
+
+# những collections được copy sang luôn khi khởi động
+direct-read-namespaces = ["bdc.products"]
+
+# bật gzip cho ES để nén dữ liệu khi gửi
+gzip = true
+
+index-as-update = true
+
+# đổi tên index từ Mongo sang ES
+[[mapping]]
+namespace = "bdc.products"
+index = "products"
+
+# lọc các document trước khi đẩy sang ES, hiện là lọc các doc được xóa mềm, ẩn, hoặc hết hàng
+[[filter]]
+namespace = "bdc.products"
+path = "./filters/products_filter.js"
+routing = true
+
+# vẫn là code js nhưng có thể để lọc field, và một số thứ khác
+[[script]]
+namespace = "bdc.products"
+path = "./transforms/products_transform.js"
+routing = true # dùng khi có ghi đè lên index
