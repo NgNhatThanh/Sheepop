@@ -2,14 +2,17 @@ import { useEffect, useState } from "react"
 import { FaSearch, FaShoppingCart } from "react-icons/fa"
 import { fetchWithAuth } from "../../util/AuthUtil"
 import { BASE_API_URL } from "../../constants"
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 
 export default function Header({isAuthenticated}){
+    const navigate = useNavigate()
     const maxMiniCartDisplay = 5;
     const [isCartOpen, setIsCartOpen] = useState(false);
     const [cartItems, setCartItems] = useState([]);
     const location = useLocation()
     const showMiniCart = !['/cart', '/checkout'].includes(location.pathname)
+
+    const [keyword, setKeyword] = useState("")
 
     const fetchMiniCart = async () => {
         const res = await fetchWithAuth(`${BASE_API_URL}/v1/cart/get-mini`, null, false)
@@ -17,10 +20,6 @@ export default function Header({isAuthenticated}){
         localStorage.setItem('cart', JSON.stringify(cart))
         return cart
     }
-
-    // if(isAuthenticated){
-
-    // }
 
     useEffect(() => {
         setIsCartOpen(false)
@@ -53,16 +52,20 @@ export default function Header({isAuthenticated}){
                 <div className="flex flex-1 mx-4">
                     <input
                         type="text"
+                        value={keyword}
                         placeholder="Mua Hàng Xuyên Tết"
+                        onChange={e => setKeyword(e.target.value)}
+                        onKeyDown={e => {
+                            if(e.key === 'Enter' && keyword) navigate(`search?keyword=${keyword}`)
+                        }}
                         className="w-full p-2 rounded-l-md border-none focus:ring-0 text-black bg-white"
                     />
-                    <Link to={'search'} className="flex items-center p-2 bg-red-600 rounded-r-md cursor-pointer">
+                    <Link to={keyword ? `search?keyword=${keyword}` : '#'} className="flex items-center p-2 bg-red-600 rounded-r-md cursor-pointer">
                         <FaSearch className="text-white" />
                     </Link>
                     
                 </div>
 
-                {/* Cart Icon */}
                 {showMiniCart && (
                     <div 
                         className="relative"
@@ -78,7 +81,6 @@ export default function Header({isAuthenticated}){
                             )}
                         </Link>
 
-                        {/* Mini Cart Dropdown */}
                         {isCartOpen && (
                             <div className="absolute right-0 -mt-1 w-64 bg-white text-black shadow-lg rounded-lg p-4 z-2">
                                 <h4 className="font-semibold text-md mb-2">Giỏ hàng của bạn</h4>

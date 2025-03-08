@@ -4,7 +4,13 @@ spring:
       database: ${MONGO_DATABASE}
       port: 27018
       username: ${MONGO_USERNAME}
-      password: ${MONGO_PASSWORD}   
+      password: ${MONGO_PASSWORD}
+
+logging:
+  level:
+    org:
+      elasticsearch:
+        client: TRACE
 
 redis:
   host: localhost

@@ -245,6 +245,7 @@ public class ShopFacadeService {
         product.setShop(shop);
         product.setCreatedAt(new Date());
         product.setUpdatedAt(new Date());
+        product.setLocation(address.getProvince().getName());
         Category category = ModelMapper.getInstance().map(productDTO.getCategory(), Category.class);
         if(category.isHasChildren())
             throw new RequestException("Invalid request: category has children");

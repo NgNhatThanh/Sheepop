@@ -84,17 +84,22 @@ public class CartFacadeService {
         }
         else{
             List<CartItem> uptList = new ArrayList<>();
-            for(CartItem item : cart.getItems()){
+            List<CartItem> toRemove = new ArrayList<>();
+            List<CartItem> items = cart.getItems();
+            for(CartItem item : items){
                 if(!item.getProduct().isVisible()){
-                    cart.getItems().remove(item);
-                    continue;
+                    toRemove.add(item);
                 }
-                item.setProduct(productService.findById(item.getProduct().getId().toString()));
-                if(item.getQuantity() > getItemStock(item)){
-                    item.setSelected(false);
-                    uptList.add(item);
+                else{
+                    item.setProduct(productService.findById(item.getProduct().getId().toString()));
+                    if(item.getQuantity() > getItemStock(item)){
+                        item.setSelected(false);
+                        uptList.add(item);
+                    }
                 }
             }
+            items.removeAll(toRemove);
+            cart.setItems(items);
             cartService.saveAllItem(uptList);
         }
         cartRedisService.save(cart);

@@ -1,4 +1,4 @@
-package com.app.bdc_backend.model;
+package com.app.bdc_backend.model.dto;
 
 import lombok.Getter;
 import lombok.Setter;

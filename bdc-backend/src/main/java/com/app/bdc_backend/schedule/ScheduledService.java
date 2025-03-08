@@ -1,4 +1,4 @@
-package com.app.bdc_backend.facade;
+package com.app.bdc_backend.schedule;
 
 import com.app.bdc_backend.model.dto.BasicReviewInfo;
 import com.app.bdc_backend.model.dto.response.ProductSaleInfo;
@@ -16,7 +16,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -38,8 +37,11 @@ public class ScheduledService {
         List<Product> products = productService.getAll();
         for(Product product : products){
             ProductSaleInfo saleInfo = orderService.getProductSaleInfo(product.getId());
+            BasicReviewInfo reviewInfo = reviewService.getProductReviewInfo(product.getId());
             product.setRevenue(saleInfo.getRevenue());
             product.setSold(saleInfo.getSold());
+            product.setAverageRating(reviewInfo.getAverageRating());
+            product.setTotalReviews(reviewInfo.getTotalReviews());
             if(!product.getSkuList().isEmpty()){
                 long minPrice = product.getSkuList().get(0).getPrice();
                 int totalQuantity = 0;

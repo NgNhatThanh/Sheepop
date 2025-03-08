@@ -1,4 +1,4 @@
-package com.app.bdc_backend.model;
+package com.app.bdc_backend.model.dto;
 
 import com.app.bdc_backend.model.address.Address;
 import lombok.Getter;

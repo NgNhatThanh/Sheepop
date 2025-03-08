@@ -29,7 +29,7 @@ const PreviewProductPage = lazy(() => import('./pages/myshop/product/PreviewProd
 const ProductEdit = lazy(() => import('./pages/myshop/product/ProductEdit.jsx'));
 const ProductList = lazy(() => import('./pages/admin/product/ProductList.jsx'));
 const CategoryPage = lazy(() => import('./pages/admin/product/CategoryPage.jsx'));
-const SearchPage = lazy(() => import('./pages/searchpage/SearchPage.jsx'));
+const SearchPage = lazy(() => import('./pages/home/search/SearchPage.jsx'));
 const UserList = lazy(() => import('./pages/admin/user/UserList.jsx'))
 const ShopList = lazy(() => import('./pages/admin/user/ShopList.jsx'))
 const OrderList = lazy(() => import('./pages/admin/order/OrderList.jsx'))

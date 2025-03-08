@@ -1,7 +1,7 @@
 package com.app.bdc_backend.facade;
 
-import com.app.bdc_backend.model.BasicShippingOrderInfo;
-import com.app.bdc_backend.model.ShipmentInfo;
+import com.app.bdc_backend.model.dto.BasicShippingOrderInfo;
+import com.app.bdc_backend.model.dto.ShipmentInfo;
 import com.app.bdc_backend.model.cart.Cart;
 import com.app.bdc_backend.model.cart.CartItem;
 import com.app.bdc_backend.model.dto.response.CheckoutDTO;

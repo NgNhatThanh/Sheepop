@@ -176,7 +176,7 @@ export default function OrdersPage() {
       {orders[currentType] && orders[currentType].list.map((order, index) => (
           <div
             key={index}
-            className="w-full bg-white shadow-md rounded-lg p-4 mt-3 overflow-auto"
+            className="w-full bg-white shadow-md rounded-sm p-4 mt-3 overflow-auto"
           >
             <div className={`text-right text-sm ${statusTextColor[order.status - 1]}`}>
               {statusText[order.status - 1]}

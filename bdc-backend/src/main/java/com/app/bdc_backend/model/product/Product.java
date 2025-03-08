@@ -51,6 +51,12 @@ public class Product {
 
     private int sold;
 
+    private double averageRating;
+
+    private int totalReviews;
+
+    private String location;
+
     private boolean visible;
 
     private Date createdAt;

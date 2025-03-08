@@ -4,6 +4,7 @@ import { useSearchParams, Link } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import { FaStar } from "react-icons/fa";
 import BannerSlider from "./BannerSlider";
+import ProductCard from "./ProductCard";
 
 export default function HomePage() {
     const [searchParams] = useSearchParams();
@@ -32,32 +33,35 @@ export default function HomePage() {
 
             <BannerSlider/>
 
-            <h2 className="text-2xl font-bold mb-4 mt-5">Danh sách sản phẩm</h2>
+            <div className="flex justify-center">
+                <h2 className="text-center w-full text-2xl font-bold mb-4 mt-5 p-4 bg-white border-1 border-blue-500 text-blue-600">Gợi ý hôm nay</h2>
+            </div>
 
             {productList.length === 0 ? (
                 <p>Không có sản phẩm nào.</p>
             ) : (
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
                     {productList.map((product) => (
-                        <Link to={`/product/${encodeURIComponent(product.name.replace(/\s+/g, "-"))}.${product.id}`}  
-                            key={product.id} 
-                            className="bg-white border p-2 rounded-lg shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:border-blue-400"
-                        >
-                            <img 
-                                src={product.thumbnailUrl} 
-                                alt={product.name} 
-                                className="w-full h-40 object-contain rounded-md" 
-                            />
-                            <p className="text-sm h-10 font-medium line-clamp-2 overflow-hidden mt-2">{product.name}</p>
-                            <p className="text-blue-500 font-bold">{product.price.toLocaleString()}₫</p>
-                            <div className="flex">
-                                <div className="flex gap-1 border-r border-gray-300 p-1 items-center">
-                                    <FaStar className="text-sm text-blue-500" />
-                                    <p className="text-sm ">{product.averageRating.toFixed(1)}</p>
-                                </div>
-                                <p className="ml-1 flex items-center text-sm items-center">{product.sold} đã bán</p>
-                            </div>
-                        </Link>
+                        // <Link to={`/product/${encodeURIComponent(product.name.replace(/\s+/g, "-"))}.${product.id}`}  
+                        //     key={product.id} 
+                        //     className="bg-white border p-2 rounded-sm shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:border-blue-400"
+                        // >
+                        //     <img 
+                        //         src={product.thumbnailUrl} 
+                        //         alt={product.name} 
+                        //         className="w-full h-40 object-contain rounded-md" 
+                        //     />
+                        //     <p className="text-sm h-10 font-medium line-clamp-2 overflow-hidden mt-2">{product.name}</p>
+                        //     <p className="text-blue-500 font-bold">{product.price.toLocaleString()}₫</p>
+                        //     <div className="flex">
+                        //         <div className="flex gap-1 border-r border-gray-300 p-1 items-center">
+                        //             <FaStar className="text-sm text-blue-500" />
+                        //             <p className="text-sm ">{product.averageRating.toFixed(1)}</p>
+                        //         </div>
+                        //         <p className="ml-1 flex items-center text-sm items-center">{product.sold} đã bán</p>
+                        //     </div>
+                        // </Link>
+                        <ProductCard product={product}/>
                     ))}
                 </div>
             )}

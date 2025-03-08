@@ -46,7 +46,7 @@ services:
       - ./monstache:/app/monstache
     ports:
       - 8082:8080
-    restart: unless-stopped
+    # restart: unless-stopped
 
   redis:
     image: redis

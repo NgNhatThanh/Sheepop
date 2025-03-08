@@ -25,6 +25,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = RuntimeException.class)
     public ResponseEntity<?> runtimeExHandling(RuntimeException e){
+        e.printStackTrace();
         log.warn("Runtime Exception: {}", e.getMessage());
         return ResponseEntity.internalServerError().body(Map.of("message", "Exception happened"));
     }
