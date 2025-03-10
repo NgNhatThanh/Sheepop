@@ -38,7 +38,8 @@ public class SecurityConfig {
             "/api/v1/common/**",
             "/api/v1/product/**",
             "/api/v1/homepage/**",
-            "/api/v1/review/get_review_list"};
+            "/api/v1/review/get_review_list",
+    };
 
     @Bean
     public PasswordEncoder passwordEncoder() {

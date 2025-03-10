@@ -14,4 +14,6 @@ public interface CategoryRepository extends MongoRepository<Category, String> {
     List<Category> findByNameContainingIgnoreCase(String name);
 
     List<Category> findAllByParent(Category parent);
+
+    List<Category> findAllByIdIn(List<String> ids);
 }

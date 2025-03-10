@@ -2,10 +2,12 @@ package com.app.bdc_backend.facade;
 
 import com.app.bdc_backend.elasticsearch.service.ESProductService;
 import com.app.bdc_backend.exception.RequestException;
+import com.app.bdc_backend.model.address.Province;
 import com.app.bdc_backend.model.dto.request.ProductSearchFilters;
 import com.app.bdc_backend.model.dto.response.ProductCardDTO;
 import com.app.bdc_backend.model.product.Category;
 import com.app.bdc_backend.model.product.Product;
+import com.app.bdc_backend.service.AddressService;
 import com.app.bdc_backend.service.CategoryService;
 import com.app.bdc_backend.service.ProductService;
 import com.app.bdc_backend.util.ModelMapper;
@@ -15,7 +17,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -26,6 +27,8 @@ public class HomepageFacadeService {
     private final CategoryService categoryService;
 
     private final ESProductService esProductService;
+
+    private final AddressService addressService;
 
     public Page<ProductCardDTO> getHomePageItems(int page, int limit){
         Page<Product> productPage = productService.findAllForHomepage(page, limit);
@@ -39,26 +42,39 @@ public class HomepageFacadeService {
                                                int page, int limit,
                                                ProductSearchFilters filters){
         if(!filters.getCategoryIds().isEmpty()){
-            String parentCatId = filters.getCategoryIds().get(0);
-            Category category = categoryService.findById(parentCatId);
-            if(category == null)
-                throw new RequestException("Invalid request: category not found");
-            List<Category> parents = new ArrayList<>(List.of(category));
+            List<Category> parents = categoryService.getAllByIdIn(filters.getCategoryIds());
+            if(parents == null || parents.size() != filters.getCategoryIds().size()){
+                throw new RequestException("Invalid request: some category id wrong");
+            }
             boolean ok = true;
+            List<Category> toRemove = new ArrayList<>();
+            List<Category> toAdd = new ArrayList<>();
             while(ok){
                 ok = false;
                 for(Category cat : parents){
                     if(cat.isHasChildren()){
                         ok = true;
                         List<Category> par = categoryService.getByParent(cat);
-                        parents.remove(cat);
-                        parents.addAll(par);
+                        toRemove.add(cat);
+                        toAdd.addAll(par);
                     }
                 }
+                parents.removeAll(toRemove);
+                parents.addAll(toAdd);
+                toRemove.clear();
+                toAdd.clear();
             }
             filters.setCategoryIds(parents.stream().map(cat -> cat.getId().toString()).toList());
         }
         return esProductService.homepageSearch(keyword, sortBy, order, page, limit, filters);
+    }
+
+    public List<Category> getCategoriesFilter(){
+        return categoryService.getByParent(null);
+    }
+
+    public List<Province> getLocationsFilter(){
+        return addressService.getProvinceList();
     }
 
 }

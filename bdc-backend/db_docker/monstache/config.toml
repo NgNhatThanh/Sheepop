@@ -23,10 +23,10 @@ index = "products"
 
 
 # lọc các document trước khi đẩy sang ES, hiện là lọc các doc được xóa mềm, ẩn, hoặc hết hàng
-[[filter]]
-namespace = "bdc.products"
-path = "./filters/products_filter.js"
-routing = true
+# [[filter]]
+# namespace = "bdc.products"
+# path = "./filters/products_filter.js"
+# routing = true
 
 # vẫn là code js nhưng có thể để lọc field, và một số thứ khác
 [[script]]

@@ -1,78 +1,60 @@
-import React, { useState } from 'react';
-import { RiArrowDownSLine, RiArrowUpSLine, RiFilterLine, RiPriceTag3Line } from 'react-icons/ri';
+import React, { useEffect, useState } from 'react';
+import { RiFilterLine, RiPriceTag3Line } from 'react-icons/ri';
+import { BASE_API_URL } from '../../../constants';
+import { FaStar } from "react-icons/fa";
 
-export default function FilterSidebar(){
-  const [sections, setSections] = useState([
-    {
-      id: 'categories',
-      title: 'Theo Danh Mục',
-      isOpen: true,
-      items: [
-        { id: 'ao', name: 'Áo', count: 1250, checked: true },
-        { id: 'thoi-trang-tre-em', name: 'Thời Trang Trẻ Em', count: 980 },
-        { id: 'thoi-trang-nam', name: 'Thời Trang Nam', count: 1450 },
-        { id: 'nha-cua', name: 'Nhà Cửa & Đời Sống', count: 756 },
-      ]
-    },
-    {
-      id: 'location',
-      title: 'Nơi Bán',
-      isOpen: true,
-      items: [
-        { id: 'ha-noi', name: 'Hà Nội', count: 852 },
-        { id: 'ho-chi-minh', name: 'TP. Hồ Chí Minh', count: 1254 },
-        { id: 'quan-9', name: 'Quận 9', count: 453 },
-        { id: 'hoang-mai', name: 'Quận Hoàng Mai', count: 321 },
-      ]
-    },
-    {
-      id: 'shipping',
-      title: 'Đơn Vị Vận Chuyển',
-      isOpen: true,
-      items: [
-        { id: 'hoa-toc', name: 'Hỏa Tốc', count: 231 },
-        { id: 'nhanh', name: 'Nhanh', count: 542 },
-        { id: 'tiet-kiem', name: 'Tiết Kiệm', count: 876, checked: true },
-      ]
-    },
-    {
-      id: 'brand',
-      title: 'Thương Hiệu',
-      isOpen: true,
-      items: [
-        { id: 'mucho', name: 'Mucho', count: 124 },
-        { id: 'misoul', name: 'MiSoul', count: 98 },
-        { id: 'adam-store', name: 'ADAM STORE', count: 156 },
-        { id: 'teelab', name: 'Teelab', count: 213 },
-      ]
-    },
-  ]);
+export default function FilterSidebar({filters, setFilters, resetFilters}){
 
   const [priceRange, setPriceRange] = useState({
-    min: 0,
-    max: 500000
+    min: filters.minPrice || '',
+    max: filters.maxPrice || ''
   });
 
-  const toggleSection = (sectionId) => {
-    setSections(prevSections =>
-      prevSections.map(section =>
-        section.id === sectionId ? { ...section, isOpen: !section.isOpen } : section
-      )
-    );
-  };
+  const [categories, setCategories] = useState([])
+  const [locations, setLocations] = useState([])
 
-  const toggleCheckbox = (sectionId, itemId) => {
-    setSections(prevSections =>
-      prevSections.map(section =>
-        section.id === sectionId ? {
-          ...section,
-          items: section.items.map(item =>
-            item.id === itemId ? { ...item, checked: !item.checked } : item
-          )
-        } : section
-      )
-    );
-  };
+  const [errorPriceRange, setErrorPriceRange] = useState(false)
+
+  const handlePriceChange = () => {
+    setErrorPriceRange(false)
+    if(priceRange.min && priceRange.max && priceRange.min > priceRange.max){
+      setErrorPriceRange(true)
+      return
+    }
+    if(!priceRange.min && !priceRange.max){
+      setErrorPriceRange(true)
+      return
+    }
+    if(priceRange.min){
+      setFilters(prev => ({
+        ...prev,
+        minPrice: priceRange.min
+      }))
+    }
+    if(priceRange.max){
+      setFilters(prev => ({
+        ...prev,
+        maxPrice: priceRange.max
+      }))
+    }
+  }
+
+  useEffect(() => {
+    const fetchCategories = () => {
+      fetch(`${BASE_API_URL}/v1/homepage/get_categories_filter`)
+        .then(res => res.json())
+        .then(res => setCategories(res))
+    }
+
+    const fetchLocations = () => {
+      fetch(`${BASE_API_URL}/v1/homepage/get_locations_filter`)
+        .then(res => res.json())
+        .then(res => setLocations(res))
+    }
+
+    fetchLocations()
+    fetchCategories()
+  }, [])
 
   return (
     <div className="w-full bg-white rounded-lg shadow-sm border border-gray-100 p-4 animate-fade-in">
@@ -83,41 +65,71 @@ export default function FilterSidebar(){
         </h2>
       </div>
 
-      {sections.map((section) => (
-        <div key={section.id} className="py-4 border-b border-gray-200">
-          <button
-            className="font-medium text-gray-800 mb-2 flex justify-between items-center w-full"
-            onClick={() => toggleSection(section.id)}
-          >
-            {section.title}
-            {section.isOpen ? (
-              <RiArrowUpSLine size={16} className="text-gray-500" />
-            ) : (
-              <RiArrowDownSLine size={16} className="text-gray-500" />
-            )}
-          </button>
-          
-          {section.isOpen && (
-            <div className="mt-2 space-y-2 max-h-[200px] overflow-y-auto pr-2">
-              {section.items.map((item) => (
-                <div key={item.id} className="flex items-center">
-                  <input
-                    type="checkbox"
-                    id={`${section.id}-${item.id}`}
-                    className="w-4 h-4 cursor-pointer rounded border-gray-300 text-orange-500 focus:ring-orange-500"
-                    checked={item.checked || false}
-                    onChange={() => toggleCheckbox(section.id, item.id)}
-                  />
-                  <label htmlFor={`${section.id}-${item.id}`} className="ml-2 text-sm font-medium text-gray-700 cursor-pointer select-none">
-                    {item.name}
-                  </label>
-                  <span className="ml-auto text-xs text-gray-500">({item.count})</span>
-                </div>
-              ))}
+      <div className="py-4 border-b border-gray-200">
+        <h2
+          className="font-medium text-gray-800 mb-2 flex justify-between items-center w-full"
+        >
+          Theo danh mục
+        </h2>
+        <div className="mt-2 space-y-2 max-h-[200px] overflow-y-auto pr-2">
+          {categories.length > 0 && categories.map((cat) => (
+            <div 
+              key={cat.id} 
+              className="flex items-center"
+            >
+              <input
+                type="checkbox"
+                checked={filters.categoryIds?.includes(cat.id)}
+                className="w-4 h-4 cursor-pointer rounded border-gray-300 text-orange-500 focus:ring-orange-500"
+                onChange={e => {
+                  setFilters(prev => ({
+                    ...prev,
+                    categoryIds: e.target.checked
+                      ? prev.categoryIds ? [...prev.categoryIds, cat.id] : [cat.id] // Thêm nếu chưa có
+                      : (prev.categoryIds || []).filter(id => id !== cat.id) // Xoá nếu đã có
+                  }));
+                }}
+              />
+              <label className="ml-2 text-sm font-medium text-gray-700 cursor-pointer select-none">
+                {cat.name}
+              </label>
             </div>
-          )}
+          ))}
         </div>
-      ))}
+      </div>
+
+      <div className="py-4 border-b border-gray-200">
+        <h2
+          className="font-medium text-gray-800 mb-2 flex justify-between items-center w-full"
+        >
+          Nơi bán
+        </h2>
+        <div className="mt-2 space-y-2 max-h-[200px] overflow-y-auto pr-2">
+          {locations.length > 0 && locations.map((loc, index) => (
+            <div 
+              key={index} 
+              className="flex items-center"
+            >
+              <input
+                type="checkbox"
+                checked={filters.locations?.includes(loc.name)}
+                className="w-4 h-4 cursor-pointer rounded border-gray-300 text-orange-500 focus:ring-orange-500"
+                onChange={e => {
+                  setFilters(prev => ({
+                    ...prev,
+                    locations: e.target.checked
+                      ? [...prev.locations, loc.name] 
+                      : (prev.locations || []).filter(locName => locName !== loc.name) 
+                  }));
+                }}
+              />
+              <label className="ml-2 text-sm font-medium text-gray-700 cursor-pointer select-none">
+                {loc.name}
+              </label>
+            </div>
+          ))}
+        </div>
+      </div>
 
       <div className="py-4 border-b border-gray-200">
         <h3 className="font-medium text-gray-800 mb-2 flex items-center">
@@ -125,27 +137,14 @@ export default function FilterSidebar(){
           Khoảng Giá
         </h3>
         <div className="mt-4 px-2">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs text-gray-500">₫{priceRange.min.toLocaleString()}</span>
-            <span className="text-xs text-gray-500">₫{priceRange.max.toLocaleString()}</span>
-          </div>
-          <input
-            type="range"
-            min="0"
-            max="1000000"
-            step="10000"
-            value={priceRange.max}
-            onChange={(e) => setPriceRange(prev => ({ ...prev, max: parseInt(e.target.value) }))}
-            className="h-2 bg-gray-200 rounded-full appearance-none cursor-pointer w-full"
-          />
           <div className="flex gap-2 mt-4">
             <div className="flex-1">
               <input
                 type="number"
                 value={priceRange.min}
-                onChange={(e) => setPriceRange(prev => ({ ...prev, min: parseInt(e.target.value) }))}
+                onChange={(e) => setPriceRange(prev => ({ ...prev, min: parseInt(e.target.value) || '' }))}
                 className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md"
-                placeholder="₫ TỪ"
+                placeholder="₫ Từ"
               />
             </div>
             <div className="self-center">-</div>
@@ -153,17 +152,68 @@ export default function FilterSidebar(){
               <input
                 type="number"
                 value={priceRange.max}
-                onChange={(e) => setPriceRange(prev => ({ ...prev, max: parseInt(e.target.value) }))}
+                onChange={(e) => setPriceRange(prev => ({ ...prev, max: parseInt(e.target.value) || '' }))}
                 className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md"
-                placeholder="₫ ĐẾN"
+                placeholder="₫ Đến"
               />
             </div>
           </div>
-          <button className="w-full mt-3 px-3 py-2 bg-blue-500 text-white rounded-md text-sm font-medium hover:bg-blue-600 transition-colors">
+          {errorPriceRange && (
+            <p className='text-red-500 text-sm'>Vui lòng chọn khoảng giá phù hợp</p>
+          )}
+          <button 
+            className="cursor-pointer w-full mt-3 px-3 py-2 bg-blue-500 text-white rounded-md text-sm font-medium hover:bg-blue-600 transition-colors"
+            onClick={handlePriceChange}  
+          >
             Áp Dụng
           </button>
         </div>
       </div>
+
+      <div className="py-4 border-b border-gray-200">
+        <h2
+          className="font-medium text-gray-800 mb-2 flex justify-between items-center w-full"
+        >
+          Đánh giá
+        </h2>
+
+        <div className="mt-4 px-2 flex flex-col gap-2">
+          {[5, 4, 3, 2, 1].map(rating => (
+            <div 
+              key={rating} 
+              className="cursor-pointer flex gap-3 items-center justify-left"
+              onClick={() => {
+                setFilters(prev => ({
+                  ...prev, 
+                  minRating: rating
+                }))
+              }}
+            >
+              {[...Array(5)].map((_, index) => (
+                <FaStar
+                  key={index}
+                  className={index < rating ? "text-blue-500" : "text-gray-300"}
+                />
+              ))}
+              {rating <= 4 && <p>trở lên</p>}
+            </div>
+          ))}
+        </div>
+      </div> 
+
+      <button 
+        className="cursor-pointer w-full mt-3 px-3 py-2 bg-blue-500 text-white rounded-md text-sm font-medium hover:bg-blue-600 transition-colors"
+        onClick={() => {
+          setPriceRange({
+            max: '',
+            min: ''
+          })
+          resetFilters()
+        }}  
+      >
+        Xóa bộ lọc
+      </button>
+
     </div>
   );
 };

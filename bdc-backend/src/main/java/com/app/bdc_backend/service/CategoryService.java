@@ -40,6 +40,10 @@ public class CategoryService {
         return categoryRepository.findById(id).orElse(null);
     }
 
+    public List<Category> getAllByIdIn(List<String> ids){
+        return categoryRepository.findAllByIdIn(ids);
+    }
+
     public List<Category> getByParent(Category parent){
         return categoryRepository.findAllByParent(parent);
     }

@@ -13,7 +13,7 @@ public class ProductSearchFilters {
 
     private List<String> categoryIds;
     
-    private String location;
+    private List<String> locations;
     
     private Integer minPrice;
     

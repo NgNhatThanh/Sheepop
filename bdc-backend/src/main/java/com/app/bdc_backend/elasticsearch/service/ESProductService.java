@@ -31,8 +31,10 @@ public class ESProductService {
             case "newest":
                 sortBy = "createdAt";
                 break;
-            case "hottest":
+            case "sales":
                 sortBy = "sold";
+                break;
+            case "price":
                 break;
             default:
                 throw new RequestException("Invalid request: invalid sort by");

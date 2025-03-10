@@ -1,42 +1,29 @@
 import React, { useState } from 'react';
 import { RiArrowDownSLine, RiArrowLeftSLine, RiArrowRightSLine } from 'react-icons/ri';
 
-export default function SearchFilter(){
+export default function SearchFilter({sort, setSort, page, setPage, totalPages}){
   const sortOptions = [
-    { id: 'relevant', label: 'Liên Quan' },
+    { id: 'relevance', label: 'Liên Quan' },
     { id: 'newest', label: 'Mới Nhất' },
-    { id: 'bestselling', label: 'Bán Chạy' },
-    { id: 'price', label: 'Giá' },
+    { id: 'sales', label: 'Bán Chạy' },
   ];
 
-  const [activeSort, setActiveSort] = useState('relevant');
-  const [currentPage, setCurrentPage] = useState(1);
-  const totalPages = 17;
-
-  const handleSortChange = (sortId) => {
-    setActiveSort(sortId);
-  };
+  const [openPriceSortDropdown, setOpenPriceSortDropdown] = useState(false)
 
   const handlePrevPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(prevPage => prevPage - 1);
+    if (page > 0) {
+      setPage(prevPage => prevPage - 1);
     }
   };
 
   const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(prevPage => prevPage + 1);
+    if (page < totalPages - 1) {
+      setPage(prevPage => prevPage + 1);
     }
   };
 
   return (
     <div className="flex flex-col gap-3 w-full animate-fade-in">
-      <div className="flex items-center text-sm">
-        <span className="text-gray-500 flex items-center">
-          Kết quả tìm kiếm cho từ khóa '<span className="text-blue-500 font-medium">áo</span>'
-        </span>
-      </div>
-      
       <div className="flex justify-between items-center">
         <div className="flex items-center">
           <span className="text-sm text-gray-500 mr-3">Sắp xếp theo</span>
@@ -44,48 +31,101 @@ export default function SearchFilter(){
             {sortOptions.map((option) => (
               <button
                 key={option.id}
-                onClick={() => handleSortChange(option.id)}
+                onClick={() => {
+                  setSort({
+                    sortBy: option.id,
+                    order: "desc"
+                  })
+                }}
                 className={`
-                  px-4 py-2 text-sm font-medium border border-gray-200 rounded-md focus:outline-none transition-all
-                  ${activeSort === option.id 
+                  cursor-pointer px-4 py-2 text-sm font-medium border border-gray-200 rounded-md focus:outline-none transition-all
+                  ${sort.sortBy === option.id 
                     ? "bg-blue-500 text-white border-blue-500" 
                     : "hover:bg-gray-50"}
                 `}
               >
                 {option.label}
-                {option.id === 'price' && (
-                  <RiArrowDownSLine size={16} className="ml-1 inline-block" />
-                )}
               </button>
             ))}
+
+            <div 
+              className='relative'
+              onMouseEnter={() => setOpenPriceSortDropdown(true)}
+              onMouseLeave={() => setOpenPriceSortDropdown(false)}
+            >
+              <button
+                className={`
+                    w-50 flex justify-between px-4 py-2 text-sm font-medium border border-gray-200 rounded-md focus:outline-none transition-all
+                    ${sort.sortBy === 'price' 
+                      ? "bg-blue-500 text-white border-blue-500" 
+                      : "hover:bg-gray-50"}
+                  `}
+                >
+                  {sort.sortBy === 'price' ? ('Giá: ' + (sort.order === 'asc' ? 'Thấp đến Cao' : 'Cao đến Thấp')) : 'Giá'}
+                  <RiArrowDownSLine size={16} className="ml-1 inline-block" />
+              </button>
+              {openPriceSortDropdown && (
+                <div className='absolute top-full bg-white z-5 w-50'>
+                  <button
+                    onClick={() => {
+                      setSort({
+                        sortBy: 'price',
+                        order: 'asc'
+                      })
+                      setOpenPriceSortDropdown(false)
+                    }}
+                    className={`
+                      w-full text-left px-4 py-2 text-sm font-medium hover:text-blue-500 cursor-pointer
+                    `}
+                  >
+                    Giá: Thấp đến Cao
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setSort({
+                        sortBy: 'price',
+                        order: 'desc'
+                      })
+                      setOpenPriceSortDropdown(false)
+                    }}
+                    className={`
+                      w-full text-left px-4 py-2 text-sm font-medium hover:text-blue-500 cursor-pointer
+                    `}
+                  >
+                    Giá: Cao đến Thấp
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
         
         <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-500">
-            {currentPage}/{totalPages}
+          <span className="text-gray-500">
+            <span className='text-blue-700'>{Number(page) + 1}</span>/{totalPages}
           </span>
-          <div className="flex items-center">
+          <div className="flex items-center gap-2">
             <button
               onClick={handlePrevPage}
-              disabled={currentPage === 1}
+              disabled={page === 0}
               className={`
-                "p-2 rounded-md border",
-                currentPage === 1 
-                  ? "text-gray-300 border-gray-200 cursor-not-allowed" 
-                  : "text-gray-600 border-gray-200 hover:bg-gray-50"
+                p-2 rounded-md border border-blue-500
+                ${page === 0 
+                  ? "text-gray-300 cursor-not-allowed" 
+                  : "text-gray-600 cursor-pointer hover:bg-blue-300"}
               `}
             >
               <RiArrowLeftSLine size={16} />
             </button>
             <button
               onClick={handleNextPage}
-              disabled={currentPage === totalPages}
+              disabled={page === totalPages - 1}
               className={`
-                "p-2 rounded-md border ml-1",
-                currentPage === totalPages 
-                  ? "text-gray-300 border-gray-200 cursor-not-allowed" 
-                  : "text-gray-600 border-gray-200 hover:bg-gray-50"
+                p-2 rounded-md border border-blue-500
+                ${page === totalPages - 1 
+                  ? "text-gray-300 cursor-not-allowed" 
+                  : "text-gray-600 cursor-pointer hover:bg-blue-300"}
               `}
             >
               <RiArrowRightSLine size={16} />

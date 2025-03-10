@@ -33,9 +33,14 @@ public class ESProductRepository{
                 .query(q -> q
                     .bool(b -> {
                         BoolQuery.Builder boolBuilder = new BoolQuery.Builder();
+                        boolBuilder.must(m -> m.term(t ->
+                                t.field("deleted").value(false)));
+                        boolBuilder.must(m -> m.term(t ->
+                                t.field("visible").value(true)));
+                        boolBuilder.must(m -> m.term(t ->
+                                t.field("restricted").value(false)));
                         boolBuilder.filter(m -> m.match(t ->
                                 t.field("name").query(keyword).fuzziness("2")));
-
                         if (!filters.getCategoryIds().isEmpty()) {
                             boolBuilder.filter(f -> f.terms(t ->
                                     t.field("categoryId").terms(ts ->
@@ -43,10 +48,13 @@ public class ESProductRepository{
                                                     FieldValue::of).toList()))));
                         }
 
-                        if (filters.getLocation() != null && !filters.getLocation().isEmpty()) {
-                            boolBuilder.filter(f ->
-                                    f.match(m -> m.field("location").query(filters.getLocation())));
+                        if (!filters.getLocations().isEmpty()) {
+                            boolBuilder.filter(f -> f.terms(t ->
+                                    t.field("location.keyword").terms(ts ->
+                                            ts.value(filters.getLocations().stream().map(
+                                                    FieldValue::of).toList()))));
                         }
+
                         if (filters.getMinPrice() != null) {
                             boolBuilder.filter(f -> f.range(m ->
                                     m.number(v ->
@@ -77,6 +85,7 @@ public class ESProductRepository{
         SearchResponse<ObjectNode> response = client.search(rq, ObjectNode.class);
         NativeQueryBuilder nativeQueryBuilder = new NativeQueryBuilder();
         nativeQueryBuilder.withQuery(Objects.requireNonNull(rq.query()));
+        System.out.println(nativeQueryBuilder.getQuery());
         List<ObjectNode> nodes = response.hits().hits().stream()
                 .map(hit -> {
                     ObjectNode node = hit.source();
