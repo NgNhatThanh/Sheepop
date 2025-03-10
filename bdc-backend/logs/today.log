@@ -1,0 +1,68 @@
+2025-01-22 10:48:51,ICT INFO [main] o.s.boot.StartupInfoLogger.logStarting: Starting BdcBackendApplication v0.0.1-SNAPSHOT using Java 17.0.2 with PID 1 (/app/app.jar started by root in /app)
+
+2025-01-22 10:48:51,ICT INFO [main] o.s.boot.SpringApplication.logStartupProfileInfo: The following 1 profile is active: "prod"
+
+2025-01-22 10:48:53,ICT INFO [main] o.s.d.r.c.RepositoryConfigurationDelegate.multipleStoresDetected: Multiple Spring Data modules found, entering strict repository configuration mode
+
+2025-01-22 10:48:53,ICT INFO [main] o.s.d.r.c.RepositoryConfigurationDelegate.registerRepositoriesIn: Bootstrapping Spring Data MongoDB repositories in DEFAULT mode.
+
+2025-01-22 10:48:53,ICT INFO [main] o.s.d.r.c.RepositoryConfigurationDelegate.registerRepositoriesIn: Finished Spring Data repository scanning in 206 ms. Found 5 MongoDB repository interfaces.
+
+2025-01-22 10:48:53,ICT INFO [main] o.s.d.r.c.RepositoryConfigurationDelegate.multipleStoresDetected: Multiple Spring Data modules found, entering strict repository configuration mode
+
+2025-01-22 10:48:53,ICT INFO [main] o.s.d.r.c.RepositoryConfigurationDelegate.registerRepositoriesIn: Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+
+2025-01-22 10:48:53,ICT INFO [main] o.s.d.r.c.RepositoryConfigurationExtensionSupport.isStrictRepositoryCandidate: Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.app.bdc_backend.dao.FollowRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+
+2025-01-22 10:48:53,ICT INFO [main] o.s.d.r.c.RepositoryConfigurationExtensionSupport.isStrictRepositoryCandidate: Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.app.bdc_backend.dao.product.ProductRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+
+2025-01-22 10:48:53,ICT INFO [main] o.s.d.r.c.RepositoryConfigurationExtensionSupport.isStrictRepositoryCandidate: Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.app.bdc_backend.dao.order.ReviewRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+
+2025-01-22 10:48:53,ICT INFO [main] o.s.d.r.c.RepositoryConfigurationExtensionSupport.isStrictRepositoryCandidate: Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.app.bdc_backend.dao.shop.ShopRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+
+2025-01-22 10:48:53,ICT INFO [main] o.s.d.r.c.RepositoryConfigurationExtensionSupport.isStrictRepositoryCandidate: Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.app.bdc_backend.dao.UserRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+
+2025-01-22 10:48:53,ICT INFO [main] o.s.d.r.c.RepositoryConfigurationDelegate.registerRepositoriesIn: Finished Spring Data repository scanning in 13 ms. Found 0 Redis repository interfaces.
+
+2025-01-22 10:48:54,ICT INFO [main] o.s.b.w.e.tomcat.TomcatWebServer.initialize: Tomcat initialized with port 8080 (http)
+
+2025-01-22 10:48:54,ICT INFO [main] o.apache.juli.logging.DirectJDKLog.log: Starting service [Tomcat]
+
+2025-01-22 10:48:54,ICT INFO [main] o.apache.juli.logging.DirectJDKLog.log: Starting Servlet engine: [Apache Tomcat/10.1.34]
+
+2025-01-22 10:48:54,ICT INFO [main] o.apache.juli.logging.DirectJDKLog.log: Initializing Spring embedded WebApplicationContext
+
+2025-01-22 10:48:54,ICT INFO [main] o.s.b.w.s.c.ServletWebServerApplicationContext.prepareWebApplicationContext: Root WebApplicationContext: initialization completed in 2922 ms
+
+2025-01-22 10:48:55,ICT INFO [main] c.m.i.d.logging.SLF4JLogger.info: MongoClient with metadata {"driver": {"name": "mongo-java-driver|sync|spring-boot", "version": "5.2.1"}, "os": {"type": "Linux", "name": "Linux", "architecture": "amd64", "version": "5.15.167.4-microsoft-standard-WSL2"}, "platform": "Java/Oracle Corporation/17.0.2+8-86", "env": {"container": {"runtime": "docker"}}} created with settings MongoClientSettings{readPreference=primary, writeConcern=WriteConcern{w=null, wTimeout=null ms, journal=null}, retryWrites=true, retryReads=true, readConcern=ReadConcern{level=null}, credential=MongoCredential{mechanism=null, userName='root', source='admin', password=<hidden>, mechanismProperties=<hidden>}, transportSettings=null, commandListeners=[], codecRegistry=ProvidersCodecRegistry{codecProviders=[ValueCodecProvider{}, BsonValueCodecProvider{}, DBRefCodecProvider{}, DBObjectCodecProvider{}, DocumentCodecProvider{}, CollectionCodecProvider{}, IterableCodecProvider{}, MapCodecProvider{}, GeoJsonCodecProvider{}, GridFSFileCodecProvider{}, Jsr310CodecProvider{}, JsonObjectCodecProvider{}, BsonCodecProvider{}, EnumCodecProvider{}, com.mongodb.client.model.mql.ExpressionCodecProvider@1b31af02, com.mongodb.Jep395RecordCodecProvider@2bb31455, com.mongodb.KotlinCodecProvider@3c16528d]}, loggerSettings=LoggerSettings{maxDocumentLength=1000}, clusterSettings={hosts=[mongo_db:27017], srvServiceName=mongodb, mode=SINGLE, requiredClusterType=UNKNOWN, requiredReplicaSetName='null', serverSelector='null', clusterListeners='[]', serverSelectionTimeout='30000 ms', localThreshold='15 ms'}, socketSettings=SocketSettings{connectTimeoutMS=10000, readTimeoutMS=0, receiveBufferSize=0, proxySettings=ProxySettings{host=null, port=null, username=null, password=null}}, heartbeatSocketSettings=SocketSettings{connectTimeoutMS=10000, readTimeoutMS=10000, receiveBufferSize=0, proxySettings=ProxySettings{host=null, port=null, username=null, password=null}}, connectionPoolSettings=ConnectionPoolSettings{maxSize=100, minSize=0, maxWaitTimeMS=120000, maxConnectionLifeTimeMS=0, maxConnectionIdleTimeMS=0, maintenanceInitialDelayMS=0, maintenanceFrequencyMS=60000, connectionPoolListeners=[], maxConnecting=2}, serverSettings=ServerSettings{heartbeatFrequencyMS=10000, minHeartbeatFrequencyMS=500, serverMonitoringMode=AUTO, serverListeners='[]', serverMonitorListeners='[]'}, sslSettings=SslSettings{enabled=false, invalidHostNameAllowed=false, context=null}, applicationName='null', compressorList=[], uuidRepresentation=JAVA_LEGACY, serverApi=null, autoEncryptionSettings=null, dnsClient=null, inetAddressResolver=null, contextProvider=null, timeoutMS=null}
+
+2025-01-22 10:48:55,ICT INFO [cluster-ClusterId{value='67906aa742059c4b539e4a27', description='null'}-mongo_db:27017] c.m.i.d.logging.SLF4JLogger.info: Monitor thread successfully connected to server with description ServerDescription{userAddress=mongo_db:27017, type=STANDALONE, cryptd=false, state=CONNECTED, ok=true, minWireVersion=0, maxWireVersion=25, maxDocumentSize=16777216, logicalSessionTimeoutMinutes=30, roundTripTimeNanos=26752777, minRoundTripTimeNanos=0}
+
+2025-01-22 10:48:55,ICT INFO [main] o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer.configure: Global AuthenticationManager configured with UserDetailsService bean with name myUserDetailService
+
+2025-01-22 10:48:57,ICT DEBUG [main] o.s.s.web.DefaultSecurityFilterChain.<init>: Will secure any request with filters: DisableEncodeUrlFilter, WebAsyncManagerIntegrationFilter, SecurityContextHolderFilter, HeaderWriterFilter, LogoutFilter, JwtAuthFilter, RequestCacheAwareFilter, SecurityContextHolderAwareRequestFilter, AnonymousAuthenticationFilter, SessionManagementFilter, ExceptionTranslationFilter, AuthorizationFilter
+
+2025-01-22 10:48:57,ICT INFO [main] o.s.v.b.OptionalValidatorFactoryBean.afterPropertiesSet: Failed to set up a Bean Validation provider: jakarta.validation.NoProviderFoundException: Unable to create a Configuration, because no Jakarta Bean Validation provider could be found. Add a provider like Hibernate Validator (RI) to your classpath.
+
+2025-01-22 10:48:57,ICT INFO [main] o.s.b.w.e.tomcat.TomcatWebServer.start: Tomcat started on port 8080 (http) with context path '/'
+
+2025-01-22 10:48:58,ICT INFO [main] o.s.boot.StartupInfoLogger.logStarted: Started BdcBackendApplication in 7.996 seconds (process running for 9.351)
+
+2025-01-22 10:49:15,ICT INFO [http-nio-8080-exec-1] o.apache.juli.logging.DirectJDKLog.log: Initializing Spring DispatcherServlet 'dispatcherServlet'
+
+2025-01-22 10:49:15,ICT INFO [http-nio-8080-exec-1] o.s.web.servlet.FrameworkServlet.initServletBean: Initializing Servlet 'dispatcherServlet'
+
+2025-01-22 10:49:15,ICT INFO [http-nio-8080-exec-1] o.s.web.servlet.FrameworkServlet.initServletBean: Completed initialization in 2 ms
+
+2025-01-22 10:49:15,ICT DEBUG [http-nio-8080-exec-1] o.s.security.web.FilterChainProxy.doFilterInternal: Securing POST /api/v1/auth/login
+
+2025-01-22 10:49:15,ICT DEBUG [http-nio-8080-exec-1] o.s.s.w.a.AnonymousAuthenticationFilter.defaultWithAnonymous: Set SecurityContextHolder to anonymous SecurityContext
+
+2025-01-22 10:49:15,ICT DEBUG [http-nio-8080-exec-1] o.s.security.web.FilterChainProxy.lambda$doFilterInternal$3: Secured POST /api/v1/auth/login
+
+2025-01-22 10:49:16,ICT DEBUG [http-nio-8080-exec-1] o.s.s.a.d.AbstractUserDetailsAuthenticationProvider.authenticate: Failed to find user 'long'
+
+2025-01-22 10:49:24,ICT INFO [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown.shutDownGracefully: Commencing graceful shutdown. Waiting for active requests to complete
+
+2025-01-22 10:49:24,ICT INFO [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown.doShutdown: Graceful shutdown complete
+
