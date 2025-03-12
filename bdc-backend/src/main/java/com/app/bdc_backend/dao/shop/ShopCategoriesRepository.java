@@ -6,5 +6,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ShopCategoriesRepository extends MongoRepository<ShopCategories, String> {
-    ShopCategories findAllByShopId(String string);
+
+    ShopCategories findByShopId(String string);
+
 }

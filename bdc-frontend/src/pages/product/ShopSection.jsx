@@ -7,7 +7,7 @@ export default function ShopSection({ shop }){
     return (
         <div className="w-300 bg-white mx-auto p-4 rounded-sm flex mb-4">
             <div className="ml-2 p-2 pr-7 flex gap-5 border-r border-gray-200">
-                <Link to='#'>
+                <Link to={`/shop/${shop.username}`}>
                     <img src={shop.avatarUrl} className="w-20 h-20 rounded-full"/>
                 </Link>
                 <div>

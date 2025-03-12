@@ -33,8 +33,7 @@ public class SecurityConfig {
 
     private static final String[] PUBLIC_ENDPOINTS = {
             "/api/v1/auth/**",
-            "/api/v1/shop/info/**",
-            "/api/v1/shop/base/**",
+            "/api/v1/shopinfo/**",
             "/api/v1/common/**",
             "/api/v1/product/**",
             "/api/v1/homepage/**",
@@ -54,6 +53,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+                .anonymous(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/v1/admin/**").hasAuthority(RoleName.ADMIN.toString())

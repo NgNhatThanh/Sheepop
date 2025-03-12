@@ -53,4 +53,38 @@ public class ESProductService {
                 ModelMapper.getInstance().map(es, ProductCardDTO.class));
     }
 
+    public Page<ProductCardDTO> getShopProductList(String shopId,
+                                                   String categoryId,
+                                                   String sortBy,
+                                                   String order,
+                                                   int page, int limit){
+        switch (sortBy){
+            case "quality":
+                sortBy = "averageRating";
+                break;
+            case "newest":
+                sortBy = "createdAt";
+                break;
+            case "sales":
+                sortBy = "sold";
+                break;
+            case "price":
+                break;
+            default:
+                throw new RequestException("Invalid request: invalid sort by");
+        }
+        Sort sort = Sort.by(
+                order.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC,
+                sortBy);
+        Pageable pageable = PageRequest.of(page, limit, sort);
+        Page<ESProduct> pageRes;
+        try {
+            pageRes = productRepository.getShopProducts(shopId, categoryId, pageable);
+        } catch (IOException e) {
+            throw new ServerException("Internal Server Error: Elasticsearch");
+        }
+        return pageRes.map(es ->
+                ModelMapper.getInstance().map(es, ProductCardDTO.class));
+    }
+
 }

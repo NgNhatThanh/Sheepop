@@ -7,11 +7,11 @@ import com.app.bdc_backend.model.address.Ward;
 import com.app.bdc_backend.model.dto.request.AddAddressDTO;
 import com.app.bdc_backend.model.dto.request.UpdateProfileDTO;
 import com.app.bdc_backend.model.dto.response.UserResponseDTO;
+import com.app.bdc_backend.model.shop.Follow;
+import com.app.bdc_backend.model.shop.Shop;
 import com.app.bdc_backend.model.user.User;
 import com.app.bdc_backend.model.user.UserAddress;
-import com.app.bdc_backend.service.AddressService;
-import com.app.bdc_backend.service.UserAddressService;
-import com.app.bdc_backend.service.UserService;
+import com.app.bdc_backend.service.*;
 import com.app.bdc_backend.util.ModelMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -28,6 +28,10 @@ public class UserFacadeService {
     private final UserAddressService userAddressService;
 
     private final AddressService addressService;
+
+    private final FollowService followService;
+
+    private final ShopService shopService;
 
     public UserResponseDTO getUserProfile(){
         String curUsername = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -76,6 +80,32 @@ public class UserFacadeService {
         }
         userAddressService.save(userAddress);
         return userAddress;
+    }
+
+    public void updateFollow(String shopId, boolean isFollow){
+        Shop shop = shopService.findById(shopId);
+        if(shop == null)
+            throw new RequestException("Invalid request: shop not found");
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userService.findByUsername(username);
+        if(user.isDeleted())
+            throw new RequestException("Invalid request: shop is deleted");
+        Follow follow = followService.find(shopId, user.getId().toString());
+        boolean isFollowing = follow != null;
+        if(isFollow && isFollowing)
+            throw new RequestException("Invalid request: already followed");
+        if(!isFollow && !isFollowing)
+            throw new RequestException("Invalid request: already not followed");
+        if(isFollow){
+            follow = new Follow(shopId, user.getId().toString());
+            followService.save(follow);
+            shop.setFollowerCount(shop.getFollowerCount() + 1);
+        }
+        else{
+            followService.delete(follow);
+            shop.setFollowerCount(shop.getFollowerCount() - 1);
+        }
+        shopService.save(shop);
     }
 
     private UserAddress fromDTOtoAddress(AddAddressDTO dto)  {

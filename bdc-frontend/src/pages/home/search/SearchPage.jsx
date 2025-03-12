@@ -15,7 +15,7 @@ export default function SearchPage(){
   const [isEmpty, setIsEmpty] = useState(false)
   const limit = 60
   const [page, setPage] = useState(searchParams.get('page') || 0)
-  const [totalPages, setTotalPages] = useState(0)
+  const [totalPages, setTotalPages] = useState(1)
   const [keyword] = useState(searchParams.get('keyword'))
   const [sort, setSort] = useState({
     sortBy: searchParams.get('sortBy') || "relevance",
@@ -26,7 +26,8 @@ export default function SearchPage(){
     locations: searchParams.getAll('locations') || [],
     minPrice: searchParams.get('minPrice') || null,
     maxPrice: searchParams.get('maxPrice') || null,
-    minRating: searchParams.get('minRating') || null
+    minRating: searchParams.get('minRating') || null,
+    shopId: searchParams.get('shopId') || null
   })
 
   const resetFilters = () => {
@@ -35,7 +36,8 @@ export default function SearchPage(){
       locations: [],
       minPrice: null,
       maxPrice: null,
-      minRating: null
+      minRating: null,
+      shopId: searchParams.get('shopId') || null
     })
   }
   const [products, setProducts] = useState([])
@@ -63,7 +65,8 @@ export default function SearchPage(){
       locations: filters.locations,
       minPrice: filters.minPrice,
       maxPrice: filters.maxPrice,
-      minRating: filters.minRating
+      minRating: filters.minRating,
+      shopId: filters.shopId
     }
     const filteredParams = Object.fromEntries(
       Object.entries(params).filter(([_, value]) => value !== undefined && value !== null && value !== "")

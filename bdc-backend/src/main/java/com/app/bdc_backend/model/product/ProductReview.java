@@ -21,10 +21,10 @@ public class ProductReview {
     @Id
     private ObjectId id;
 
-    @DocumentReference
+    @DocumentReference(lazy = true)
     private User reviewer;
 
-    @DocumentReference
+    @DocumentReference(lazy = true)
     private OrderItem orderItem;
 
     private int rating;

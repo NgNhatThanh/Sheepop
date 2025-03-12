@@ -23,7 +23,7 @@ public class Category {
     @EqualsAndHashCode.Include
     private String name;
 
-    @DocumentReference
+    @DocumentReference(lazy = true)
     private Category parent;
 
     private String description;

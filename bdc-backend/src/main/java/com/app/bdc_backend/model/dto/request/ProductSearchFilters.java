@@ -21,4 +21,6 @@ public class ProductSearchFilters {
     
     private Integer minRating;
 
+    private String shopId;
+
 }

@@ -8,17 +8,15 @@ import com.app.bdc_backend.model.dto.request.AddAddressDTO;
 import com.app.bdc_backend.model.dto.request.SaveProductDTO;
 import com.app.bdc_backend.model.dto.request.UpdateShopProfileDTO;
 import com.app.bdc_backend.model.dto.response.*;
-import com.app.bdc_backend.model.enums.PaymentStatus;
-import com.app.bdc_backend.model.enums.PaymentType;
 import com.app.bdc_backend.model.enums.RestrictStatus;
 import com.app.bdc_backend.model.enums.ShopOrderStatus;
-import com.app.bdc_backend.model.order.OrderItem;
 import com.app.bdc_backend.model.order.ShopOrder;
 import com.app.bdc_backend.model.product.Category;
 import com.app.bdc_backend.model.product.Product;
 import com.app.bdc_backend.model.product.ProductSKU;
 import com.app.bdc_backend.model.shop.Shop;
 import com.app.bdc_backend.model.shop.ShopAddress;
+import com.app.bdc_backend.model.shop.ShopCategories;
 import com.app.bdc_backend.model.user.User;
 import com.app.bdc_backend.service.*;
 import com.app.bdc_backend.util.ModelMapper;
@@ -28,12 +26,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -255,6 +251,7 @@ public class ShopFacadeService {
             productService.addProductAttributeList(sku.getAttributes());
         }
         shop.setProductCount(shop.getProductCount() + 1);
+        saveShopCategories(category, shop);
         shopService.save(shop);
         categoryService.increaseProductCount(category);
         productService.addProductMediaList(product.getMediaList());
@@ -276,6 +273,11 @@ public class ShopFacadeService {
         updatedProd.setUpdatedAt(new Date());
         updatedProd.setCreatedAt(product.getCreatedAt());
         updatedProd.setShop(product.getShop());
+        Category category = ModelMapper.getInstance().map(dto.getCategory(), Category.class);
+        if(category.isHasChildren())
+            throw new RequestException("Invalid request: category has children");
+        Shop shop = product.getShop();
+        saveShopCategories(category, shop);
         for(ProductSKU sku : updatedProd.getSkuList()){
             sku.setProduct(updatedProd);
             productService.addProductAttributeList(sku.getAttributes());
@@ -287,8 +289,24 @@ public class ShopFacadeService {
             updatedProd.setRestrictStatus(RestrictStatus.PENDING);
             updatedProd.setRestricted(true);
         }
+
         updatedProd.setDeleted(product.isDeleted());
         productService.saveProduct(updatedProd);
+    }
+
+    private void saveShopCategories(Category category, Shop shop) {
+        ShopCategories shopCategories = shopService.getShopCategories(shop);
+        boolean existedCat = false;
+        for(Category cat : shopCategories.getCategories()){
+            if(cat.getId().equals(category.getId())){
+                existedCat = true;
+                break;
+            }
+        }
+        if(!existedCat){
+            shopCategories.getCategories().add(category);
+            shopService.saveShopCategories(shopCategories);
+        }
     }
 
     public Page<ShopProductTableResponseDTO> getProductList(int type,

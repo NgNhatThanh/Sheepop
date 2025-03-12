@@ -38,4 +38,16 @@ public class UserController {
         return ResponseEntity.ok(userFacadeService.addAddress(dto));
     }
 
+    @PostMapping("/follow")
+    public ResponseEntity<?> followShop(@RequestParam String shopId){
+        userFacadeService.updateFollow(shopId, true);
+        return ResponseEntity.ok().body(Map.of("status", "success"));
+    }
+
+    @PostMapping("/unfollow")
+    public ResponseEntity<?> unfollowShop(@RequestParam String shopId){
+        userFacadeService.updateFollow(shopId, false);
+        return ResponseEntity.ok().body(Map.of("status", "success"));
+    }
+
 }

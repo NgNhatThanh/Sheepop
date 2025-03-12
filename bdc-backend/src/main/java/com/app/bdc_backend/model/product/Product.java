@@ -25,7 +25,7 @@ public class Product {
 
     private String name;
 
-    @DocumentReference
+    @DocumentReference(lazy = true)
     private Shop shop;
 
     private String description;
@@ -36,15 +36,15 @@ public class Product {
 
     private int quantity;
 
-    @DocumentReference
+    @DocumentReference(lazy = true)
     private Category category;
 
     private int weight;
 
-    @DocumentReference
+    @DocumentReference(lazy = true)
     private List<ProductSKU> skuList;
 
-    @DocumentReference
+    @DocumentReference(lazy = true)
     private List<ProductMedia> mediaList;
 
     private long revenue;

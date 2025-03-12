@@ -33,8 +33,8 @@ const SearchPage = lazy(() => import('./pages/home/search/SearchPage.jsx'));
 const UserList = lazy(() => import('./pages/admin/user/UserList.jsx'))
 const ShopList = lazy(() => import('./pages/admin/user/ShopList.jsx'))
 const OrderList = lazy(() => import('./pages/admin/order/OrderList.jsx'))
-
 const AdminPageLayout = lazy(() => import('./pages/admin/AdminPageLayout.jsx'))
+const ShopPage = lazy(() => import('./pages/shop/ShopPage.jsx'))
 
 function App() {
 
@@ -86,6 +86,7 @@ function App() {
             <Route path='' element={<HomePage/>}/>
             <Route path='preview/:productId' element={<PreviewProductPage/>}/>
             <Route path='product/:productInfo' element={<ProductPage/>}/>
+            <Route path='shop/:username' element={<ShopPage/>}/>
             <Route path='cart' element={<CartPage/>}/>
             <Route path='checkout/success' element={<SuccessPage/>}/>
             <Route path='checkout' element={<CheckoutPage/>}/>

@@ -43,7 +43,8 @@ public class HomepageController {
                                          @RequestParam(required = false) List<String> locations,
                                          @RequestParam(required = false) Integer minPrice,
                                          @RequestParam(required = false) Integer maxPrice,
-                                         @RequestParam(required = false) Integer minRating){
+                                         @RequestParam(required = false) Integer minRating,
+                                         @RequestParam(required = false) String shopId){
         log.info("Locations: {}", locations);
         if(minPrice != null && maxPrice != null && minPrice > maxPrice)
             throw new RequestException("Invalid request: price range is invalid");
@@ -56,7 +57,7 @@ public class HomepageController {
         ProductSearchFilters filters = new ProductSearchFilters(
                 categoryIds == null ? new ArrayList<>() : categoryIds,
                 locations == null ? new ArrayList<>() : locations,
-                minPrice, maxPrice, minRating);
+                minPrice, maxPrice, minRating, shopId);
         Page<ProductCardDTO> dtos = homepageFacadeService.searchProducts(keyword, sortBy, order, page, limit,
                 filters);
         return ResponseEntity.ok(new PageResponse<>(dtos));

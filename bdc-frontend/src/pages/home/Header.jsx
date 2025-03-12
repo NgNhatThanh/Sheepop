@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import { FaSearch, FaShoppingCart } from "react-icons/fa"
 import { fetchWithAuth } from "../../util/AuthUtil"
 import { BASE_API_URL } from "../../constants"
-import { Link, useLocation, useSearchParams } from 'react-router-dom'
+import { Link, useLocation, useParams, useSearchParams } from 'react-router-dom'
 
 export default function Header({isAuthenticated}){
 
@@ -15,6 +15,8 @@ export default function Header({isAuthenticated}){
     const showMiniCart = !['/cart', '/checkout'].includes(location.pathname)
 
     const [keyword, setKeyword] = useState(searchParams.get('keyword') || '')
+    const shopId = searchParams.get('shopId')
+    const [searchScope, setSearchScope] = useState(shopId ? 'shop' : 'all');
 
     const fetchMiniCart = async () => {
         const res = await fetchWithAuth(`${BASE_API_URL}/v1/cart/get-mini`, null, false)
@@ -52,17 +54,30 @@ export default function Header({isAuthenticated}){
                 </Link>
                 
                 <div className="flex flex-1 mx-4">
+
+                    {shopId && (
+                        <select
+                            className="mr-2 cursor-pointer px-3 py-2 rounded-md border-r bg-gray-100 text-gray-700"
+                            value={searchScope}
+                            onChange={(e) => setSearchScope(e.target.value)}
+                        >
+                            <option value="shop" className="cursor-pointer">Tìm trong shop</option>
+                            <option value="all" className="cursor-pointer">Tìm toàn bộ</option>
+                        </select>
+                    )}
+
                     <input
                         type="text"
                         value={keyword}
                         placeholder={keyword || 'Tìm kiếm sản phẩm'}
                         onChange={e => setKeyword(e.target.value)}
                         onKeyDown={e => {
-                            if(e.key === 'Enter' && keyword) window.location.assign(`search?keyword=${keyword}`)
+                            if(e.key === 'Enter' && keyword) window.location.assign(`/search?keyword=${keyword}${searchScope === 'shop' ? '&shopId=' + shopId : ''}`)
                         }}
                         className="w-full p-2 rounded-l-md border-none focus:ring-0 text-black bg-white"
                     />
-                    <a href={keyword ? `search?keyword=${keyword}` : '#'} className="flex items-center p-2 bg-red-600 rounded-r-md cursor-pointer">
+
+                    <a href={keyword ? `/search?keyword=${keyword}${searchScope === 'shop' ? '&shopId=' + shopId : ''}` : '#'} className="flex items-center p-2 bg-red-600 rounded-r-md cursor-pointer">
                         <FaSearch className="text-white" />
                     </a>
                     

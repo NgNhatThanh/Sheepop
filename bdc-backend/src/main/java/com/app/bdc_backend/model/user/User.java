@@ -38,7 +38,7 @@ public class User {
 
     private Date createdAt;
 
-    @DocumentReference
+    @DocumentReference(lazy = true)
     private Role role;
 
     private boolean fromSocial = false;

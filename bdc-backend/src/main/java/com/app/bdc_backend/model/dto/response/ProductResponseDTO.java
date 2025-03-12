@@ -50,6 +50,8 @@ public class ProductResponseDTO {
 
         private String name;
 
+        private String username;
+
         private String avatarUrl;
 
         private int totalProducts;

@@ -1,17 +1,19 @@
 package com.app.bdc_backend.model.dto.response;
 
+import com.app.bdc_backend.model.product.Category;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
 @NoArgsConstructor
-public class ShopResponseDTO {
+public class ShopInfoDTO {
 
-    private String shopId;
+    private String id;
 
     private String name;
 
@@ -21,12 +23,16 @@ public class ShopResponseDTO {
 
     private Date createdAt;
 
+    private boolean isFollowing;
+
     private int followerCount;
 
     private int productCount;
 
-    private int reviewCount;
+    private int totalReviews;
 
     private float averageRating;
+
+    private List<Category> shopCategories;
 
 }

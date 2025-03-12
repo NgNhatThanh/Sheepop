@@ -58,7 +58,7 @@ public class ShopService {
     }
 
     public ShopCategories getShopCategories(Shop shop) {
-        ShopCategories shopCategories = shopCategoriesRepository.findAllByShopId(shop.getId().toString());
+        ShopCategories shopCategories = shopCategoriesRepository.findByShopId(shop.getId().toString());
         if(shopCategories == null){
             shopCategories = new ShopCategories();
             shopCategories.setShopId(shop.getId().toString());
@@ -90,6 +90,10 @@ public class ShopService {
                 return new PageImpl<>(pageRes.getContent(), pageable, pageRes.getTotalElements());
         }
         return new PageImpl<>(new ArrayList<>());
+    }
+
+    public void saveShopCategories(ShopCategories shopCategories) {
+        shopCategoriesRepository.save(shopCategories);
     }
 
     public AdminShopTableDTO toAdminShopTableDTO(Shop shop) {

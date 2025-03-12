@@ -22,12 +22,12 @@ public class Cart {
     @Id
     private ObjectId id;
 
-    @DocumentReference
+    @DocumentReference(lazy = true)
     private User user;
 
     private Date updatedAt;
 
-    @DocumentReference
+    @DocumentReference(lazy = true)
     private List<CartItem> items = new ArrayList<>();
 
 }

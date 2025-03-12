@@ -32,13 +32,7 @@ public class ESProductRepository{
                 .index("products")
                 .query(q -> q
                     .bool(b -> {
-                        BoolQuery.Builder boolBuilder = new BoolQuery.Builder();
-                        boolBuilder.must(m -> m.term(t ->
-                                t.field("deleted").value(false)));
-                        boolBuilder.must(m -> m.term(t ->
-                                t.field("visible").value(true)));
-                        boolBuilder.must(m -> m.term(t ->
-                                t.field("restricted").value(false)));
+                        BoolQuery.Builder boolBuilder = commonBoolQueryBuilder();
                         boolBuilder.filter(m -> m.match(t ->
                                 t.field("name").query(keyword).fuzziness("2")));
                         if (!filters.getCategoryIds().isEmpty()) {
@@ -70,9 +64,47 @@ public class ESProductRepository{
                                     m.number(v ->
                                             v.field("averageRating").gte(Double.valueOf(filters.getMinRating())))));
                         }
+                        if(filters.getShopId() != null){
+                            boolBuilder.must(m -> m.term(t ->
+                                    t.field("shopId").value(filters.getShopId())));
+                        }
+
                         return boolBuilder;
                     })
                 );
+        return getEsProducts(pageable, searchBuilder);
+    }
+
+    public Page<ESProduct> getShopProducts(String shopId, String categoryId, Pageable pageable) throws IOException {
+        SearchRequest.Builder searchBuilder = new SearchRequest.Builder()
+                .index("products")
+                .query(q -> q
+                        .bool(b -> {
+                            BoolQuery.Builder boolBuilder = commonBoolQueryBuilder();
+                            boolBuilder.must(m -> m.term(t ->
+                                    t.field("shopId").value(shopId)));
+                            if (categoryId != null && !categoryId.isEmpty()) {
+                                boolBuilder.must(m -> m.term(t ->
+                                        t.field("categoryId").value(categoryId)));
+                            }
+                            return boolBuilder;
+                        })
+                );
+        return getEsProducts(pageable, searchBuilder);
+    }
+
+    private BoolQuery.Builder commonBoolQueryBuilder(){
+        BoolQuery.Builder boolBuilder = new BoolQuery.Builder();
+        boolBuilder.must(m -> m.term(t ->
+                t.field("deleted").value(false)));
+        boolBuilder.must(m -> m.term(t ->
+                t.field("visible").value(true)));
+        boolBuilder.must(m -> m.term(t ->
+                t.field("restricted").value(false)));
+        return boolBuilder;
+    }
+
+    private Page<ESProduct> getEsProducts(Pageable pageable, SearchRequest.Builder searchBuilder) throws IOException {
         Sort sort = pageable.getSort();
         String sortBy = sort.get().toList().get(0).getProperty();
         Sort.Direction direction = sort.get().toList().get(0).getDirection();

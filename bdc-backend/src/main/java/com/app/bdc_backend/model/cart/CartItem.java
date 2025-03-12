@@ -20,11 +20,11 @@ public class CartItem {
     @Id
     private ObjectId id;
 
-    @DocumentReference
+    @DocumentReference(lazy = true)
     @JsonIgnore
     private Cart cart;
 
-    @DocumentReference
+    @DocumentReference(lazy = true)
     private Product product;
 
     private List<ProductAttribute> attributes;

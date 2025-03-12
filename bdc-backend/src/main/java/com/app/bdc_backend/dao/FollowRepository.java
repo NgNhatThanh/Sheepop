@@ -9,4 +9,8 @@ public interface FollowRepository extends MongoRepository<Follow, String> {
 
     int countByShopId(String shopId);
 
+    Follow findByShopIdAndUserId(String shopId, String userId);
+
+    boolean existsByShopIdAndUserId(String shopId, String userId);
+
 }

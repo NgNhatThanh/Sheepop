@@ -39,6 +39,8 @@ public class Shop {
 
     private int totalReviews;
 
+    private int followerCount;
+
     private boolean deleted = false;
 
 }
