@@ -72,13 +72,13 @@ export default function OrdersPage() {
         setOrders(prev => ({
           ...prev,
           [type]: {
-            'list': reset ? res.detailList : (prev[type].list ? prev[type].list.concat(res.detailList) : res.detailList),
+            'list': reset ? res.content : (prev[type].list ? prev[type].list.concat(res.content) : res.content),
             'orderCount' : res.nextOffset
           }
         }))
         setOffset(res.nextOffset)
-        if(reset && res.detailList.length === 0) setIsEmptyList(true)
-        if(res.detailList.length < limit) setIsEndOfOrders(true)
+        if(reset && res.content.length === 0) setIsEmptyList(true)
+        if(res.content.length < limit) setIsEndOfOrders(true)
         setIsFetchingOrders(false)
       })
       .catch(() => setIsFetchingOrders(false))
