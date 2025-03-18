@@ -52,7 +52,7 @@ export default function ShopHeader({shopInfo}){
                 <FiShoppingBag className="w-4 h-4" />
                 Sản Phẩm:
               </span>
-              <span className="font-medium text-gray-800">283</span>
+              <span className="font-medium text-gray-800">{shopInfo.productCount}</span>
             </div>
             
             <div className="flex items-center gap-2 mb-2">

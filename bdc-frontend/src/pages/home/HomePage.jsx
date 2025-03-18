@@ -41,8 +41,8 @@ export default function HomePage() {
                 <p>Không có sản phẩm nào.</p>
             ) : (
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
-                    {productList.map((product) => (
-                        <ProductCard product={product}/>
+                    {productList.map((product, index) => (
+                        <ProductCard key={index} product={product}/>
                     ))}
                 </div>
             )}

@@ -32,4 +32,5 @@ public class ShopOrderStatus {
                 })
                 .collect(Collectors.toList());
     }
+
 }

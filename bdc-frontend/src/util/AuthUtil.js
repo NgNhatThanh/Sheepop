@@ -97,3 +97,14 @@ export const setUserData = (accessToken) => {
         console.log(err)
     }
 }
+
+export const logout = async () => {
+    await fetchWithAuth(`${BASE_API_URL}/v1/auth/logout`, null, false, {
+        method: "POST",
+        credentials: "include",
+    })
+    await localStorage.removeItem("access_token")
+    await localStorage.removeItem("userData")
+    await localStorage.removeItem("cart")
+    window.location.assign("/login")
+}

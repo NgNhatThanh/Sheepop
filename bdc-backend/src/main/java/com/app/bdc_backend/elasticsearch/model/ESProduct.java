@@ -27,7 +27,10 @@ public class ESProduct {
     @Field(type = FieldType.Text)
     private String thumbnailUrl;
 
-    @Field(type = FieldType.Text)
+    @Field(type = FieldType.Keyword)
+    private String shopId;
+
+    @Field(type = FieldType.Keyword)
     private String categoryId;
 
     @Field(type = FieldType.Long)

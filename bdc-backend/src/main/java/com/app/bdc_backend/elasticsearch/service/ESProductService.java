@@ -1,6 +1,7 @@
 package com.app.bdc_backend.elasticsearch.service;
 
 import com.app.bdc_backend.elasticsearch.dao.ESProductRepository;
+import com.app.bdc_backend.elasticsearch.dao.ESProductRepository_I;
 import com.app.bdc_backend.elasticsearch.model.ESProduct;
 import com.app.bdc_backend.exception.RequestException;
 import com.app.bdc_backend.exception.ServerException;
@@ -18,6 +19,8 @@ import java.io.IOException;
 public class ESProductService {
 
     private final ESProductRepository productRepository;
+
+    private final ESProductRepository_I productRepository_I;
 
     public Page<ProductCardDTO> homepageSearch(String keyword,
                                                String sortBy,
@@ -59,8 +62,8 @@ public class ESProductService {
                                                    String order,
                                                    int page, int limit){
         switch (sortBy){
-            case "quality":
-                sortBy = "averageRating";
+            case "popular":
+                sortBy = "totalReviews";
                 break;
             case "newest":
                 sortBy = "createdAt";
@@ -85,6 +88,10 @@ public class ESProductService {
         }
         return pageRes.map(es ->
                 ModelMapper.getInstance().map(es, ProductCardDTO.class));
+    }
+
+    public int countRestrictedProductsOfShop(String shopId){
+        return productRepository_I.countByShopIdAndRestricted(shopId, true);
     }
 
 }

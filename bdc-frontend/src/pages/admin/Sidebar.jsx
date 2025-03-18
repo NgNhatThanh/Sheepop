@@ -41,33 +41,33 @@ const menuList = [
       }
     ]
   },
-  {
-    title: "Thanh toán",
-    icon: "",
-    subMenu: [
-      {
-        title: "Thống kê",
-        to: ""
-      },
-      {
-        title: "Danh sách",
-        to: ""
-      },
-      {
-        title: "Chưa trả",
-        to: ""
-      }
-    ]
-  },
-  {
-    title: "Nội dung",
-    subMenu: [
-      {
-        title: "Trang chủ",
-        to: ""
-      }
-    ]
-  }
+  // {
+  //   title: "Thanh toán",
+  //   icon: "",
+  //   subMenu: [
+  //     {
+  //       title: "Thống kê",
+  //       to: ""
+  //     },
+  //     {
+  //       title: "Danh sách",
+  //       to: ""
+  //     },
+  //     {
+  //       title: "Chưa trả",
+  //       to: ""
+  //     }
+  //   ]
+  // },
+  // {
+  //   title: "Nội dung",
+  //   subMenu: [
+  //     {
+  //       title: "Trang chủ",
+  //       to: ""
+  //     }
+  //   ]
+  // }
 ]
 
 export default function Sidebar() {

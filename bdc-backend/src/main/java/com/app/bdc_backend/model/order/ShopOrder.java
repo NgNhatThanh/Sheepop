@@ -21,13 +21,13 @@ public class ShopOrder {
     @Id
     private ObjectId id;
 
-    @DocumentReference(lazy = true)
+    @DocumentReference
     private User user;
 
-    @DocumentReference(lazy = true)
+    @DocumentReference
     private Order order;
 
-    @DocumentReference(lazy = true)
+    @DocumentReference
     private Shop shop;
 
     @DocumentReference

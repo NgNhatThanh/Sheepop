@@ -12,7 +12,7 @@ const MyShopLayout = lazy(() => import ('./pages/myshop/MyShopLayout.jsx'))
 const ShopProducts = lazy(() => import('./pages/myshop/product/ShopProducts.jsx'));
 const SaveProduct = lazy(() => import('./pages/myshop/product/SaveProduct.jsx'));
 const ShopOrder = lazy(() => import('./pages/myshop/order/ShopOrder.jsx'));
-const ShopDashboard = lazy(() => import('./pages/myshop/ShopDashboard.jsx'));
+const ShopDashboard = lazy(() => import('./pages/myshop/dashboard/ShopDashboard.jsx'));
 const ProductPage = lazy(() => import('./pages/product/ProductPage.jsx'));
 const ErrorPage = lazy(() => import('./pages/product/ErrorPage.jsx'));
 const CartPage = lazy(() => import('./pages/cart/CartPage.jsx'))
@@ -57,6 +57,8 @@ function App() {
       </div>
     )
   }
+
+  window.scrollTo({ top: 0 })
 
   return (
       // <Router>

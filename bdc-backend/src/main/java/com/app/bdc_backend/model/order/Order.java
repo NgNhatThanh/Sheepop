@@ -20,13 +20,13 @@ public class Order {
     @Id
     private ObjectId id;
 
-    @DocumentReference(lazy = true)
+    @DocumentReference
     private User user;
 
-    @DocumentReference(lazy = true)
+    @DocumentReference
     private UserAddress address;
 
-    @DocumentReference(lazy = true)
+    @DocumentReference
     private Payment payment;
 
     private Date createdAt = new Date();

@@ -23,7 +23,7 @@ public class ProductSKU {
     private ObjectId id;
 
     @JsonIgnore
-    @DocumentReference(lazy = true)
+    @DocumentReference
     private Product product;
 
     private String sku;

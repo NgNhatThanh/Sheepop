@@ -1,14 +1,12 @@
 package com.app.bdc_backend.facade;
 
 import com.app.bdc_backend.exception.RequestException;
+import com.app.bdc_backend.model.Notification;
 import com.app.bdc_backend.model.cart.Cart;
 import com.app.bdc_backend.model.cart.CartItem;
 import com.app.bdc_backend.model.dto.request.OrderCancelationDTO;
 import com.app.bdc_backend.model.dto.response.*;
-import com.app.bdc_backend.model.enums.CommonEntity;
-import com.app.bdc_backend.model.enums.PaymentStatus;
-import com.app.bdc_backend.model.enums.PaymentType;
-import com.app.bdc_backend.model.enums.ShopOrderStatus;
+import com.app.bdc_backend.model.enums.*;
 import com.app.bdc_backend.model.order.Order;
 import com.app.bdc_backend.model.order.OrderItem;
 import com.app.bdc_backend.model.order.Payment;
@@ -24,7 +22,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -46,7 +43,10 @@ public class OrderFacadeService {
     private final ProductService productService;
 
     private final PaymentService paymentService;
+
     private final ShopService shopService;
+
+    private final NotificationService notificationService;
 
     public Order placeOrder(Map<String, Object> body){
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -124,6 +124,7 @@ public class OrderFacadeService {
             shopOrder.setShippingFee((Integer) shop.get("shipping_fee"));
             String shopId = (String) shop.get("shop_id");
             List<OrderItem> orderItems = new ArrayList<>();
+            long total = 0;
             for(CartItem item : checkoutList){
                 if(item.getProduct().getShop().getId().toString().equals(shopId)){
                     shopOrder.setShop(item.getProduct().getShop());
@@ -133,19 +134,35 @@ public class OrderFacadeService {
                     orderItem.setPrice(item.getPrice());
                     orderItem.setAttributes(item.getAttributes());
                     orderItems.add(orderItem);
+                    total += item.getPrice() * item.getQuantity();
                     sellItem(item);
                 }
             }
             orderService.saveAllItems(orderItems);
+            shopOrder.setTotal(total);
             shopOrder.setStatus(ShopOrderStatus.PENDING);
             shopOrder.setItems(orderItems);
             shopOrders.add(shopOrder);
         }
         orderService.saveAllShopOrders(shopOrders);
+
+        List<Notification> notiList = new ArrayList<>();
+        for(ShopOrder shopOrder : shopOrders){
+            Notification notification = Notification.builder()
+                    .receiver(shopOrder.getShop().getUser())
+                    .scope(NotificationScope.SHOP)
+                    .itemCount(1)
+                    .content("Bạn có %d đơn hàng mới")
+                    .redirectUrl("/myshop/order-list?type=1")
+                    .thumbnailUrl(shopOrder.getItems().get(0).getProduct().getThumbnailUrl())
+                    .build();
+            notiList.add(notification);
+        }
+        notificationService.sendAllNotis(notiList);
         return order;
     }
 
-    public OrderPageResponse getOrderList(int type, int limit, int offset){
+    public OffsetResponse<OrderDTO> getOrderList(int type, int limit, int offset){
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userService.findByUsername(username);
         return switch (type) {
@@ -188,8 +205,7 @@ public class OrderFacadeService {
         return toShopOrderDetailDTO(shopOrder);
     }
 
-    private OrderPageResponse getOrderByShopOrderStatus(User user, List<Integer> status, int offset, int limit) {
-        OrderPageResponse response = new OrderPageResponse();
+    private OffsetResponse<OrderDTO> getOrderByShopOrderStatus(User user, List<Integer> status, int offset, int limit) {
         List<OrderDTO> orderDTOS = new ArrayList<>();
         List<ShopOrder> shopOrders = orderService.getShopOrderByStatus(user,
                 status,
@@ -207,9 +223,7 @@ public class OrderFacadeService {
             orderDTO.setPayment(shopOrder.getOrder().getPayment());
             orderDTOS.add(orderDTO);
         }
-        response.setDetailList(orderDTOS);
-        response.setNextOffset(offset + shopOrders.size());
-        return response;
+        return new OffsetResponse<>(orderDTOS, offset + shopOrders.size());
     }
 
     public void markOrderAsReceived(String shopOrderId){
@@ -232,6 +246,16 @@ public class OrderFacadeService {
         shopOrder.getShop().setRevenue(shopOrder.getShop().getRevenue() + (shopOrder.getTotal() - shopOrder.getShippingFee()));
         shopService.save(shopOrder.getShop());
         orderService.saveAllShopOrders(List.of(shopOrder));
+
+        Notification notification = Notification.builder()
+                .receiver(shopOrder.getShop().getUser())
+                .scope(NotificationScope.SHOP)
+                .itemCount(1)
+                .content("%d đơn hàng vận chuyển thành công")
+                .redirectUrl("/myshop/order-list?type=4")
+                .thumbnailUrl(shopOrder.getItems().get(0).getProduct().getThumbnailUrl())
+                .build();
+        notificationService.sendNotification(notification);
     }
 
     public void cancelOrder(OrderCancelationDTO dto){
@@ -294,6 +318,22 @@ public class OrderFacadeService {
             throw new RequestException("Invalid request: entity");
         }
         orderService.cancelAllShopOrders(cancelList, dto.getWhoCancel(), dto.getCancelReason());
+
+        if(dto.getWhoCancel() != CommonEntity.SHOP){
+            List<Notification> notiList = new ArrayList<>();
+            for(ShopOrder shopOrder : cancelList){
+                Notification notification = Notification.builder()
+                        .receiver(shopOrder.getShop().getUser())
+                        .scope(NotificationScope.SHOP)
+                        .itemCount(1)
+                        .content("%d đơn hàng bị hủy")
+                        .redirectUrl("/myshop/order-list?type=5")
+                        .thumbnailUrl(shopOrder.getItems().get(0).getProduct().getThumbnailUrl())
+                        .build();
+                notiList.add(notification);
+            }
+            notificationService.sendAllNotis(notiList);
+        }
     }
 
     private void refund(){
@@ -319,14 +359,14 @@ public class OrderFacadeService {
     }
 
 
-    private OrderPageResponse getPaymentPendingOrders(User user, int offset, int limit){
+    private OffsetResponse<OrderDTO> getPaymentPendingOrders(User user, int offset, int limit){
         List<Order> orders = orderService.getOrdersByPaymentStatus(user, PaymentStatus.PENDING, offset, limit);
-        return toOrderPageResponse(orders, offset);
+        return toOffsetResponse(orders, offset);
     }
 
-    private OrderPageResponse getAllOrders(User user, int offset, int limit) {
+    private OffsetResponse<OrderDTO> getAllOrders(User user, int offset, int limit) {
         List<Order> orders = orderService.getLastByUser(user, offset, limit);
-        return toOrderPageResponse(orders, offset);
+        return toOffsetResponse(orders, offset);
     }
 
     private void sellItem(CartItem item){
@@ -359,9 +399,7 @@ public class OrderFacadeService {
         return dto;
     }
 
-    private OrderPageResponse toOrderPageResponse(List<Order> orders, int offset){
-        OrderPageResponse response = new OrderPageResponse();
-        response.setNextOffset(offset + orders.size());
+    private OffsetResponse<OrderDTO> toOffsetResponse(List<Order> orders, int offset){
         List<OrderDTO> orderDtos = new ArrayList<>();
         for(Order order : orders){
             OrderDTO orderDTO = new OrderDTO();
@@ -392,8 +430,7 @@ public class OrderFacadeService {
                 orderDtos.add(orderDTO);
             }
         }
-        response.setDetailList(orderDtos);
-        return response;
+        return new OffsetResponse<>(orderDtos, offset + orderDtos.size());
     }
 
     private ShopOrderDTO toShopOrderDTO(ShopOrder shopOrder) {

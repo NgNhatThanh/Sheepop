@@ -21,6 +21,39 @@ services:
     volumes:
       - ./mongo_data:/data/db
 
+  es-init:
+    image: curlimages/curl:latest
+    depends_on:
+      - es01
+    entrypoint: >
+      sh -c "
+      echo 'Waiting for Elasticsearch...';
+      sleep 20;
+      curl -X PUT 'http://es01:9200/products' -H 'Content-Type: application/json' -d'
+      {
+        \"mappings\": {
+          \"properties\": {
+            \"shopId\": { \"type\": \"keyword\" },
+            \"categoryId\": { \"type\": \"keyword\" },
+            \"createdAt\": { \"type\": \"date\" }
+          }
+        }
+      }';
+      curl -X PUT 'http://es01:9200/shop_orders' -H 'Content-Type: application/json' -d'
+      {
+        \"mappings\": {
+          \"properties\": {
+            \"shopId\": { \"type\": \"keyword\" },
+            \"userId\": { \"type\": \"keyword\" },
+            \"orderId\": { \"type\": \"keyword\" },
+            \"createdAt\": { \"type\": \"date\" }
+          }
+        }
+      }';
+      echo 'Mapping created!';
+      "
+
+
   # mongo_two:
   #   container_name: mongo2
   #   image: mongo
@@ -38,6 +71,9 @@ services:
   monstache:
     image: rwynn/monstache:latest
     container_name: oc_monstache
+    depends_on:
+      - es01
+      - es-init
     working_dir: /app/monstache
     command: -f ./config.toml
     environment:

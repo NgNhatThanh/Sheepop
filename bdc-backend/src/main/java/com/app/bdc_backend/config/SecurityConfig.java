@@ -32,6 +32,7 @@ public class SecurityConfig {
     private CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
     private static final String[] PUBLIC_ENDPOINTS = {
+            "/ws/**",
             "/api/v1/auth/**",
             "/api/v1/shopinfo/**",
             "/api/v1/common/**",

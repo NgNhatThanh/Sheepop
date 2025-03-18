@@ -112,6 +112,10 @@ public class ESProductRepository{
                 s.field(f ->
                         f.field(sortBy)
                                 .order(direction == Sort.Direction.DESC ? SortOrder.Desc : SortOrder.Asc)));
+        searchBuilder.sort(s ->
+                s.field(f ->
+                        f.field("averageRating")
+                                .order(SortOrder.Desc)));
         searchBuilder.from((int) pageable.getOffset()).size(pageable.getPageSize());
         SearchRequest rq = searchBuilder.build();
         SearchResponse<ObjectNode> response = client.search(rq, ObjectNode.class);

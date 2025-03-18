@@ -23,7 +23,7 @@ export default function ShopPage(){
     const [totalPages, setTotalPages] = useState(1)
     const [selectedCategory, setSelectedCategory] = useState(null)
     const [sort, setSort] = useState({
-        sortBy: "quality",
+        sortBy: "popular",
         order: "desc"
     })
 

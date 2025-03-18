@@ -1,6 +1,7 @@
 package com.app.bdc_backend.facade;
 
 import com.app.bdc_backend.exception.RequestException;
+import com.app.bdc_backend.model.Notification;
 import com.app.bdc_backend.model.address.District;
 import com.app.bdc_backend.model.address.Province;
 import com.app.bdc_backend.model.address.Ward;
@@ -8,6 +9,7 @@ import com.app.bdc_backend.model.dto.request.AddAddressDTO;
 import com.app.bdc_backend.model.dto.request.SaveProductDTO;
 import com.app.bdc_backend.model.dto.request.UpdateShopProfileDTO;
 import com.app.bdc_backend.model.dto.response.*;
+import com.app.bdc_backend.model.enums.NotificationScope;
 import com.app.bdc_backend.model.enums.RestrictStatus;
 import com.app.bdc_backend.model.enums.ShopOrderStatus;
 import com.app.bdc_backend.model.order.ShopOrder;
@@ -51,6 +53,8 @@ public class ShopFacadeService {
     private final CategoryService categoryService;
 
     private final ProductFacadeService productFacadeService;
+
+    private final NotificationService notificationService;
 
     public ShopProfileDTO getShopProfile(String username) {
         User user = userService.findByUsername(username);
@@ -117,6 +121,11 @@ public class ShopFacadeService {
         }
         address.setShopId(shop.getId().toString());
         shopService.saveAddress(address);
+        List<Product> products = productService.getAllByShop(shop);
+        for(Product product : products){
+            product.setLocation(address.getProvince().getName());
+        }
+        productService.saveAllProducts(products);
         return address;
     }
 
@@ -227,6 +236,22 @@ public class ShopFacadeService {
             shopOrder.setStatus(ShopOrderStatus.DELIVERING);
         }
         orderService.saveAllShopOrders(List.of(shopOrder));
+
+        String notiContent;
+        if(shopOrder.getStatus() == ShopOrderStatus.PREPARING){
+            notiContent = "Đơn hàng đã được xác nhận";
+        }
+        else{
+            notiContent = "Đơn hàng đang được vận chuyển";
+        }
+        Notification notification = Notification.builder()
+                .scope(NotificationScope.BUYER)
+                .content(notiContent)
+                .receiver(shopOrder.getUser())
+                .redirectUrl("/account/orders/" + shopOrderId)
+                .thumbnailUrl(shopOrder.getItems().get(0).getProduct().getThumbnailUrl())
+                .build();
+        notificationService.sendNotification(notification);
     }
 
     @Transactional

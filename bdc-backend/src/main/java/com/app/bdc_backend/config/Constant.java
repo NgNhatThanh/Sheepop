@@ -20,4 +20,6 @@ public class Constant {
     @Value("${domain.name}")
     private String domain;
 
+    private final String placeOrderRedirectUrl = "/myshop/order-list?type=1";
+
 }

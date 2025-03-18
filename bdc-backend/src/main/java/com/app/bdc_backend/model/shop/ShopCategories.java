@@ -21,7 +21,7 @@ public class ShopCategories {
 
     private String shopId;
 
-    @DocumentReference(lazy = true)
+    @DocumentReference
     private List<Category> categories = new ArrayList<>();
 
 }
