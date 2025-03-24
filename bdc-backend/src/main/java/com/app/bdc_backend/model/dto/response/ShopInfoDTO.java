@@ -15,6 +15,8 @@ public class ShopInfoDTO {
 
     private String id;
 
+    private String userId;
+
     private String name;
 
     private String description;

@@ -48,6 +48,8 @@ public class ProductResponseDTO {
 
         private String id;
 
+        private String userId;
+
         private String name;
 
         private String username;

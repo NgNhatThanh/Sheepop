@@ -1,6 +1,6 @@
-package com.app.bdc_backend.model.order;
+package com.app.bdc_backend.model;
 
-import com.app.bdc_backend.model.user.UserAddress;
+import com.app.bdc_backend.model.enums.MessageType;
 import com.app.bdc_backend.model.user.User;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,22 +11,24 @@ import org.springframework.data.mongodb.core.mapping.DocumentReference;
 
 import java.util.Date;
 
-@Document(collection = "orders")
+@Document(collection = "chat_messages")
 @Getter
 @Setter
-public class Order {
+public class ChatMessage {
 
     @Id
     private ObjectId id;
 
-    @DocumentReference
-    private User user;
+    @DocumentReference(lazy = true)
+    private ChatRoom room;
 
-    @DocumentReference
-    private UserAddress address;
+    private User sender;
 
-    @DocumentReference
-    private Payment payment;
+    private MessageType type;
+
+    private String content;
+
+    private boolean read;
 
     private Date createdAt = new Date();
 

@@ -1,8 +1,12 @@
 import { Link } from 'react-router-dom'
 import { BsShopWindow } from "react-icons/bs";
 import { IoChatboxEllipses } from "react-icons/io5";
+import { useDispatch } from 'react-redux';
+import { setUserId } from "../../redux/chatSlice";
 
 export default function ShopSection({ shop }){
+
+    const dispatch = useDispatch()
 
     return (
         <div className="w-300 bg-white mx-auto p-4 rounded-sm flex mb-4">
@@ -13,10 +17,15 @@ export default function ShopSection({ shop }){
                 <div>
                     <p className="text-xl mb-3">{shop.name}</p>
                     <div className="flex gap-2">
-                        <button className='flex gap-2 justify-center items-center p-2 border-1 border-blue-600 bg-blue-100 rounded-sm text-blue-800 font-semibold cursor-pointer hover:bg-blue-200'>
+                        <button 
+                            className='flex gap-2 justify-center items-center p-2 border-1 border-blue-600 bg-blue-100 rounded-sm text-blue-800 font-semibold cursor-pointer hover:bg-blue-200'
+                            onClick={() => {
+                                dispatch(setUserId(shop.userId))
+                            }}
+                        >
                             <IoChatboxEllipses /> Nhắn tin
                         </button>
-                        <Link to='#'>
+                        <Link to={`../shop/${shop.username}`}>
                             <button className="flex gap-2 justify-center items-center p-2 border-1 rounded-sm border-gray-400 cursor-pointer hover:bg-gray-100">
                                 <BsShopWindow /> Xem cửa hàng
                             </button>

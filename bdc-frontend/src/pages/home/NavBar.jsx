@@ -5,6 +5,7 @@ import React from "react";
 import { Link } from 'react-router-dom'
 import { logout } from "../../util/AuthUtil";
 import NotificationDropdown from "./NotificationDropdown";
+import { WebsocketProvider } from "../common/WebsocketProvider";
 
 const Navbar = ({isAuthenticated}) => {
     const [isOptionsDropdownOpen, setIsOptionsDropdownOpen] = useState(false);
@@ -19,7 +20,9 @@ const Navbar = ({isAuthenticated}) => {
                 </div>
                 {isAuthenticated ? (
                     <div className="flex space-x-3">
-                        <NotificationDropdown/>
+                        <WebsocketProvider>
+                            <NotificationDropdown/>
+                        </WebsocketProvider>
                         
                         <div
                             className="relative"

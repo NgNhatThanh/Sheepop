@@ -126,6 +126,7 @@ public class ProductFacadeService {
 
         Shop shop = product.getShop();
         dto.getShop().setId(shop.getId().toString());
+        dto.getShop().setUserId(shop.getUser().getId().toString());
         dto.getShop().setName(shop.getName());
         dto.getShop().setUsername(shop.getUser().getUsername());
         dto.getShop().setAvatarUrl(shop.getAvatarUrl());

@@ -3,6 +3,9 @@ import Header from "./Header";
 import Footer from "./Footer";
 import { Outlet } from "react-router-dom";
 import React from "react";
+import MiniChat from "./chat/MiniChat";
+import {ChatProvider} from "./chat/ChatProvider";
+import { WebsocketProvider } from "../common/WebsocketProvider";
 
 export default function MainLayout({isAuthenticated}){
     return(
@@ -11,6 +14,13 @@ export default function MainLayout({isAuthenticated}){
             <Header isAuthenticated={isAuthenticated}/>
             <Outlet/>
             <Footer/>
+            {isAuthenticated && (
+                <WebsocketProvider>
+                    <ChatProvider>
+                        <MiniChat/>
+                    </ChatProvider> 
+                </WebsocketProvider>
+            )} 
         </div>
     )
 }

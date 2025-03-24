@@ -23,7 +23,7 @@ public class OrderItem {
     @DocumentReference
     private Product product;
 
-    private int quantity;
+    private int quantity;   
 
     private long price;
 

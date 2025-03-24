@@ -4,8 +4,12 @@ import { FiShoppingBag, FiUsers, FiStar, FiClock } from 'react-icons/fi';
 import { fetchWithAuth } from '../../util/AuthUtil'
 import { BASE_API_URL } from '../../constants';
 import { toast } from 'react-toastify';
+import { useDispatch } from "react-redux";
+import { setUserId } from "../../redux/chatSlice";
 
 export default function ShopHeader({shopInfo}){
+
+  const dispatch = useDispatch();
 
   const handleUpdateFollow = (follow) => {
     fetchWithAuth(`${BASE_API_URL}/v1/user/${follow ? 'follow' : 'unfollow'}?shopId=${shopInfo.id}`, window.location, true, {
@@ -89,7 +93,10 @@ export default function ShopHeader({shopInfo}){
             <FaUserPlus size={16} />
             <span>{shopInfo.following ? 'Hủy theo dõi' : 'Theo dõi'}</span>
           </button>
-          <button className="cursor-pointer bg-blue-500 hover:bg-blue-600 text-white px-5 py-1.5 rounded font-medium transition-all duration-200 shadow-sm hover:shadow flex items-center gap-1">
+          <button 
+            className="cursor-pointer bg-blue-500 hover:bg-blue-600 text-white px-5 py-1.5 rounded font-medium transition-all duration-200 shadow-sm hover:shadow flex items-center gap-1"
+            onClick={() => dispatch(setUserId(shopInfo.userId))}
+          >
             <FaComment size={16} />
             <span>Chat</span>
           </button>

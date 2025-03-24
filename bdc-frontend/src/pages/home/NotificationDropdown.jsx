@@ -1,12 +1,15 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useContext } from "react";
 import { FaBell, FaCheck } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
 import { BASE_API_URL } from "../../constants";
 import { fetchWithAuth } from "../../util/AuthUtil";
 import { toast } from "react-toastify";
-import { Stomp } from '@stomp/stompjs';
+import SocketContext from "../common/WebsocketProvider";
 
 export default function NotificationDropdown(){
+
+  const { isConnected, subscribeToChanel } = useContext(SocketContext)
+
   const [isOpen, setIsOpen] = useState(false);
   const [activeScope, setActiveScope] = useState("buyer");
   const [notifications, setNotifications] = useState({
@@ -22,7 +25,6 @@ export default function NotificationDropdown(){
   const [hasMore, setHasMore] = useState({ buyer: true, shop: true });
   const [unreadCount, setUnreadCount] = useState(0);
   const dropdownRef = useRef(null);
-  const notifContainerRef = useRef(null);
   
   const markAsRead = (id) => {
     if(id){
@@ -54,9 +56,9 @@ export default function NotificationDropdown(){
   } 
   const handleScroll = (e) => {
     const bottom = e.target.scrollHeight - e.target.scrollTop <= e.target.clientHeight + 50;
-    // if (bottom && !loading && hasMore[activeScope]) {
-    //   fetchNotifications  (activeScope);
-    // }
+    if (bottom && !loading && hasMore[activeScope]) {
+      fetchNotifications  (activeScope);
+    }
   };
 
   const fetchNotifications = (scope) => {
@@ -69,16 +71,15 @@ export default function NotificationDropdown(){
           toast.error("Có lỗi xảy ra khi tải thông báo")
         }
         else{
-          setUnreadCount(res.unreadCount)
           setOffset(prev => ({
             ...prev,
-            [scope]: res.main.nextOffset
+            [scope]: res.nextOffset
           }))
           setNotifications(prev => ({
             ...prev,
-            [scope]: [...res.main.content]
+            [scope]: [...(prev[scope] || []), ...res.content]
           }))
-          if(res.main.nextOffset - offset[scope] < limit){
+          if(res.nextOffset - offset[scope] < limit){
             setHasMore(prev => ({
               ...prev,
               [scope]: false
@@ -89,27 +90,15 @@ export default function NotificationDropdown(){
       .finally(() => setLoading(false))
   }
 
+  const countUnread = () => {
+    fetchWithAuth(`${BASE_API_URL}/v1/notification/count_unread`)
+      .then(res => res.json())
+      .then(res => setUnreadCount(res))
+  }
+
 
   useEffect(() => {
-    console.log(window.location.origin);
-    const username = JSON.parse(localStorage.getItem('userData'))['username']
-    const client = Stomp.client("http://localhost:8080/ws")
-    client.connect({}, () => {
-      client.subscribe(`/user/${username}/notify`, (noti) => {
-        const newNoti = JSON.parse(noti.body);
-        toast.info("Có thông báo mới")
-        const scope = newNoti.scope.toLowerCase()
-        setNotifications((prev) => ({
-          ...prev,
-          [scope]: [newNoti, ...(prev[scope] || [])]
-        }));
-        setUnreadCount(prev => prev + 1)
-      }, (error) => {
-        console.error('WebSocket error:', error);
-        showError('Could not connect to WebSocket server. Please refresh the page and try again.');
-      });
-    })
-
+    countUnread()
     fetchNotifications("shop")
     fetchNotifications("buyer")
 
@@ -125,6 +114,19 @@ export default function NotificationDropdown(){
       // stompClient.deactivate();
     };
   }, []);
+
+  useEffect(() => {
+    const username = JSON.parse(localStorage.getItem('userData'))['username']
+    subscribeToChanel(`/user/${username}/notify`, (newNoti) => {
+      toast.info("Có thông báo mới")
+      const scope = newNoti.scope.toLowerCase()
+      setNotifications((prev) => ({
+        ...prev,
+        [scope]: [newNoti, ...(prev[scope] || [])]
+      }));
+      setUnreadCount(prev => prev + 1)
+    });
+  }, [isConnected])
 
   return (
     <div className="relative" ref={dropdownRef}>
@@ -197,7 +199,6 @@ export default function NotificationDropdown(){
           <div 
             className="flex-grow overflow-y-auto"
             onScroll={handleScroll}
-            ref={notifContainerRef}
           >
             {notifications[activeScope].length > 0 ? (
               <div>

@@ -28,12 +28,14 @@ public class NotificationController {
         catch (IllegalArgumentException e){
             throw new RequestException(e.getMessage());
         }
-        Map<String, Object> res = new HashMap<>();
-        res.put("main", notificationFacadeService.getList(
+        return ResponseEntity.ok(notificationFacadeService.getList(
                 scp, offset, limit
         ));
-        res.put("unreadCount", notificationFacadeService.countUnread());
-        return ResponseEntity.ok(res);
+    }
+
+    @GetMapping("/count_unread")
+    public ResponseEntity<?> countUnread(){
+        return ResponseEntity.ok(notificationFacadeService.countUnread());
     }
 
     @PostMapping("/mark_as_read")

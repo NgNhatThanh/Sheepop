@@ -53,6 +53,7 @@ public class ShopInfoFacadeService {
     private ShopInfoDTO toShopInfoDTO(Shop shop, ShopCategories shopCategories){
         ShopInfoDTO dto = ModelMapper.getInstance().map(shop, ShopInfoDTO.class);
         dto.setId(shop.getId().toString());
+        dto.setUserId(shop.getUser().getId().toString());
         dto.setShopCategories(shopCategories.getCategories());
         if(SecurityContextHolder.getContext().getAuthentication() != null){
             String username = SecurityContextHolder.getContext().getAuthentication().getName();
