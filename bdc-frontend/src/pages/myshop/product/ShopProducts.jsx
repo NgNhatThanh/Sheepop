@@ -210,7 +210,7 @@ export default function ShopProducts(){
                         >
                             Tất cả
                         </li>
-                        {shopCategories.map((cat, index) => (
+                        {shopCategories.length > 0 && shopCategories.map((cat, index) => (
                             <li
                                 key={index}
                                 className="px-2 py-1 cursor-pointer hover:bg-gray-200"

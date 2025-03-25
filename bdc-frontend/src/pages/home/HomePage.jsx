@@ -5,6 +5,7 @@ import { ToastContainer, toast } from "react-toastify";
 import { FaStar } from "react-icons/fa";
 import BannerSlider from "./BannerSlider";
 import ProductCard from "./ProductCard";
+import CategorySection from "./CategorySection";
 
 export default function HomePage() {
     const [searchParams] = useSearchParams();
@@ -31,10 +32,16 @@ export default function HomePage() {
     return (
         <div className="container mx-auto px-4 py-6">
 
-            <BannerSlider/>
+            {/* <BannerSlider/> */}
+            
+            <CategorySection/>
 
             <div className="flex justify-center">
-                <h2 className="text-center w-full text-2xl font-bold mb-4 mt-5 p-4 bg-white border-1 border-blue-500 text-blue-600">Gợi ý hôm nay</h2>
+                <h2 
+                    className="text-center w-full text-2xl font-bold mb-4 mt-5 p-4 bg-white border-1 border-blue-500 text-blue-600"
+                >
+                    Sản phẩm mới
+                </h2>
             </div>
 
             {productList.length === 0 ? (

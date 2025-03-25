@@ -56,7 +56,7 @@ public class AdminCategoryFacadeService {
     }
 
     public List<CategoryDTO> getSubCategories(String parentId) {
-        Category parent = categoryService.findById(parentId);
+        Category parent = categoryService.getById(parentId);
         if(parent == null)
             throw new RequestException("Invalid request: invalid parent Id");
         if(!parent.isHasChildren())
@@ -71,7 +71,7 @@ public class AdminCategoryFacadeService {
                 || dto.getDescription() == null
                 || dto.getDescription().isEmpty())
             throw new RequestException("Invalid request: data mustn't be empty");
-        Category category = categoryService.findById(catId);
+        Category category = categoryService.getById(catId);
         if(category == null)
             throw new RequestException("Invalid request: category does not exist");
         List<Category> sameLevelCats = categoryService.getByParent(category.getParent());
@@ -97,7 +97,7 @@ public class AdminCategoryFacadeService {
         category.setDescription(dto.getDescription());
         category.setCreatedAt(new Date());
         if(dto.getParentId() != null){
-            Category parent = categoryService.findById(dto.getParentId());
+            Category parent = categoryService.getById(dto.getParentId());
             if(parent == null)
                 throw new RequestException("Invalid request: parent category does not exist");
             category.setParent(parent);

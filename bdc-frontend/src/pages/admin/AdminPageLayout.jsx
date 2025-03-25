@@ -3,6 +3,7 @@ import Navbar from './Navbar'
 import Sidebar from './Sidebar'
 import { fetchWithAuth } from "../../util/AuthUtil"
 import { BASE_API_URL } from "../../constants"
+import { ToastContainer } from "react-toastify"
 
 export default function AdminPageLayout({ isAuthenticated }){
     if(!isAuthenticated) return <Navigate to={`/login?from=${window.location}`}/>
@@ -19,6 +20,10 @@ export default function AdminPageLayout({ isAuthenticated }){
                     <Outlet/>
                 </div>
             </div>
+
+            <ToastContainer
+                position="bottom-right"
+            />
         </div>
     )
 }

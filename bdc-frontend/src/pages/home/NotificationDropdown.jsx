@@ -142,7 +142,6 @@ export default function NotificationDropdown(){
             </span>
           )}
         </div>
-        Thông báo
       </button>
 
       {isOpen && (

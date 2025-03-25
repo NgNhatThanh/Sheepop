@@ -56,6 +56,7 @@ export async function fetchWithAuth(url, from, isCompulsory, options = {}){
                 if(ref.status === 403)
                     window.location.assign("/")
                 if(isCompulsory){
+                    alert(`Lỗi fetch ${url}`)
                     localStorage.setItem('from', from)
                     window.location.assign('/login' + `${from ? '?from=' + from : ''}`)
                 }

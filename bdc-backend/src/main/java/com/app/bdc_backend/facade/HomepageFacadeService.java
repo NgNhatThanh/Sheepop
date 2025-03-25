@@ -5,10 +5,13 @@ import com.app.bdc_backend.exception.RequestException;
 import com.app.bdc_backend.model.address.Province;
 import com.app.bdc_backend.model.dto.request.ProductSearchFilters;
 import com.app.bdc_backend.model.dto.response.ProductCardDTO;
+import com.app.bdc_backend.model.homepage.Banner;
+import com.app.bdc_backend.model.homepage.DisplayCategory;
 import com.app.bdc_backend.model.product.Category;
 import com.app.bdc_backend.model.product.Product;
 import com.app.bdc_backend.service.AddressService;
 import com.app.bdc_backend.service.CategoryService;
+import com.app.bdc_backend.service.HomepageService;
 import com.app.bdc_backend.service.ProductService;
 import com.app.bdc_backend.util.ModelMapper;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +32,8 @@ public class HomepageFacadeService {
     private final ESProductService esProductService;
 
     private final AddressService addressService;
+
+    private final HomepageService homepageService;
 
     public Page<ProductCardDTO> getHomePageItems(int page, int limit){
         Page<Product> productPage = productService.findAllForHomepage(page, limit);
@@ -77,4 +82,11 @@ public class HomepageFacadeService {
         return addressService.getProvinceList();
     }
 
+    public List<Banner> getAllBanners() {
+        return homepageService.getAllBanners();
+    }
+
+    public List<DisplayCategory> getAllDisplayCategories() {
+        return homepageService.getAllDisplayCategories();
+    }
 }

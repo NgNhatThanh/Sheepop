@@ -358,7 +358,7 @@ public class ShopFacadeService {
         Pageable pageable = PageRequest.of(page, limit, sort);
         Category category = null;
         if(!categoryId.isEmpty()) {
-            category = categoryService.findById(categoryId);
+            category = categoryService.getById(categoryId);
             if(category == null)
                 throw new RequestException("Invalid request: category not found");
         }

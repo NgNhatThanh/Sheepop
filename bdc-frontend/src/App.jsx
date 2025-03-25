@@ -35,6 +35,7 @@ const ShopList = lazy(() => import('./pages/admin/user/ShopList.jsx'))
 const OrderList = lazy(() => import('./pages/admin/order/OrderList.jsx'))
 const AdminPageLayout = lazy(() => import('./pages/admin/AdminPageLayout.jsx'))
 const ShopPage = lazy(() => import('./pages/shop/ShopPage.jsx'))
+const ContentManage = lazy(() => import('./pages/admin/content/ContentManage.jsx'));
 
 function App() {
 
@@ -83,6 +84,7 @@ function App() {
             <Route path='user' element={<UserList/>}/>
             <Route path='shop' element={<ShopList/>}/>
             <Route path='order' element={<OrderList/>}/>
+            <Route path='content' element={<ContentManage/>}/>
           </Route>
           <Route path='/' element={<MainLayout isAuthenticated={isAuthenticated}/>}>
             <Route path='' element={<HomePage/>}/>

@@ -34,7 +34,7 @@ public class HomepageController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<?> searchItems(@RequestParam String keyword,
+    public ResponseEntity<?> searchItems(@RequestParam(required = false) String keyword,
                                          @RequestParam(required = false, defaultValue = "relevance") String sortBy,
                                          @RequestParam(required = false, defaultValue = "desc") String order,
                                          @RequestParam(required = false, defaultValue = "0") int page,
@@ -71,6 +71,16 @@ public class HomepageController {
     @GetMapping("/get_locations_filter")
     public ResponseEntity<?> getLocationsFilter(){
         return ResponseEntity.ok(homepageFacadeService.getLocationsFilter());
+    }
+
+    @GetMapping("/get_banners")
+    public ResponseEntity<?> getBanners(){
+        return ResponseEntity.ok(homepageFacadeService.getAllBanners());
+    }
+
+    @GetMapping("/get_display_categories")
+    public ResponseEntity<?> getDisplayCategories(){
+        return ResponseEntity.ok(homepageFacadeService.getAllDisplayCategories());
     }
 
 }

@@ -23,7 +23,7 @@ const Navbar = ({isAuthenticated}) => {
                         <WebsocketProvider>
                             <NotificationDropdown/>
                         </WebsocketProvider>
-                        
+                        <p>Thông báo</p>
                         <div
                             className="relative"
                             onMouseEnter={() => setIsOptionsDropdownOpen(true)}

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import { Link } from 'react-router-dom'
 import ProductMedia from './ProductMedia'
 import {BASE_API_URL} from '../../constants/index'
 import {fetchWithAuth} from '../../util/AuthUtil'
@@ -143,9 +144,12 @@ export default function ProductSection({product, isPreview}){
             <div className="flex category-info mb-4">
                 {breadcrumb.map((cat) => (
                     <span key={cat.id}>
-                        <a href='#' className="text-blue-600 font-semibold hover:underline">
+                        <Link 
+                            to={`../search?categoryIds=${cat.id}`}
+                            className="text-blue-600 font-semibold hover:underline"
+                        >
                             {cat.name}
-                        </a>
+                        </Link>
                         <span className="mr-2">{" > "}</span>
                     </span>
                 ))}

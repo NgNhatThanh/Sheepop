@@ -1,7 +1,8 @@
-import { IoIosNotifications } from "react-icons/io";
 import { useState } from "react";
 import { Link } from 'react-router-dom'
 import { logout } from "../../util/AuthUtil";
+import { WebsocketProvider } from "../common/WebsocketProvider";
+import NotificationDropdown from "../home/NotificationDropdown";
 
 export default function Navbar() {
 
@@ -17,7 +18,9 @@ export default function Navbar() {
       </div>
       <ul className="flex gap-4 text-2xl">
         <li className="cursor-pointer hover:text-gray-400">
-          <IoIosNotifications />
+          <WebsocketProvider>
+              <NotificationDropdown/>
+          </WebsocketProvider>
         </li>
         <li 
           className="cursor-pointer hover:text-gray-400"

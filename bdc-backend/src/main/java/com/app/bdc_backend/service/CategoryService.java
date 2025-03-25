@@ -36,7 +36,7 @@ public class CategoryService {
         saveAll(updatedCats);
     }
 
-    public Category findById(String id){
+    public Category getById(String id){
         return categoryRepository.findById(id).orElse(null);
     }
 

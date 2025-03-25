@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { fetchWithAuth } from '../../../util/AuthUtil'
 import { BASE_API_URL } from "../../../constants";
 import Pagination from '../../../pages/common/Pagination'
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import { ImNewTab } from "react-icons/im";
 import RestrictProductForm from "./RestrictProductForm";
 import Button from '@mui/material/Button';
@@ -386,10 +386,6 @@ export default function ProductList(){
                     </div>
                 </div>
             )}
-
-            <ToastContainer
-                position="bottom-right"
-            />
         </div>
     )
 }

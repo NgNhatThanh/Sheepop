@@ -59,15 +59,15 @@ const menuList = [
   //     }
   //   ]
   // },
-  // {
-  //   title: "Nội dung",
-  //   subMenu: [
-  //     {
-  //       title: "Trang chủ",
-  //       to: ""
-  //     }
-  //   ]
-  // }
+  {
+    title: "Nội dung",
+    subMenu: [
+      {
+        title: "Trang chủ",
+        to: "content"
+      }
+    ]
+  }
 ]
 
 export default function Sidebar() {
