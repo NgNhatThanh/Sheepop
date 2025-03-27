@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import java.util.Map;
 
@@ -12,11 +13,20 @@ import java.util.Map;
 @Slf4j
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(value = MaxUploadSizeExceededException.class)
+    public ResponseEntity<?> fileSizeExceeded(MaxUploadSizeExceededException e) {
+        return ResponseEntity.badRequest().body(Map.of(
+            "message", "File size is too large"
+        ));
+    }
+
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
     public ResponseEntity<?> invalidInputException(MethodArgumentNotValidException ex) {
-        log.warn("Invalid request: {}", ex.getBindingResult().getAllErrors().get(0).getDefaultMessage());
+        String message = ex.getBindingResult().getAllErrors().get(0).getDefaultMessage();
+        if(message == null) message = "Invalid input: " + ex.getBindingResult().getAllErrors().get(0).getObjectName();
+        log.warn("Invalid request: {}", message);
         return ResponseEntity.badRequest().body(Map.of(
-                "message", "Invalid data"
+                "message", message
         ));
     }
 

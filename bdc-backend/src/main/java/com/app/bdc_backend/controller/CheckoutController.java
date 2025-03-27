@@ -17,6 +17,7 @@ public class CheckoutController {
     private final CheckoutFacaceService checkoutFacaceService;
 
     @RequestMapping(method = {RequestMethod.GET, RequestMethod.POST}, path = "/get")
+    //body include addressId
     public ResponseEntity<?> getCheckoutList(@RequestBody(required = false) Map<String, Object> rqBody){
         return ResponseEntity.ok(checkoutFacaceService.getCheckoutList(rqBody));
     }

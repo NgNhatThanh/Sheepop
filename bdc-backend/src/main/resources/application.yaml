@@ -1,6 +1,10 @@
 spring:
   application:
     name: bdc-backend
+  servlet:
+    multipart:
+      max-file-size: 1MB # đơn lẻ từng file
+      max-request-size: 10MB # tổng các file trong một request
 
 app:
   cors:
@@ -16,3 +20,7 @@ google:
 redis:
   cart:
     expire-time-in-minutes: 30
+
+file:
+  image:
+    max-size: 1048576 # 1 MB

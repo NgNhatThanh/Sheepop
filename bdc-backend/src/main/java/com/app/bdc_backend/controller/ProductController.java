@@ -2,6 +2,7 @@ package com.app.bdc_backend.controller;
 
 import com.app.bdc_backend.facade.ProductFacadeService;
 import com.app.bdc_backend.model.dto.request.SelectVariationDTO;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +20,7 @@ public class ProductController {
     }
 
     @PostMapping("/select_variation")
-    public ResponseEntity<?> selectVariation(@RequestBody SelectVariationDTO selectVariationDTO) {
+    public ResponseEntity<?> selectVariation(@RequestBody @Valid SelectVariationDTO selectVariationDTO) {
         return ResponseEntity.ok(productFacadeService.selectVariation(selectVariationDTO));
     }
 

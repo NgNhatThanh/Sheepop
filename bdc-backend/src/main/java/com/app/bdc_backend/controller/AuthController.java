@@ -8,6 +8,7 @@ import com.app.bdc_backend.model.dto.request.LoginDTO;
 import com.app.bdc_backend.model.dto.request.RegistrationDTO;
 import com.app.bdc_backend.model.enums.RoleName;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -37,7 +38,7 @@ public class AuthController{
     private final String REFRESH_TOKEN_COOKIE_NAME = "refresh_token";
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody RegistrationDTO dto){
+    public ResponseEntity<?> register(@RequestBody @Valid RegistrationDTO dto){
         AuthResponseDTO res = authFacadeService.registerUser(dto);
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, getRefreshTokenCookie(res.getRefreshToken()).toString())
@@ -47,7 +48,7 @@ public class AuthController{
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginDTO dto) {
+    public ResponseEntity<?> login(@RequestBody @Valid LoginDTO dto) {
         try{
             UsernamePasswordAuthenticationToken authToken =
                     new UsernamePasswordAuthenticationToken(dto.getUsername(), dto.getPassword());

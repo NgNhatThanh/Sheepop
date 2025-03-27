@@ -99,16 +99,16 @@ export default function CheckoutPage(){
     const handlePlaceOrder = () => {
         setCheckingOut(true)
         const body = {
-            'address_id': selectedAddress.id,
-            'shop_orders': [],
-            'payment_type': 'cash_on_delivery'
+            'addressId': selectedAddress.id,
+            'shopOrders': [],
+            'paymentType': 'cash_on_delivery'
         }
         checkoutList.map((shopCheckout) => {
             const totalPrice = shopCheckout.items.reduce((subtotal, item) => subtotal + item.price * item.quantity, 0)
             body['shop_orders'].push({
-                'shop_id': shopCheckout.shop.id,
-                'shipping_fee': shopCheckout.shipmentFee,
-                'total_price': totalPrice
+                'shopId': shopCheckout.shop.id,
+                'shippingFee': shopCheckout.shipmentFee,
+                'totalPrice': totalPrice
             })
         })
         try{

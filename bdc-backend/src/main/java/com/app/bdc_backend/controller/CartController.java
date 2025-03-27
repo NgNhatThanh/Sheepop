@@ -3,6 +3,8 @@ package com.app.bdc_backend.controller;
 import com.app.bdc_backend.facade.CartFacadeService;
 import com.app.bdc_backend.model.dto.request.AddToCartDTO;
 import com.app.bdc_backend.model.dto.request.CartItemUpdateDTO;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +26,7 @@ public class CartController {
     }
 
     @PostMapping("/add-to-cart")
-    public ResponseEntity<?> addToCart(@RequestBody AddToCartDTO dto) {
+    public ResponseEntity<?> addToCart(@RequestBody @Valid AddToCartDTO dto) {
         cartFacadeService.addToCart(dto);
         return ResponseEntity.ok().body(Map.of(
                 "msg", "Successfully added to cart"
@@ -37,7 +39,7 @@ public class CartController {
     }
 
     @PostMapping("/update")
-    public ResponseEntity<?> updateCart(@RequestBody List<CartItemUpdateDTO> dtoList) {
+    public ResponseEntity<?> updateCart(@RequestBody @NotEmpty List<@Valid CartItemUpdateDTO> dtoList) {
         return ResponseEntity.ok(cartFacadeService.updateCart(dtoList));
     }
 

@@ -211,20 +211,8 @@ public class OrderService {
         return shopOrderRepository.findByOrder(order);
     }
 
-    public Page<ShopOrder> getShopOrderByShop(Shop shop, Pageable pageable){
-        return shopOrderRepository.findLastByShopOrderByCreatedAtDesc(shop, pageable);
-    }
-
     public int countProductSold(ObjectId productId){
         return orderItemRepository.countProductSoldByProductId(productId);
-    }
-
-    public int countShopSold(ObjectId shopId){
-        return shopOrderRepository.countShopSold(shopId);
-    }
-
-    public List<ShopOrder> getAllShopOrder(){
-        return shopOrderRepository.findAll();
     }
 
     public ShopOrderDTO toShopOrderDTO(ShopOrder shopOrder) {
@@ -243,18 +231,23 @@ public class OrderService {
         dtoShopOrder.setPaymentType(shopOrder.getOrder().getPayment().getType());
         List<OrderItemDTO> itemDtos = new ArrayList<>();
         for(OrderItem item : shopOrder.getItems()){
-            OrderItemDTO dtoItem = new OrderItemDTO();
-            dtoItem.setId(item.getId().toString());
-            dtoItem.setQuantity(item.getQuantity());
-            dtoItem.setPrice(item.getPrice());
-            dtoItem.setAttributes(item.getAttributes());
-            dtoItem.getProduct().setId(item.getProduct().getId().toString());
-            dtoItem.getProduct().setName(item.getProduct().getName());
-            dtoItem.getProduct().setThumbnailUrl(item.getProduct().getThumbnailUrl());
+            OrderItemDTO dtoItem = toOrderItemDTO(item);
             itemDtos.add(dtoItem);
         }
         dtoShopOrder.setItems(itemDtos);
         return dtoShopOrder;
+    }
+
+    public OrderItemDTO toOrderItemDTO(OrderItem item) {
+        OrderItemDTO dtoItem = new OrderItemDTO();
+        dtoItem.setId(item.getId().toString());
+        dtoItem.setQuantity(item.getQuantity());
+        dtoItem.setPrice(item.getPrice());
+        dtoItem.setAttributes(item.getAttributes());
+        dtoItem.getProduct().setId(item.getProduct().getId().toString());
+        dtoItem.getProduct().setName(item.getProduct().getName());
+        dtoItem.getProduct().setThumbnailUrl(item.getProduct().getThumbnailUrl());
+        return dtoItem;
     }
 
 }

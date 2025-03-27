@@ -3,6 +3,7 @@ package com.app.bdc_backend.controller;
 import com.app.bdc_backend.facade.UserFacadeService;
 import com.app.bdc_backend.model.dto.request.AddAddressDTO;
 import com.app.bdc_backend.model.dto.request.UpdateProfileDTO;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +25,7 @@ public class UserController {
     }
 
     @PostMapping("/profile/update")
-    public ResponseEntity<?> updateProfile(@RequestBody UpdateProfileDTO dto) {
+    public ResponseEntity<?> updateProfile(@RequestBody @Valid UpdateProfileDTO dto) {
         return ResponseEntity.ok(userFacadeService.updateProfile(dto));
     }
 
@@ -34,7 +35,7 @@ public class UserController {
     }
 
     @PostMapping("/address/add")
-    public ResponseEntity<?> addAddress(@RequestBody AddAddressDTO dto){
+    public ResponseEntity<?> addAddress(@RequestBody @Valid AddAddressDTO dto){
         return ResponseEntity.ok(userFacadeService.addAddress(dto));
     }
 

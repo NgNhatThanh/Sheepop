@@ -6,17 +6,12 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class UpdateShopProfileDTO {
+public class RestrictProductDTO {
 
     @NotBlank
-    private String id;
+    private String productId;
 
     @NotBlank
-    private String shopName;
-
-    private String description;
-
-    @NotBlank
-    private String avatarUrl;
+    private String reason;
 
 }

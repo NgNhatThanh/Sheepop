@@ -4,7 +4,8 @@ import com.app.bdc_backend.exception.RequestException;
 import com.app.bdc_backend.model.Notification;
 import com.app.bdc_backend.model.cart.Cart;
 import com.app.bdc_backend.model.cart.CartItem;
-import com.app.bdc_backend.model.dto.request.OrderCancelationDTO;
+import com.app.bdc_backend.model.dto.request.OrderCancellationDTO;
+import com.app.bdc_backend.model.dto.request.PlaceOrderDTO;
 import com.app.bdc_backend.model.dto.response.*;
 import com.app.bdc_backend.model.enums.*;
 import com.app.bdc_backend.model.order.Order;
@@ -48,7 +49,7 @@ public class OrderFacadeService {
 
     private final NotificationService notificationService;
 
-    public Order placeOrder(Map<String, Object> body){
+    public Order placeOrder(PlaceOrderDTO dto){
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userService.findByUsername(username);
         Cart cart = cartRedisService.findByUser(username);
@@ -84,32 +85,24 @@ public class OrderFacadeService {
         Order order = new Order();
         UserAddress to = null;
         for(UserAddress userAddress : userAddresses){
-            if(userAddress.getId().toString().equals(body.get("address_id").toString())){
+            if(userAddress.getId().toString().equals(dto.getAddressId())){
                 to = userAddress;
                 break;
             }
         }
+        if(to == null){
+            throw new RequestException("Invalid request: user address not found");
+        }
         order.setAddress(to);
         order.setUser(user);
-        Object rawShops = body.get("shop_orders");
-        if (rawShops == null) {
-            throw new RequestException("Invalid request: shop orders data is missing");
-        }
-        List<Map<String, Object>> shops;
-        try{
-            shops = (List<Map<String, Object>>) body.get("shop_orders");
-        }
-        catch (ClassCastException e){
-            throw new RequestException("Invalid request: invalid shop orders data");
-        }
         long totalPay = 0;
-        for(Map<String, Object> shop : shops){
-            totalPay += (Integer) shop.get("total_price");
-            totalPay += (Integer) shop.get("shipping_fee");
+        for(PlaceOrderDTO.PlaceShopOrderDTO shopOrder : dto.getShopOrders()){
+            totalPay += shopOrder.getTotalPrice();
+            totalPay += shopOrder.getShippingFee();
         }
         Payment payment = new Payment();
         payment.setCreatedAt(new Date());
-        payment.setType(PaymentType.fromString(body.get("payment_type").toString()));
+        payment.setType(PaymentType.fromString(dto.getPaymentType()));
         if(payment.getType() != PaymentType.COD) payment.setStatus(PaymentStatus.PENDING);
         else payment.setStatus(PaymentStatus.COD);
         payment.setAmount(totalPay);
@@ -117,12 +110,12 @@ public class OrderFacadeService {
         order.setPayment(payment);
         order = orderService.save(order);
         List<ShopOrder> shopOrders = new ArrayList<>();
-        for(Map<String, Object> shop : shops){
+        for(PlaceOrderDTO.PlaceShopOrderDTO shopOrderDTO : dto.getShopOrders()){
             ShopOrder shopOrder = new ShopOrder();
             shopOrder.setUser(user);
             shopOrder.setOrder(order);
-            shopOrder.setShippingFee((Integer) shop.get("shipping_fee"));
-            String shopId = (String) shop.get("shop_id");
+            shopOrder.setShippingFee(shopOrderDTO.getShippingFee());
+            String shopId = shopOrderDTO.getShopId();
             List<OrderItem> orderItems = new ArrayList<>();
             long total = 0;
             for(CartItem item : checkoutList){
@@ -258,7 +251,7 @@ public class OrderFacadeService {
         notificationService.sendNotification(notification);
     }
 
-    public void cancelOrder(OrderCancelationDTO dto){
+    public void cancelOrder(OrderCancellationDTO dto){
         if(dto.getCancelReason() == null || dto.getCancelReason().isEmpty()){
             throw new RequestException("Invalid request: cancel reason mustn't be empty");
         }
@@ -310,9 +303,6 @@ public class OrderFacadeService {
                 throw new RequestException("Invalid request: this order cannot be canceled");
             }
             cancelList = List.of(shopOrder);
-        }
-        else if(dto.getWhoCancel() == CommonEntity.ADMIN){
-            // code for admin
         }
         else{
             throw new RequestException("Invalid request: entity");
@@ -394,7 +384,7 @@ public class OrderFacadeService {
         dto.setPayment(shopOrder.getOrder().getPayment());
         dto.setItems(shopOrder.getItems()
                 .stream()
-                .map(this::toOrderItemDTO)
+                .map(orderService::toOrderItemDTO)
                 .toList());
         return dto;
     }
@@ -414,10 +404,10 @@ public class OrderFacadeService {
             for(ShopOrder shopOrder : shopOrders){
                 ShopOrderDTO dtoShopOrder = toShopOrderDTO(shopOrder);
                 orderDTO.setStatus(shopOrder.getStatus());
-                log.info("Shop order status: " + shopOrder.getStatus());
+                log.info("Shop order status: {}",shopOrder.getStatus());
                 if(shopOrder.getStatus() < ShopOrderStatus.SENT) orderDTO.setCancelable(true);
                 if(!pendingPayment){
-                    log.info("Status: " + shopOrder.getStatus());
+                    log.info("Status: {}",shopOrder.getStatus());
                     orderDTO.setCompleted(shopOrder.getStatus() == ShopOrderStatus.COMPLETED);
                     orderDTO.setRated(shopOrder.getStatus() == ShopOrderStatus.RATED);
                     orderDTO.setShopOrders(List.of(dtoShopOrder));
@@ -443,21 +433,9 @@ public class OrderFacadeService {
         dtoShopOrder.setShippingFee(shopOrder.getShippingFee());
         List<OrderItemDTO> itemDtos = shopOrder.getItems()
                 .stream()
-                .map(this::toOrderItemDTO).toList();
+                .map(orderService::toOrderItemDTO).toList();
         dtoShopOrder.setItems(itemDtos);
         return dtoShopOrder;
-    }
-
-    private OrderItemDTO toOrderItemDTO(OrderItem item) {
-        OrderItemDTO dtoItem = new OrderItemDTO();
-        dtoItem.setId(item.getId().toString());
-        dtoItem.setQuantity(item.getQuantity());
-        dtoItem.setPrice(item.getPrice());
-        dtoItem.setAttributes(item.getAttributes());
-        dtoItem.getProduct().setId(item.getProduct().getId().toString());
-        dtoItem.getProduct().setName(item.getProduct().getName());
-        dtoItem.getProduct().setThumbnailUrl(item.getProduct().getThumbnailUrl());
-        return dtoItem;
     }
 
 }

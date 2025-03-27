@@ -1,5 +1,7 @@
 package com.app.bdc_backend.model.dto.request;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.util.Date;
@@ -11,10 +13,13 @@ import java.util.Date;
 @NoArgsConstructor
 public class RegistrationDTO {
 
+    @NotBlank
     private String fullName;
 
+    @NotBlank
     private String username;
 
+    @NotBlank
     private String password;
 
     private String phoneNumber;
@@ -25,6 +30,7 @@ public class RegistrationDTO {
 
     private boolean fromSocial = false;
 
+    @NotNull
     private Date dob;
 
 }

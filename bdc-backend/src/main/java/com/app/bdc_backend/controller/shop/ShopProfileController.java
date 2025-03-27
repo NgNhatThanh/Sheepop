@@ -4,6 +4,7 @@ import com.app.bdc_backend.facade.ShopFacadeService;
 import com.app.bdc_backend.model.dto.request.AddAddressDTO;
 import com.app.bdc_backend.model.dto.request.UpdateShopProfileDTO;
 import com.app.bdc_backend.model.dto.response.ShopProfileDTO;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -30,13 +31,13 @@ public class ShopProfileController {
     }
 
     @PostMapping("/update")
-    public ResponseEntity<?> updateProfile(@RequestBody UpdateShopProfileDTO dto) {
+    public ResponseEntity<?> updateProfile(@RequestBody @Valid UpdateShopProfileDTO dto) {
         ShopProfileDTO resProfile = shopFacadeService.updateShopProfile(dto);
         return ResponseEntity.ok(resProfile);
     }
 
     @PostMapping("/update_address")
-    public ResponseEntity<?> updateAddress(@RequestBody AddAddressDTO dto) {
+    public ResponseEntity<?> updateAddress(@RequestBody @Valid AddAddressDTO dto) {
         return ResponseEntity.ok(shopFacadeService.setAddress(dto));
     }
 

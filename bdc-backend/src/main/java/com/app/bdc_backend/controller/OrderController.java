@@ -1,8 +1,10 @@
 package com.app.bdc_backend.controller;
 
 import com.app.bdc_backend.facade.OrderFacadeService;
-import com.app.bdc_backend.model.dto.request.OrderCancelationDTO;
+import com.app.bdc_backend.model.dto.request.OrderCancellationDTO;
+import com.app.bdc_backend.model.dto.request.PlaceOrderDTO;
 import com.app.bdc_backend.model.order.*;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -19,8 +21,8 @@ public class OrderController {
     private final OrderFacadeService orderFacadeService;
 
     @PostMapping("/place_order")
-    public ResponseEntity<?> placeOrder(@RequestBody Map<String, Object> body) {
-        Order order = orderFacadeService.placeOrder(body);
+    public ResponseEntity<?> placeOrder(@RequestBody @Valid PlaceOrderDTO dto) {
+        Order order = orderFacadeService.placeOrder(dto);
         return ResponseEntity.ok().body(Map.of(
                 "order_id", order.getId().toString()
         ));
@@ -45,7 +47,7 @@ public class OrderController {
     }
 
     @PostMapping("/cancel")
-    public ResponseEntity<?> cancelOrder(@RequestBody OrderCancelationDTO dto) {
+    public ResponseEntity<?> cancelOrder(@RequestBody @Valid OrderCancellationDTO dto) {
         orderFacadeService.cancelOrder(dto);
         return ResponseEntity.ok().build();
     }

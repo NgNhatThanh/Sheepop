@@ -2,7 +2,9 @@ package com.app.bdc_backend.controller.admin;
 
 import com.app.bdc_backend.exception.RequestException;
 import com.app.bdc_backend.facade.admin.AdminProductFacadeService;
+import com.app.bdc_backend.model.dto.request.RestrictProductDTO;
 import com.app.bdc_backend.model.dto.response.PageResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -35,11 +37,8 @@ public class AdminProductController {
     }
 
     @PostMapping("/restrict")
-    public ResponseEntity<?> restrictProduct(@RequestBody Map<String, String> body){ // include productId and reason
-        if(body.isEmpty()){
-            throw new RequestException("Invalid request: empty params");
-        }
-        adminProductFacadeService.restrictProduct(body.get("productId"), body.get("reason"));
+    public ResponseEntity<?> restrictProduct(@RequestBody @Valid RestrictProductDTO dto){ // include productId and reason
+        adminProductFacadeService.restrictProduct(dto.getProductId(), dto.getReason());
         return ResponseEntity.ok().body(Map.of("status", "success"));
     }
 

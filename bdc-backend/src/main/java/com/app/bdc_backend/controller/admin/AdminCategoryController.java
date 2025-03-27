@@ -5,6 +5,7 @@ import com.app.bdc_backend.model.dto.request.AddCategoryDTO;
 import com.app.bdc_backend.model.dto.request.UpdateCategoryDTO;
 import com.app.bdc_backend.model.dto.response.CategoryDTO;
 import com.app.bdc_backend.model.dto.response.PageResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -33,13 +34,13 @@ public class AdminCategoryController {
 
     @PostMapping("/update/{catId}")
     public ResponseEntity<?> updateCategory(@PathVariable String catId,
-                                            @RequestBody UpdateCategoryDTO dto){
+                                            @RequestBody @Valid UpdateCategoryDTO dto){
         CategoryDTO updatedCat = adminCategoryFacadeService.update(catId, dto);
         return ResponseEntity.ok().body(updatedCat);
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> addCategory(@RequestBody AddCategoryDTO dto){
+    public ResponseEntity<?> addCategory(@RequestBody @Valid AddCategoryDTO dto){
         CategoryDTO category = adminCategoryFacadeService.addCategory(dto);
         return ResponseEntity.ok().body(category);
     }

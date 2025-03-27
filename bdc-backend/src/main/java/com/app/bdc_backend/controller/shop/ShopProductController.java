@@ -5,6 +5,7 @@ import com.app.bdc_backend.model.dto.request.SaveProductDTO;
 import com.app.bdc_backend.model.dto.response.PageResponse;
 import com.app.bdc_backend.model.dto.response.ShopProductTableResponseDTO;
 import com.app.bdc_backend.model.product.Product;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -20,13 +21,13 @@ public class ShopProductController {
     private final ShopFacadeService shopFacadeService;
 
     @PostMapping("/add")
-    public ResponseEntity<?> addProduct(@RequestBody SaveProductDTO productDTO) {
+    public ResponseEntity<?> addProduct(@RequestBody @Valid SaveProductDTO productDTO) {
         shopFacadeService.addProduct(productDTO);
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/update")
-    public ResponseEntity<?> updateProduct(@RequestBody SaveProductDTO productDTO) {
+    public ResponseEntity<?> updateProduct(@RequestBody @Valid SaveProductDTO productDTO) {
         if(productDTO.getProductId() == null){
             throw new RuntimeException("Product ID is null");
         }

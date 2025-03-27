@@ -1,5 +1,6 @@
 package com.app.bdc_backend.facade;
 
+import com.app.bdc_backend.exception.RequestException;
 import com.app.bdc_backend.model.dto.BasicShippingOrderInfo;
 import com.app.bdc_backend.model.dto.ShipmentInfo;
 import com.app.bdc_backend.model.cart.Cart;
@@ -89,6 +90,10 @@ public class CheckoutFacaceService {
                     break;
                 }
             }
+        }
+
+        if(to == null){
+            throw new RequestException("User hasn't have an address yet!");
         }
 
         for(CartItem item : cart.getItems()){

@@ -41,6 +41,10 @@ public class AuthFacadeService {
 
     public AuthResponseDTO registerUser(RegistrationDTO dto)  {
         User newUser = ModelMapper.getInstance().map(dto, User.class);
+        if((newUser.isFromSocial() && newUser.getEmail() == null)
+        || (!newUser.isFromSocial() && newUser.getPhoneNumber() == null)) {
+            throw new RequestException("Invalid user information");
+        }
         newUser.setAvatarUrl(userAvatarUrl);
         userSevice.register(newUser);
         String accessToken = jwtService.generateAccessToken(newUser, new HashMap<>());
