@@ -68,13 +68,7 @@ public class ChatFacadeService {
     }
 
     public void sendMessage(SendMessageDTO dto, String senderUsername) {
-        MessageType type;
-        try{
-            type = MessageType.fromString(dto.getType());
-        }
-        catch (RuntimeException e){
-            throw new RequestException("Invalid message type");
-        }
+        MessageType type = MessageType.fromString(dto.getType());
         ChatRoom room = chatService.getChatroomById(dto.getChatroomId());
         if(room == null)
             throw new RequestException("Invalid request: room not found");

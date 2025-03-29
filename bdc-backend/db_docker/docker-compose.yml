@@ -31,8 +31,22 @@ services:
       sleep 20;
       curl -X PUT 'http://es01:9200/products' -H 'Content-Type: application/json' -d'
       {
+        \"settings\": {
+          \"analysis\": {
+            \"analyzer\": {
+              \"custom_folded_analyzer\": {
+                \"tokenizer\": \"standard\",
+                \"filter\": [\"lowercase\", \"asciifolding\"]
+              }
+            }
+          }
+        },
         \"mappings\": {
           \"properties\": {
+            \"name\": {
+              \"type\": \"text\",
+              \"analyzer\": \"custom_folded_analyzer\"
+            },
             \"shopId\": { \"type\": \"keyword\" },
             \"categoryId\": { \"type\": \"keyword\" },
             \"createdAt\": { \"type\": \"date\" }

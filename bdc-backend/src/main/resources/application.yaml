@@ -24,3 +24,14 @@ redis:
 file:
   image:
     max-size: 1048576 # 1 MB
+
+payment:
+  vnPay:
+    url: ${PAY_URL}
+    tmnCode: ${TMN_CODE}
+    secretKey: ${SECRET_KEY}
+    returnUrl: ${RETURN_URL}
+    version: ${VERSION}
+    command: ${COMMAND}
+    orderType: ${ORDER_TYPE}
+    max_time: ${MAX_TIME}

@@ -308,8 +308,8 @@ export default function ShopOrder(){
                                     <div className="flex flex-col justify-center items-center h-full gap-2">
                                         {shopOrder.status === 1 && (
                                             <button 
-                                                className={`p-2 rounded text-white ${shopOrder.completedPayment ? 'bg-blue-400 cursor-pointer hover:bg-blue-500' : 'bg-gray-300 cursor-not-allowed'}`}
-                                                onClick={() => updateOrderStatus(shopOrder.id, shopOrder.status)}
+                                                className={`p-2 rounded text-white ${shopOrder.completedPayment || shopOrder.paymentType === 'cash_on_delivery' ? 'bg-blue-400 cursor-pointer hover:bg-blue-500' : 'bg-gray-300 cursor-not-allowed'}`}
+                                                onClick={shopOrder.completedPayment || shopOrder.paymentType === 'cash_on_delivery' ? () => updateOrderStatus(shopOrder.id, shopOrder.status) : () => {}}
                                             >
                                                 Xác nhận
                                             </button>
@@ -317,8 +317,10 @@ export default function ShopOrder(){
 
                                         {shopOrder.status === 1 && (
                                             <button 
-                                                className="bg-red-400 p-2 rounded cursor-pointer hover:bg-red-500"
-                                                onClick={() => setCancelOrder(shopOrder)}
+                                                className={`p-2 rounded text-white ${
+                                                    !shopOrder.completedPayment || shopOrder.paymentType === 'cash_on_delivery' ? 'bg-red-400 cursor-pointer hover:bg-red-500' : 'bg-gray-300 cursor-not-allowed'
+                                                }`}
+                                                onClick={shopOrder.completedPayment && shopOrder.paymentType !== 'cash_on_delivery' ? () => {} : () => setCancelOrder(shopOrder)}
                                             >
                                                 Hủy đơn
                                             </button>

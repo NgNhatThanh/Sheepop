@@ -20,6 +20,13 @@ public class GlobalExceptionHandler {
         ));
     }
 
+    @ExceptionHandler(value = IllegalArgumentException.class)
+    public ResponseEntity<?> illegalArgument(IllegalArgumentException e) {
+        return ResponseEntity.badRequest().body(Map.of(
+                "message", e.getMessage()
+        ));
+    }
+
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
     public ResponseEntity<?> invalidInputException(MethodArgumentNotValidException ex) {
         String message = ex.getBindingResult().getAllErrors().get(0).getDefaultMessage();

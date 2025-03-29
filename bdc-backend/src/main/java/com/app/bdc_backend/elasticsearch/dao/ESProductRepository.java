@@ -35,7 +35,7 @@ public class ESProductRepository{
                         BoolQuery.Builder boolBuilder = commonBoolQueryBuilder();
                         if(keyword != null) {
                             boolBuilder.filter(m -> m.match(t ->
-                                    t.field("name").query(keyword).fuzziness("2")));
+                                    t.field("name").query(keyword).fuzziness("1")));
                         }
                         if (!filters.getCategoryIds().isEmpty()) {
                             boolBuilder.filter(f -> f.terms(t ->

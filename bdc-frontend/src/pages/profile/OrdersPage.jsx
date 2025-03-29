@@ -96,6 +96,18 @@ export default function OrdersPage() {
       })
   }
 
+  const handleCreatePayment = (orderId) => {
+    fetchWithAuth(`${BASE_API_URL}/v1/payment/payment_url?orderId=${orderId}`)
+      .then(res => res.json())
+      .then(res => {
+        console.log(res)
+        if(res.message){
+          toast.error("Có lỗi xảy ra, vui lòng thử lại sau")
+        }
+        else window.open(res.url, '_blank')
+      })
+  }
+
   const handleSuccessReview = (orderId, shopOrderId) => {
     toast.success("Đánh giá thành công")
     setOrders(prevOrders => {
@@ -245,55 +257,66 @@ export default function OrdersPage() {
               </p>
             </div>
   
-            <div className="flex justify-end gap-2 mt-4">
-              {order.pending && (
-                <button className="px-4 text-white py-2 bg-blue-400 text-white rounded cursor-pointer hover:bg-blue-500">
-                  Thanh toán
-                </button>
-              )}
-              {order.shopOrders[0].status === 3 || order.shopOrders[0].status === 4 && (
-                <button 
-                  className="px-4 text-white py-2 bg-blue-400 rounded cursor-pointer hover:bg-blue-500"
-                  onClick={() => handleMarkOrderAsReceived(order.shopOrders[0].id)}
-                >
-                  Đã nhận hàng
-                </button>
-              )}
-              {order.rated && (
-                <button className="px-4 text-white py-2 bg-blue-400 rounded cursor-pointer hover:bg-blue-500">
-                  Mua lại
-                </button>
-              )}
-              {}
-              {order.completed && !order.rated && (
-                <button 
-                  className="px-4 text-white py-2 bg-blue-400 text-white rounded cursor-pointer hover:bg-blue-500"
-                  onClick={() => setOpenReviewForm(prev => ({
-                    ...prev,
-                    [order.shopOrders[0].id]: true
-                  }))}
-                >
-                  Đánh giá
-                </button>
-              )}
-              {!order.pending && (
-                <button className="px-4 py-2 border border-gray-400 rounded cursor-pointer hover:bg-gray-100">
-                  <Link to={`${order.shopOrders[0].id}`}>
-                    Chi tiết
-                  </Link>
-                </button>
-              )}
-              {order.cancelable && (
-                <button 
-                  className="px-4 py-2 border border-red-500 text-red-500 rounded cursor-pointer hover:bg-gray-100"
-                  onClick={() => {
-                    setCancelOrder(order)
-                  }}  
-                >
-                  Hủy đơn
-                </button>
-              )}
-
+            <div className="flex justify-between mt-4">
+                  <div>
+                    {order.payment.expireAt && (
+                      <p className="text-gray-700">
+                        Thanh toán trước {new Date(order.payment.expireAt).toLocaleString()}
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex gap-2">
+                    {order.pending && (
+                      <button 
+                        className="px-4 text-white py-2 bg-blue-400 text-white rounded cursor-pointer hover:bg-blue-500"
+                        onClick={() => handleCreatePayment(order.id)}
+                      >
+                        Thanh toán
+                      </button>
+                    )}
+                    {order.shopOrders[0].status === 3 || order.shopOrders[0].status === 4 && (
+                      <button 
+                        className="px-4 text-white py-2 bg-blue-400 rounded cursor-pointer hover:bg-blue-500"
+                        onClick={() => handleMarkOrderAsReceived(order.shopOrders[0].id)}
+                      >
+                        Đã nhận hàng
+                      </button>
+                    )}
+                    {order.rated && (
+                      <button className="px-4 text-white py-2 bg-blue-400 rounded cursor-pointer hover:bg-blue-500">
+                        Mua lại
+                      </button>
+                    )}
+                    {}
+                    {order.completed && !order.rated && (
+                      <button 
+                        className="px-4 text-white py-2 bg-blue-400 text-white rounded cursor-pointer hover:bg-blue-500"
+                        onClick={() => setOpenReviewForm(prev => ({
+                          ...prev,
+                          [order.shopOrders[0].id]: true
+                        }))}
+                      >
+                        Đánh giá
+                      </button>
+                    )}
+                    {!order.pending && (
+                      <button className="px-4 py-2 border border-gray-400 rounded cursor-pointer hover:bg-gray-100">
+                        <Link to={`${order.shopOrders[0].id}`}>
+                          Chi tiết
+                        </Link>
+                      </button>
+                    )}
+                    {order.cancelable && order.payment.status !== 'COMPLETED' && (
+                      <button 
+                        className="px-4 py-2 border border-red-500 text-red-500 rounded cursor-pointer hover:bg-gray-100"
+                        onClick={() => {
+                          setCancelOrder(order)
+                        }}  
+                      >
+                        Hủy đơn
+                      </button>
+                    )}
+                  </div>
             </div>
             <div ref={loadMoreRef} ></div>
           </div>))}

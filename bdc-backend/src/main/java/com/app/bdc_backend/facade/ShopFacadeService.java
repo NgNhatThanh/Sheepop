@@ -10,6 +10,7 @@ import com.app.bdc_backend.model.dto.request.SaveProductDTO;
 import com.app.bdc_backend.model.dto.request.UpdateShopProfileDTO;
 import com.app.bdc_backend.model.dto.response.*;
 import com.app.bdc_backend.model.enums.NotificationScope;
+import com.app.bdc_backend.model.enums.PaymentStatus;
 import com.app.bdc_backend.model.enums.RestrictStatus;
 import com.app.bdc_backend.model.enums.ShopOrderStatus;
 import com.app.bdc_backend.model.order.ShopOrder;
@@ -226,6 +227,8 @@ public class ShopFacadeService {
         if(shopOrder == null){
             throw new RequestException("Invalid shop order id");
         }
+        if(shopOrder.getOrder().getPayment().getStatus() == PaymentStatus.PENDING)
+            throw new RequestException("Order's payment hasn't been done yet");
         if(shopOrder.getStatus() != currentStatus){
             throw new RequestException( "Invalid current status");
         }

@@ -16,6 +16,7 @@ export default function CheckoutPage(){
     const [isLoading, setIsLoading] = useState(true)
     const [isOpenAddressList, setIsOpenAddressList] = useState(false)
     const [selectingAddressId, setSelectingAddressId] = useState();
+    const [paymentType, setPaymentType] = useState("cash_on_delivery");
 
     const fetchCheckoutList = async (body) => {
         try{
@@ -101,11 +102,11 @@ export default function CheckoutPage(){
         const body = {
             'addressId': selectedAddress.id,
             'shopOrders': [],
-            'paymentType': 'cash_on_delivery'
+            'paymentType': paymentType
         }
         checkoutList.map((shopCheckout) => {
             const totalPrice = shopCheckout.items.reduce((subtotal, item) => subtotal + item.price * item.quantity, 0)
-            body['shop_orders'].push({
+            body['shopOrders'].push({
                 'shopId': shopCheckout.shop.id,
                 'shippingFee': shopCheckout.shipmentFee,
                 'totalPrice': totalPrice
@@ -125,6 +126,7 @@ export default function CheckoutPage(){
                 })
                 .then(res => {
                     console.log(res)
+                    if(res.paymentUrl) window.open(res.paymentUrl, '_blank')
                     window.location.assign('/checkout/success')
                 })
                 .catch(err => {
@@ -204,7 +206,9 @@ export default function CheckoutPage(){
                 </div>
 
                 <div className="sticky top-20">
-                    <div className="p-6 bg-white shadow-lg rounded-lg h-fit mb-6">
+                    <div className={`p-6 bg-white shadow-lg rounded-lg h-fit mb-6 ${
+                        checkingOut ? "opacity-50 pointer-events-none" : ""
+                    }`}>
                         <div className="flex justify-between">
                             <h3 className="text-xl font-bold mb-4">Địa chỉ</h3>
                             <button className="cursor-pointer mb-2 text-blue-400" onClick={() => {
@@ -228,13 +232,53 @@ export default function CheckoutPage(){
                         )}
                     </div>
 
-                    <div className="p-6 bg-white shadow-lg rounded-lg h-fit mb-6">
+                    <div className={`p-6 bg-white shadow-lg rounded-lg h-fit mb-6
+                        ${
+                            checkingOut ? "opacity-50 pointer-events-none" : ""
+                        }`}>
                         <h3 className="text-xl font-bold mb-4">Hình thức thanh toán</h3>
-                        <div className="flex justify-between">
-                            <h4>Thanh toán tiền mặt</h4>
-                            <button className="text-blue-400 cursor-pointer">
-                                Thay đổi
-                            </button>
+                        <div className="space-y-3">
+                            <label className="flex items-center justify-between p-3 border rounded-lg cursor-pointer">
+                                <span>Thanh toán tiền mặt</span>
+                                <input
+                                    type="radio"
+                                    name="payment"
+                                    value="cash_on_delivery"
+                                    checked={paymentType === "cash_on_delivery"}
+                                    onChange={() => setPaymentType("cash_on_delivery")}
+                                    className="hidden"
+                                />
+                                <div
+                                    className={`w-5 h-5 border-2 rounded-full flex items-center justify-center ${
+                                        paymentType === "cash_on_delivery" ? "border-blue-500" : "border-gray-300"
+                                    }`}
+                                >
+                                    {paymentType === "cash_on_delivery" && (
+                                        <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                                    )}
+                                </div>
+                            </label>
+
+                            <label className="flex items-center justify-between p-3 border rounded-lg cursor-pointer">
+                                <span>Chuyển khoản</span>
+                                <input
+                                    type="radio"
+                                    name="payment"
+                                    value="bank_transfer"
+                                    checked={paymentType === "bank_transfer"}
+                                    onChange={() => setPaymentType("bank_transfer")}
+                                    className="hidden"
+                                />
+                                <div
+                                    className={`w-5 h-5 border-2 rounded-full flex items-center justify-center ${
+                                        paymentType === "bank_transfer" ? "border-blue-500" : "border-gray-300"
+                                    }`}
+                                >
+                                    {paymentType === "bank_transfer" && (
+                                        <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                                    )}
+                                </div>
+                            </label>
                         </div>
                     </div>
 

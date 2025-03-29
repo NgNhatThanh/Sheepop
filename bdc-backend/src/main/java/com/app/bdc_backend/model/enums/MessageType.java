@@ -22,6 +22,6 @@ public enum MessageType {
                 return type;
             }
         }
-        throw new IllegalArgumentException("Invalid type: " + value);
+        throw new IllegalArgumentException("Invalid message type: " + value);
     }
 }

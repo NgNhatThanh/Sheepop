@@ -2,6 +2,7 @@ package com.app.bdc_backend.service;
 
 import com.app.bdc_backend.dao.order.OrderItemRepository;
 import com.app.bdc_backend.dao.order.OrderRerpository;
+import com.app.bdc_backend.dao.order.PaymentRepository;
 import com.app.bdc_backend.dao.shop.ShopOrderRepository;
 import com.app.bdc_backend.model.dto.ShopOrderPageImpl;
 import com.app.bdc_backend.model.dto.response.OrderItemDTO;
@@ -12,6 +13,7 @@ import com.app.bdc_backend.model.enums.PaymentType;
 import com.app.bdc_backend.model.enums.ShopOrderStatus;
 import com.app.bdc_backend.model.order.Order;
 import com.app.bdc_backend.model.order.OrderItem;
+import com.app.bdc_backend.model.order.Payment;
 import com.app.bdc_backend.model.order.ShopOrder;
 import com.app.bdc_backend.model.shop.Shop;
 import com.app.bdc_backend.model.user.User;
@@ -32,6 +34,8 @@ public class OrderService {
     private final OrderItemRepository orderItemRepository;
 
     private final ShopOrderRepository shopOrderRepository;
+
+    private final PaymentRepository paymentRepository;
 
     public Order save(Order order) {
         return orderRerpository.save(order);
@@ -79,6 +83,10 @@ public class OrderService {
             shopOrder.setStatus(ShopOrderStatus.CANCELLED);
         }
         saveAllShopOrders(shopOrders);
+    }
+
+    public void savePayment(Payment payment) {
+        paymentRepository.save(payment);
     }
 
     public List<ShopOrder> getShopOrderByStatus(User user, List<Integer> statusList, int offset, int limit){
@@ -220,8 +228,8 @@ public class OrderService {
         dtoShopOrder.setId(shopOrder.getId().toString());
         dtoShopOrder.setUsername(shopOrder.getShop().getUser().getUsername());
         dtoShopOrder.setName(shopOrder.getShop().getName());
-        dtoShopOrder.setCompletedPayment(shopOrder.getOrder().getPayment().getStatus() != PaymentStatus.PENDING
-                || shopOrder.getOrder().getPayment().getType() == PaymentType.COD);
+        dtoShopOrder.setCompletedPayment(shopOrder.getOrder().getPayment().getStatus() == PaymentStatus.COMPLETED
+        || shopOrder.getOrder().getPayment().getType() == PaymentType.COD);
         dtoShopOrder.setBuyerName(shopOrder.getUser().getFullName());
         dtoShopOrder.setBuyerUsername(shopOrder.getUser().getUsername());
         dtoShopOrder.setStatus(shopOrder.getStatus());

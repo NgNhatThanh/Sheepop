@@ -36,6 +36,7 @@ const OrderList = lazy(() => import('./pages/admin/order/OrderList.jsx'))
 const AdminPageLayout = lazy(() => import('./pages/admin/AdminPageLayout.jsx'))
 const ShopPage = lazy(() => import('./pages/shop/ShopPage.jsx'))
 const ContentManage = lazy(() => import('./pages/admin/content/ContentManage.jsx'));
+const HandleReturn = lazy(() => import('./pages/home/payment/HandlePaymentReturn.jsx'));
 
 function App() {
 
@@ -101,6 +102,7 @@ function App() {
               <Route path='orders/:shopOrderId' element={<OrderDetail/>}/>
             </Route>
             <Route path='search' element={<SearchPage/>}/>
+            <Route path='payment_return' element={<HandleReturn/>}/>
           </Route>
           <Route path="*" element={<ErrorPage errorType={ERROR_TYPE.NOT_FOUND}/>}/>
         </Routes>

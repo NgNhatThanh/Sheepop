@@ -19,6 +19,7 @@ import com.app.bdc_backend.model.user.UserAddress;
 import com.app.bdc_backend.service.*;
 import com.app.bdc_backend.service.redis.impl.CartRedisService;
 import com.app.bdc_backend.util.ModelMapper;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -43,13 +44,14 @@ public class OrderFacadeService {
 
     private final ProductService productService;
 
-    private final PaymentService paymentService;
-
     private final ShopService shopService;
+
+    private final VNPayService vnPayService;
 
     private final NotificationService notificationService;
 
-    public Order placeOrder(PlaceOrderDTO dto){
+    public PlaceOrderResponse placeOrder(PlaceOrderDTO dto, HttpServletRequest request) throws RequestException {
+        PaymentType paymentType = PaymentType.fromString(dto.getPaymentType());
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userService.findByUsername(username);
         Cart cart = cartRedisService.findByUser(username);
@@ -102,11 +104,17 @@ public class OrderFacadeService {
         }
         Payment payment = new Payment();
         payment.setCreatedAt(new Date());
-        payment.setType(PaymentType.fromString(dto.getPaymentType()));
-        if(payment.getType() != PaymentType.COD) payment.setStatus(PaymentStatus.PENDING);
+        payment.setType(paymentType);
+        if(payment.getType() != PaymentType.COD) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(payment.getCreatedAt());
+            calendar.add(Calendar.HOUR, 1);
+            payment.setExpireAt(calendar.getTime());
+            payment.setStatus(PaymentStatus.PENDING);
+        }
         else payment.setStatus(PaymentStatus.COD);
         payment.setAmount(totalPay);
-        paymentService.save(payment);
+        orderService.savePayment(payment);
         order.setPayment(payment);
         order = orderService.save(order);
         List<ShopOrder> shopOrders = new ArrayList<>();
@@ -152,7 +160,14 @@ public class OrderFacadeService {
             notiList.add(notification);
         }
         notificationService.sendAllNotis(notiList);
-        return order;
+
+        PlaceOrderResponse res = new PlaceOrderResponse();
+        res.setOrderId(order.getId().toString());
+        if(paymentType == PaymentType.BANK_TRANSFER){
+            String paymentUrl = vnPayService.createPaymentUrl(order, request);
+            res.setPaymentUrl(paymentUrl);
+        }
+        return res;
     }
 
     public OffsetResponse<OrderDTO> getOrderList(int type, int limit, int offset){
@@ -285,8 +300,10 @@ public class OrderFacadeService {
                 }
                 if(order.getPayment().getStatus() == PaymentStatus.COMPLETED){
                     refund();
+                    order.getPayment().setStatus(PaymentStatus.REFUNDED);
                 }
             }
+            orderService.savePayment(order.getPayment());
         }
         else if(dto.getWhoCancel() == CommonEntity.SHOP){
             ShopOrder shopOrder = orderService.getShopOrderById(dto.getShopOrderIds().get(0));

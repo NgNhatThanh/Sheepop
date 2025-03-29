@@ -3,7 +3,9 @@ package com.app.bdc_backend.controller;
 import com.app.bdc_backend.facade.OrderFacadeService;
 import com.app.bdc_backend.model.dto.request.OrderCancellationDTO;
 import com.app.bdc_backend.model.dto.request.PlaceOrderDTO;
+import com.app.bdc_backend.model.dto.response.PlaceOrderResponse;
 import com.app.bdc_backend.model.order.*;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,11 +23,9 @@ public class OrderController {
     private final OrderFacadeService orderFacadeService;
 
     @PostMapping("/place_order")
-    public ResponseEntity<?> placeOrder(@RequestBody @Valid PlaceOrderDTO dto) {
-        Order order = orderFacadeService.placeOrder(dto);
-        return ResponseEntity.ok().body(Map.of(
-                "order_id", order.getId().toString()
-        ));
+    public ResponseEntity<?> placeOrder(@RequestBody @Valid PlaceOrderDTO dto,
+                                        HttpServletRequest request) {
+        return ResponseEntity.ok().body(orderFacadeService.placeOrder(dto, request));
     }
 
     @GetMapping("/get_order_list")
