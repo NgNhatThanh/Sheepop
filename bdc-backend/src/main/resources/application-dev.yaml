@@ -1,10 +1,15 @@
 spring:
   data:
     mongodb:
-      database: ${MONGO_DATABASE}
+      database: "bdc"
       port: 27018
-      username: ${MONGO_USERNAME}
-      password: ${MONGO_PASSWORD}
+      username: "nthanh"
+      password: "123456"
+    redis:
+      port: 6379
+      host: localhost
+  elasticsearch:
+    uris: http://localhost:9200
 
 logging:
   level:
@@ -12,9 +17,8 @@ logging:
       elasticsearch:
         client: TRACE
 
-redis:
-  host: localhost
-  port: 6379
-
 domain:
   name: localhost
+
+base:
+  url: http://localhost

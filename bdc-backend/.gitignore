@@ -32,8 +32,12 @@ build/
 ### VS Code ###
 .vscode/
 
-.env
+.env*
 .m2/
+
+/logs
+
+/*_data
 
 /db_docker/*_data
 /db_docker/monstache/logs

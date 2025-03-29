@@ -1,20 +1,142 @@
 services:
-  mongo_db:
-    image: mongo:latest
-    # restart: unless-stopped
+  es01:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.28
+    container_name: es011
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=root
-      - MONGO_INITDB_ROOT_PASSWORD=root
+      - node.name=es01
+      - bootstrap.memory_lock=true
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - 9200:9200
+    volumes:
+      - ./es_data:/usr/share/elasticsearch/data
+
+  mongo_one:
+    container_name: mongo11
+    hostname: mongo1
+    image: mongo
+    command: mongod --replSet my-mongo-set --bind_ip_all
     ports:
       - 27018:27017
     volumes:
-      - db:/data/db
-    stdin_open: true
-    tty: true
+      - ./mongo_data:/data/db
+
+  mongo_init:
+    image: mongo
+    depends_on:
+      - mongo_one
+    ports:
+      - 27020:27017
+    restart: no
+    entrypoint: >
+      sh -c "
+      sleep 15;
+      mongosh --host mongo1 --eval '
+          rs.initiate({
+              _id: \"my-mongo-set\",
+              members: [{ _id: 1, host: \"mongo11:27017\" }]
+          });
+      ';
+
+      mongosh --host mongo1 --eval 'use bdc' --eval '
+          db.createUser({
+              user: \"root\",
+              pwd: \"root\",
+              roles: [\"readWrite\"]
+          })
+      ';
+      echo '✅ Khởi tạo thành công!';
+      "
+
+  es-init:
+    image: curlimages/curl:latest
+    depends_on:
+      - es01
+    entrypoint: >
+      sh -c "
+      echo 'Waiting for Elasticsearch...';
+      sleep 20;
+      curl -X PUT 'http://es01:9200/products' -H 'Content-Type: application/json' -d'
+      {
+        \"settings\": {
+          \"analysis\": {
+            \"analyzer\": {
+              \"custom_folded_analyzer\": {
+                \"tokenizer\": \"standard\",
+                \"filter\": [\"lowercase\", \"asciifolding\"]
+              }
+            }
+          }
+        },
+        \"mappings\": {
+          \"properties\": {
+            \"name\": {
+              \"type\": \"text\",
+              \"analyzer\": \"custom_folded_analyzer\"
+            },
+            \"shopId\": { \"type\": \"keyword\" },
+            \"categoryId\": { \"type\": \"keyword\" },
+            \"createdAt\": { \"type\": \"date\" }
+          }
+        }
+      }';
+      curl -X PUT 'http://es01:9200/shop_orders' -H 'Content-Type: application/json' -d'
+      {
+        \"mappings\": {
+          \"properties\": {
+            \"shopId\": { \"type\": \"keyword\" },
+            \"userId\": { \"type\": \"keyword\" },
+            \"orderId\": { \"type\": \"keyword\" },
+            \"createdAt\": { \"type\": \"date\" }
+          }
+        }
+      }';
+      echo 'Mapping created!';
+      "
+
+
+#  mongo_two:
+#    container_name: mongo2
+#    image: mongo
+#    ports:
+#     - 27019:27017
+
+  # mongo_three:
+  #   container_name: mongo3
+  #   image: mongo
+  #   command: mongod --replSet my-mongo-set --bind_ip_all
+  #   ports:
+  #     - 27020:27017
+
+  monstache:
+    image: rwynn/monstache:latest
+    container_name: oc_monstache1
+    depends_on:
+      - es01
+      - es-init
+    working_dir: /app/monstache
+    command: -f ./config.toml
+    environment:
+      - MONSTACHE_LOG_DIR=logs
+    volumes:
+      - ./monstache:/app/monstache
+    ports:
+      - 8082:8080
+    # restart: unless-stopped
+
+  redis:
+    image: redis
+    container_name: redis1
+    ports:
+      - 6379:6379
+    volumes:
+      - ./redis_data:/data
 
   app:
     depends_on:
-      - mongo_db
+      - mongo_init
+      - es-init
     build: .
     # restart: on-failure
     ports:
@@ -24,16 +146,3 @@ services:
       - ./logs:/app/logs
     stdin_open: true
     tty: true
-
-  redis:
-    image:
-      redis:latest
-    # restart: unless-stopped
-    ports:
-      - 6380:6379
-    volumes:
-      - redis_data:/data
-
-volumes:
-  db:
-  redis_data:

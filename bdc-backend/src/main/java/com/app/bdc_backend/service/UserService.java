@@ -38,8 +38,10 @@ public class UserService {
             throw new RequestException("Phone number already exists");
         }
         user.setCreatedAt(new Date());
-        String hassPassword = passwordEncoder.encode(user.getPassword());
-        user.setPassword(hassPassword);
+        String hashPassword = passwordEncoder.encode(user.getPassword());
+        user.setPassword(hashPassword);
+        Role userRole = roleRepository.findByName(RoleName.USER);
+        user.setRole(userRole);
         userRepository.save(user);
     }
 

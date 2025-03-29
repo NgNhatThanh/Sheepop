@@ -1,0 +1,46 @@
+mongo-url = "mongodb://mongo11/?replicaSet=my-mongo-set"
+
+elasticsearch-urls = ["http://host.docker.internal:9200"]
+
+# những collections được sync
+change-stream-namespaces = ["bdc.products", "bdc.shop_orders"]
+
+# những collections được copy sang luôn khi khởi động
+direct-read-namespaces = ["bdc.products", "bdc.shop_orders"]
+
+# bật gzip cho ES để nén dữ liệu khi gửi
+gzip = true
+
+# không ghi đè lên mapping sẵn có của ES
+# (do monstache tự để mapping các field text là text, nhưng mình lại muốn để là keyword)
+index-as-update = true
+
+# enable trace log
+verbose = true
+
+# đổi tên index từ Mongo sang ES
+[[mapping]]
+namespace = "bdc.products"
+index = "products"
+
+[[mapping]]
+namespace = "bdc.shop_orders"
+index = "shop_orders"
+
+
+# lọc các document trước khi đẩy sang ES, hiện là lọc các doc được xóa mềm, ẩn, hoặc hết hàng
+# [[filter]]
+# namespace = "bdc.products"
+# path = "./filters/products_filter.js"
+# routing = true
+
+# vẫn là code js nhưng có thể để lọc field, và một số thứ khác
+[[script]]
+namespace = "bdc.products"
+path = "./transforms/products_transform.js"
+routing = true # dùng khi có ghi đè lên index
+
+[[script]]
+namespace = "bdc.shop_orders"
+path = "./transforms/shoporders_transform.js"
+routing = true # dùng khi có ghi đè lên index

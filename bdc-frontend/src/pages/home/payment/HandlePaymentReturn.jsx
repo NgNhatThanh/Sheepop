@@ -16,7 +16,7 @@ export default function HandleReturn(){
     const navigate = useNavigate()
     
     const checkPayment = () => {
-        fetchWithAuth(`${BASE_API_URL}/v1/payment/check?gateway=vnpay&${params.toString()}`, '/', true, {
+        fetchWithAuth(`${BASE_API_URL}/v1/payment/check?${params.toString()}`, '/', true, {
             method: "POST"
         })
             .then(res => res.json())

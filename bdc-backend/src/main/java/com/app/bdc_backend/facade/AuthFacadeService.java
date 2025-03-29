@@ -8,6 +8,7 @@ import com.app.bdc_backend.model.dto.request.RegistrationDTO;
 import com.app.bdc_backend.model.dto.response.OauthUserDTO;
 import com.app.bdc_backend.model.enums.RoleName;
 import com.app.bdc_backend.model.shop.Shop;
+import com.app.bdc_backend.model.user.Role;
 import com.app.bdc_backend.model.user.User;
 import com.app.bdc_backend.service.*;
 import com.app.bdc_backend.service.redis.JwtRedisService;

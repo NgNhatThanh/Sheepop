@@ -8,7 +8,7 @@ spring:
 
 app:
   cors:
-    allowedOrigins: http://localhost:3000,http://localhost:8080,http://localhost:5173
+    allowedOrigins: ${base.url}:3000,${base.url}:8080,${base.url}:5173
 
 google:
   client-id: ${GOOGLE.CLIENT_ID}
@@ -30,7 +30,7 @@ payment:
     url: ${PAY_URL}
     tmnCode: ${TMN_CODE}
     secretKey: ${SECRET_KEY}
-    returnUrl: ${RETURN_URL}
+    returnUrl: ${base.url}:5173/payment_return?gateway=vnpay
     version: ${VERSION}
     command: ${COMMAND}
     orderType: ${ORDER_TYPE}

@@ -1,12 +1,18 @@
 spring:
   data:
     mongodb:
-      host: mongo_db
+      host: mongo11
       database: bdc
       username: root
       password: root
-      authentication-database: admin
+    redis:
+      port: 6379
+      host: redis1
+  elasticsearch:
+    uris: http://host.docker.internal:9200
 
-redis:
-  host: redis
-  port: 6379
+domain:
+  name: localhost
+
+base:
+  url: http://localhost
