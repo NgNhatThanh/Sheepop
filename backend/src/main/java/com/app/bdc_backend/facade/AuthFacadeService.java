@@ -66,6 +66,8 @@ public class AuthFacadeService {
 
     public AuthResponseDTO login(LoginDTO dto)  {
         User user = userSevice.findByUsername(dto.getUsername());
+        if(user.isDeleted())
+            throw new RequestException("User was banned due to violations of our Terms of Service");
         String accessToken = jwtService.generateAccessToken(user, new HashMap<>());
         String refreshToken = jwtService.generateRefreshToken(dto.getUsername(), new HashMap<>());
         jwtRedisService.setNewRefreshToken(dto.getUsername(), refreshToken);

@@ -1,8 +1,8 @@
 spring:
   data:
     mongodb:
-      host: mongo11
       database: bdc
+      host: mongo11
       username: root
       password: root
     redis:

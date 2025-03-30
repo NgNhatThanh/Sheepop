@@ -215,6 +215,14 @@ public class OrderService {
         }
     }
 
+    public List<ShopOrder> getAllShopOrder(){
+        return shopOrderRepository.findAll();
+    }
+
+    public List<Payment> getAllPendingPayments() {
+        return paymentRepository.findAllByStatusAndType(PaymentStatus.PENDING, PaymentType.BANK_TRANSFER);
+    }
+
     public List<ShopOrder> getAllShopOrderByOrder(Order order){
         return shopOrderRepository.findByOrder(order);
     }
@@ -258,4 +266,11 @@ public class OrderService {
         return dtoItem;
     }
 
+    public List<Order> getAllOrderByPayment(List<Payment> expiredPayments) {
+        return orderRerpository.findAllByPaymentIn(expiredPayments);
+    }
+
+    public void saveAllPayments(List<Payment> expiredPayments) {
+        paymentRepository.saveAll(expiredPayments);
+    }
 }

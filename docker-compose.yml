@@ -1,0 +1,22 @@
+services:
+  front-end:
+    build: ./frontend/.
+    container_name: front-end
+    ports:
+      - 5173:5173
+
+  back-end:
+    build: ./backend/.
+    container_name: back-end
+    ports:
+      - 8080:8080
+    volumes:
+      - ./backend/m2:/root/.m2
+      - ./backend/logs:/app/logs
+    stdin_open: true
+    tty: true
+
+networks:
+  default:
+    name: db_network
+    external: true

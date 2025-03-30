@@ -9,4 +9,4 @@ FROM openjdk:17-jdk-slim
 WORKDIR /app
 ENV TZ=Asia/Ho_Chi_Minh
 COPY --from=build /app/target/*.jar app.jar
-ENTRYPOINT ["sh", "-c", "echo 'Waiting for Elasticsearch...'; sleep 30; exec java -jar app.jar --spring.profiles.active=prod"]
+ENTRYPOINT ["sh", "-c", "echo 'Waiting for Databases...'; sleep 30; exec java -jar app.jar --spring.profiles.active=prod"]

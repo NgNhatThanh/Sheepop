@@ -133,16 +133,21 @@ services:
     volumes:
       - ./redis_data:/data
 
-  app:
-    depends_on:
-      - mongo_init
-      - es-init
-    build: .
-    # restart: on-failure
-    ports:
-      - 8080:8080
-    volumes:
-      - .m2:/root/.m2
-      - ./logs:/app/logs
-    stdin_open: true
-    tty: true
+  # app:
+  #   depends_on:
+  #     - mongo_init
+  #     - es-init
+  #   build: .
+  #   # restart: on-failure
+  #   ports:
+  #     - 8080:8080
+  #   volumes:
+  #     - .m2:/root/.m2
+  #     - ./logs:/app/logs
+  #   stdin_open: true
+  #   tty: true
+
+networks:
+  default:
+    name: db_network
+    driver: bridge

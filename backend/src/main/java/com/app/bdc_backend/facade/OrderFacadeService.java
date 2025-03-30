@@ -108,7 +108,7 @@ public class OrderFacadeService {
         if(payment.getType() != PaymentType.COD) {
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(payment.getCreatedAt());
-            calendar.add(Calendar.HOUR, 1);
+            calendar.add(Calendar.MINUTE, 2);
             payment.setExpireAt(calendar.getTime());
             payment.setStatus(PaymentStatus.PENDING);
         }
