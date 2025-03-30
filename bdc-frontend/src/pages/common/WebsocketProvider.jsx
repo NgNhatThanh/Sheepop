@@ -1,5 +1,6 @@
 import { Stomp } from "@stomp/stompjs";
 import { createContext, useEffect, useState } from "react";
+import { BASE_BE_URL } from "../../constants";
 
 const SocketContext = createContext()
 
@@ -9,7 +10,7 @@ export function WebsocketProvider({ children }){
     const [isConnected, setIsConnected] = useState(false)
     
     useEffect(() => {
-        const client = Stomp.client("http://localhost:8080/ws");
+        const client = Stomp.client(`${BASE_BE_URL}/ws`);
         client.reconnectDelay = 5000;
         // client.debug = () => {}
         const accessToken = localStorage.getItem("access_token")

@@ -25,7 +25,7 @@ export default function ProfilePage(){
 
     const handleChangeAvatar = async (file) => {
         const url = await uploadImage(file)
-        handleChangeProfile("avatarUrl", url)
+        if(url) handleChangeProfile("avatarUrl", url)
     }
 
     const handleUpdateProfile = () => {
