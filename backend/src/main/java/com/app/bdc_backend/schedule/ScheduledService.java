@@ -1,22 +1,15 @@
 package com.app.bdc_backend.schedule;
 
-import com.app.bdc_backend.model.dto.BasicReviewInfo;
-import com.app.bdc_backend.model.dto.response.ProductSaleInfo;
-import com.app.bdc_backend.model.dto.response.ShopProductAndRevenue;
 import com.app.bdc_backend.model.enums.CommonEntity;
 import com.app.bdc_backend.model.enums.PaymentStatus;
 import com.app.bdc_backend.model.enums.ShopOrderStatus;
 import com.app.bdc_backend.model.order.Order;
-import com.app.bdc_backend.model.order.OrderItem;
 import com.app.bdc_backend.model.order.Payment;
 import com.app.bdc_backend.model.order.ShopOrder;
-import com.app.bdc_backend.model.product.Product;
-import com.app.bdc_backend.model.product.ProductSKU;
-import com.app.bdc_backend.model.shop.Shop;
 import com.app.bdc_backend.service.OrderService;
-import com.app.bdc_backend.service.ProductService;
+import com.app.bdc_backend.service.product.ProductService;
 import com.app.bdc_backend.service.ReviewService;
-import com.app.bdc_backend.service.ShopService;
+import com.app.bdc_backend.service.user.ShopService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;

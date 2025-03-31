@@ -1,4 +1,4 @@
-package com.app.bdc_backend.service;
+package com.app.bdc_backend.service.auth;
 
 import com.app.bdc_backend.exception.ServerException;
 import com.app.bdc_backend.model.dto.response.OauthUserDTO;

@@ -1,6 +1,6 @@
 package com.app.bdc_backend.service.redis.impl;
 
-import com.app.bdc_backend.service.JwtService;
+import com.app.bdc_backend.service.auth.JwtService;
 import com.app.bdc_backend.service.redis.JwtRedisService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

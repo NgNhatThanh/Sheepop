@@ -1,4 +1,4 @@
-package com.app.bdc_backend.service;
+package com.app.bdc_backend.config;
 
 import com.app.bdc_backend.model.enums.RoleName;
 import com.app.bdc_backend.model.user.User;

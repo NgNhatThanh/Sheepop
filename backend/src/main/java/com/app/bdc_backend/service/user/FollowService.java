@@ -1,4 +1,4 @@
-package com.app.bdc_backend.service;
+package com.app.bdc_backend.service.user;
 
 import com.app.bdc_backend.dao.FollowRepository;
 import com.app.bdc_backend.model.shop.Follow;

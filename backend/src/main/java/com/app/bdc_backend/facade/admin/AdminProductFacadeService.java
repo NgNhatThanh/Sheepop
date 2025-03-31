@@ -7,7 +7,7 @@ import com.app.bdc_backend.model.enums.NotificationScope;
 import com.app.bdc_backend.model.enums.RestrictStatus;
 import com.app.bdc_backend.model.product.Product;
 import com.app.bdc_backend.service.NotificationService;
-import com.app.bdc_backend.service.ProductService;
+import com.app.bdc_backend.service.product.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;

@@ -44,4 +44,5 @@ public interface UserRepository extends MongoRepository<User, ObjectId> {
                                                                       String username,
                                                                       Pageable pageable);
 
+    boolean existsByEmail(String email);
 }

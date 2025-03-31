@@ -11,7 +11,7 @@ import com.app.bdc_backend.model.product.ProductAttribute;
 import com.app.bdc_backend.model.product.ProductSKU;
 import com.app.bdc_backend.model.shop.Shop;
 import com.app.bdc_backend.service.OrderService;
-import com.app.bdc_backend.service.ProductService;
+import com.app.bdc_backend.service.product.ProductService;
 import com.app.bdc_backend.service.ReviewService;
 import com.app.bdc_backend.util.ModelMapper;
 import lombok.RequiredArgsConstructor;

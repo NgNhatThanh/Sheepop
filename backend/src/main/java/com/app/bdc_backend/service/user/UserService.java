@@ -1,4 +1,4 @@
-package com.app.bdc_backend.service;
+package com.app.bdc_backend.service.user;
 
 import com.app.bdc_backend.dao.RoleRepository;
 import com.app.bdc_backend.dao.UserRepository;
@@ -36,6 +36,11 @@ public class UserService {
                 && !user.getPhoneNumber().isEmpty()
                 && userRepository.existsByPhoneNumber(user.getPhoneNumber())){
             throw new RequestException("Phone number already exists");
+        }
+        if(user.getEmail() != null
+                && !user.getEmail().isEmpty()
+                && userRepository.existsByEmail(user.getEmail())){
+            throw new RequestException("Email already exists");
         }
         user.setCreatedAt(new Date());
         String hashPassword = passwordEncoder.encode(user.getPassword());

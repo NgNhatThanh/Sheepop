@@ -1,18 +1,14 @@
-package com.app.bdc_backend.service;
+package com.app.bdc_backend.service.product;
 
 import com.app.bdc_backend.dao.product.*;
 import com.app.bdc_backend.model.dto.ProductPageImpl;
-import com.app.bdc_backend.model.dto.response.MyPageImpl;
 import com.app.bdc_backend.model.dto.response.ShopProductAndRevenue;
 import com.app.bdc_backend.model.enums.RestrictStatus;
 import com.app.bdc_backend.model.product.*;
 import com.app.bdc_backend.model.shop.Shop;
 import lombok.AllArgsConstructor;
-import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.*;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;

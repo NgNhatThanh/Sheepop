@@ -7,7 +7,7 @@ import com.app.bdc_backend.model.dto.response.OffsetResponse;
 import com.app.bdc_backend.model.enums.NotificationScope;
 import com.app.bdc_backend.model.user.User;
 import com.app.bdc_backend.service.NotificationService;
-import com.app.bdc_backend.service.UserService;
+import com.app.bdc_backend.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;

@@ -1,8 +1,8 @@
 "use client"
 
 import React, { useState } from "react"
-import { BASE_API_URL, GOOGLE_LOGIN_URL } from "../../constants"
-import { setUserData } from "../../util/AuthUtil"
+import { BASE_API_URL, GOOGLE_LOGIN_URL } from "../../../constants"
+import { setUserData } from "../../../util/AuthUtil"
 import { FaGoogle } from "react-icons/fa";
 import { useSearchParams, Link } from "react-router-dom"
 
@@ -17,18 +17,18 @@ export default function RegisterPage({isAuthenticated}) {
         window.location.assign(from ? `/${from}` : '/')
     }
 
-    const [fullname, setFullname] = useState("")
+    const [fullName, setFullName] = useState("")
     const [username, setUsername] = useState("")
     const [password, setPassword] = useState("")
     const [passwordRetype, setPasswordRetype] = useState("")
-    const [phoneNumber, setPhoneNumber] = useState("")
+    const [email, setEmail] = useState("")
     const [dob, setDob] = useState("")
     const [error, setError] = useState("")
 
     const handleSubmit = async (e) => {
         e.preventDefault()
         setError("")
-        if (!fullname || !username || !password || !passwordRetype || !phoneNumber || !dob) {
+        if (!fullName || !username || !password || !passwordRetype || !email || !dob) {
             setError("Vui lòng điền đầy đủ thông tin!")
             return
         }
@@ -36,7 +36,7 @@ export default function RegisterPage({isAuthenticated}) {
             setError("Mật khẩu nhập lại không khớp!")
             return
         }
-        const regDto = { fullName: fullname, username, password, phoneNumber, dob }
+        const regDto = { fullName, username, password, email, dob }
 
         fetch(`${BASE_API_URL}/v1/auth/register`, {
             method: "POST",
@@ -76,9 +76,9 @@ export default function RegisterPage({isAuthenticated}) {
                 {error && <p className="text-red-500 text-center mb-4">{error}</p>}
 
                 <form className="space-y-4" onSubmit={handleSubmit}>
-                <Input label="Họ và Tên" type="text" value={fullname} setValue={setFullname} />
+                <Input label="Họ và Tên" type="text" value={fullName} setValue={setFullName} />
                 <Input label="Tên đăng nhập" type="text" value={username} setValue={setUsername} />
-                <Input label="Số điện thoại" type="text" value={phoneNumber} setValue={setPhoneNumber} />
+                <Input label="Số điện thoại" type="text" value={email} setValue={setEmail} />
                 <Input label="Ngày sinh" type="date" value={dob} setValue={setDob} />
                 <Input label="Mật khẩu" type="password" value={password} setValue={setPassword} />
                 <Input label="Nhập lại mật khẩu" type="password" value={passwordRetype} setValue={setPasswordRetype} />

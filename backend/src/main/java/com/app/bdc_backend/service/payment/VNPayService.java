@@ -1,4 +1,4 @@
-package com.app.bdc_backend.service;
+package com.app.bdc_backend.service.payment;
 
 import com.app.bdc_backend.config.VNPayConfig;
 import com.app.bdc_backend.exception.RequestException;

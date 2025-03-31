@@ -2,8 +2,8 @@
 
 import React from "react"
 import { useState } from "react"
-import {BASE_API_URL, GOOGLE_LOGIN_URL} from "../../constants/index.js"
-import { setUserData } from "../../util/AuthUtil.js"
+import {BASE_API_URL, GOOGLE_LOGIN_URL} from "../../../constants/index.js"
+import { setUserData } from "../../../util/AuthUtil.js"
 import { FaGoogle } from "react-icons/fa";
 import { useSearchParams, Link } from "react-router-dom"
 

@@ -1,4 +1,4 @@
-package com.app.bdc_backend.service;
+package com.app.bdc_backend.service.product;
 
 import com.app.bdc_backend.dao.product.CategoryRepository;
 import com.app.bdc_backend.model.product.Category;

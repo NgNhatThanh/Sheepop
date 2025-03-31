@@ -5,7 +5,7 @@ import com.app.bdc_backend.model.dto.request.AddCategoryDTO;
 import com.app.bdc_backend.model.dto.request.UpdateCategoryDTO;
 import com.app.bdc_backend.model.dto.response.CategoryDTO;
 import com.app.bdc_backend.model.product.Category;
-import com.app.bdc_backend.service.CategoryService;
+import com.app.bdc_backend.service.product.CategoryService;
 import com.app.bdc_backend.util.ModelMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;

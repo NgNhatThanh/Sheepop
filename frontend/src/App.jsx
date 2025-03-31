@@ -5,9 +5,10 @@ import { ERROR_TYPE } from './pages/product/ErrorPage.jsx';
 
 const HomePage = lazy(() => import('./pages/home/HomePage.jsx'));
 const MainLayout = lazy(() => import('./pages/home/MainLayout.jsx'));
-const LoginPage = lazy(() => import("./pages/login/index.jsx"))
-const RegisterPage = lazy(() => import("./pages/register/index.jsx"))
-const HandleRedirect = lazy(() => import("./pages/login/HandleOauthRedirect.jsx"))
+const LoginPage = lazy(() => import("./pages/auth/login/index.jsx"))
+const RegisterPage = lazy(() => import("./pages/auth/register/index.jsx"))
+const HandleRedirect = lazy(() => import("./pages/auth/login/HandleOauthRedirect.jsx"))
+const ForgotPassword = lazy(() => import('./pages/auth/ForgotPassword.jsx'))
 const MyShopLayout = lazy(() => import ('./pages/myshop/MyShopLayout.jsx'))
 const ShopProducts = lazy(() => import('./pages/myshop/product/ShopProducts.jsx'));
 const SaveProduct = lazy(() => import('./pages/myshop/product/SaveProduct.jsx'));
@@ -67,6 +68,7 @@ function App() {
         <Routes>
           <Route exact path='/login' element={<LoginPage isAuthenticated={isAuthenticated}/>}/>
           <Route exact path='/register' element={<RegisterPage isAuthenticated={isAuthenticated}/>}/>
+          <Route exact path='forgot_password'/>
           <Route path='/redirect/:target' element={<HandleRedirect/>}/>
           <Route path='/myshop' element={<MyShopLayout isAuthenticated={isAuthenticated}/>}>
             <Route path='dashboard' element={<ShopDashboard/>}/>

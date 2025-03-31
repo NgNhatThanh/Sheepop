@@ -6,7 +6,7 @@ import com.app.bdc_backend.model.enums.PaymentStatus;
 import com.app.bdc_backend.model.order.Order;
 import com.app.bdc_backend.model.order.Payment;
 import com.app.bdc_backend.service.OrderService;
-import com.app.bdc_backend.service.VNPayService;
+import com.app.bdc_backend.service.payment.VNPayService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

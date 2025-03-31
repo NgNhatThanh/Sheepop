@@ -87,7 +87,6 @@ export default function ChatZone(){
     useEffect(() => {
         if(!newMessage) return
         if(curChatroom === null || newMessage.chatroomId !== curChatroom.id) return
-        console.log(newMessage)
         setMessages(prev => [newMessage, ...(prev || [])])
     }, [newMessage])
 
@@ -308,7 +307,7 @@ export default function ChatZone(){
                 </div>
 
                 {modalImg && (
-                    <div className="fixed inset-0 bg-black/50 backdrop-blur-md bg-opacity-75 flex justify-center items-center z-50">
+                    <div className="fixed inset-0 bg-black/50 backdrop-blur-md bg-opacity-75 flex justify-center items-center z-20">
                         <div className="relative">
                             <button
                                 className="cursor-pointer fixed top-2 right-2 text-white bg-gray-700 p-2 rounded-full hover:bg-gray-600"

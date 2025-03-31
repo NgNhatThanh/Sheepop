@@ -6,7 +6,7 @@ import com.app.bdc_backend.model.dto.request.UpdateDisplayCategoryDTO;
 import com.app.bdc_backend.model.homepage.Banner;
 import com.app.bdc_backend.model.homepage.DisplayCategory;
 import com.app.bdc_backend.model.product.Category;
-import com.app.bdc_backend.service.CategoryService;
+import com.app.bdc_backend.service.product.CategoryService;
 import com.app.bdc_backend.service.HomepageService;
 import com.app.bdc_backend.util.ModelMapper;
 import lombok.RequiredArgsConstructor;

@@ -1,11 +1,9 @@
 package com.app.bdc_backend.controller;
 
 import com.app.bdc_backend.facade.ChatFacadeService;
-import com.app.bdc_backend.model.ChatMessage;
 import com.app.bdc_backend.model.dto.request.SendMessageDTO;
-import com.app.bdc_backend.model.dto.response.ChatMessageDTO;
 import com.app.bdc_backend.model.dto.response.ChatroomDTO;
-import com.app.bdc_backend.service.MyUserDetail;
+import com.app.bdc_backend.config.MyUserDetail;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

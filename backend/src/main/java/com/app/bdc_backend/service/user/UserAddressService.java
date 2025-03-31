@@ -1,8 +1,7 @@
-package com.app.bdc_backend.service;
+package com.app.bdc_backend.service.user;
 
 import com.app.bdc_backend.dao.UserAddressRepository;
 import com.app.bdc_backend.model.user.UserAddress;
-import com.app.bdc_backend.model.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

@@ -10,7 +10,7 @@ import { WebsocketProvider } from "../common/WebsocketProvider";
 export default function MainLayout({isAuthenticated}){
     return(
         <div className="flex flex-col min-h-screen bg-gray-100">
-            <div className="sticky top-0 z-99">
+            <div className="sticky top-0 z-10">
                 <NavBar isAuthenticated={isAuthenticated}/>
                 <Header isAuthenticated={isAuthenticated}/>
             </div>
