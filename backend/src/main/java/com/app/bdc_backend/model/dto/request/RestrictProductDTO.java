@@ -1,0 +1,17 @@
+package com.app.bdc_backend.model.dto.request;
+
+import jakarta.validation.constraints.NotBlank;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+public class RestrictProductDTO {
+
+    @NotBlank
+    private String productId;
+
+    @NotBlank
+    private String reason;
+
+}

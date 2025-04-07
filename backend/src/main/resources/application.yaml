@@ -1,0 +1,48 @@
+spring:
+  application:
+    name: bdc-backend
+  servlet:
+    multipart:
+      max-file-size: 1MB # đơn lẻ từng file
+      max-request-size: 10MB # tổng các file trong một request
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+app:
+  cors:
+    allowedOrigins: ${base.url}:3000,${base.url}:8080,${base.url}:5173
+
+google:
+  client-id: ${GOOGLE.CLIENT_ID}
+  client-secret: ${GOOGLE.CLIENT_SECRET}
+  token-endpoint: ${GOOGLE.TOKEN_ENDPOINT}
+  redirect-uri: ${GOOGLE.REDIRECT_URI}
+  userinfo-endpoint: ${GOOGLE.USERINFO_URI}
+
+redis:
+  cart:
+    expire-time-in-minutes: 30
+
+file:
+  image:
+    max-size: 1048576 # 1 MB
+
+payment:
+  vnPay:
+    url: ${PAY_URL}
+    tmnCode: ${TMN_CODE}
+    secretKey: ${SECRET_KEY}
+    returnUrl: ${base.url}:5173/payment_return?gateway=vnpay
+    version: ${VERSION}
+    command: ${COMMAND}
+    orderType: ${ORDER_TYPE}
+    max_time: ${MAX_TIME}
