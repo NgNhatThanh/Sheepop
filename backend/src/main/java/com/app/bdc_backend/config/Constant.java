@@ -17,7 +17,7 @@ public class Constant {
     @Value("${REFRESH_TOKEN_EXPIRATION}")
     private long refreshTokenExpiration;
 
-    @Value("${domain.name}")
+    @Value("${server.servlet.session.cookie.domain}")
     private String domain;
 
     private final String placeOrderRedirectUrl = "/myshop/order-list?type=1";

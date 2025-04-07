@@ -16,17 +16,18 @@ spring:
           auth: true
           starttls:
             enable: true
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE.CLIENT_ID}
+            client-secret: ${GOOGLE.CLIENT_SECRET}
+            redirect-uri: ${fe_base_url}/redirect/auth?provider=google
 
 app:
   cors:
-    allowedOrigins: ${base.url}:3000,${base.url}:8080,${base.url}:5173
-
-google:
-  client-id: ${GOOGLE.CLIENT_ID}
-  client-secret: ${GOOGLE.CLIENT_SECRET}
-  token-endpoint: ${GOOGLE.TOKEN_ENDPOINT}
-  redirect-uri: ${GOOGLE.REDIRECT_URI}
-  userinfo-endpoint: ${GOOGLE.USERINFO_URI}
+    allowedOrigins: ${server.base_url}:8080,${fe_base_url}
 
 redis:
   cart:
@@ -41,7 +42,7 @@ payment:
     url: ${PAY_URL}
     tmnCode: ${TMN_CODE}
     secretKey: ${SECRET_KEY}
-    returnUrl: ${base.url}:5173/payment_return?gateway=vnpay
+    returnUrl: ${fe_base_url}/payment_return?gateway=vnpay
     version: ${VERSION}
     command: ${COMMAND}
     orderType: ${ORDER_TYPE}

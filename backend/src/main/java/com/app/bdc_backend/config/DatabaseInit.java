@@ -1,10 +1,13 @@
 package com.app.bdc_backend.config;
 
 import com.app.bdc_backend.dao.RoleRepository;
+import com.app.bdc_backend.dao.UserRepository;
 import com.app.bdc_backend.model.enums.RoleName;
 import com.app.bdc_backend.model.user.Role;
+import com.app.bdc_backend.model.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -14,6 +17,10 @@ import java.util.List;
 public class DatabaseInit implements CommandLineRunner {
 
     private final RoleRepository roleRepository;
+
+    private final UserRepository userRepository;
+
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public void run(String... args) throws Exception {
@@ -29,7 +36,13 @@ public class DatabaseInit implements CommandLineRunner {
 
             roles.add(userRole);
             roles.add(adminRole);
+
+            User admin = new User();
+            admin.setUsername("admin");
+            admin.setPassword(passwordEncoder.encode("admin"));
+            admin.setRole(adminRole);
             roleRepository.saveAll(roles);
+            userRepository.save(admin);
         }
     }
 
