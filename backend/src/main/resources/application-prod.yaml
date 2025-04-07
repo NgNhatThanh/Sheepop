@@ -1,0 +1,18 @@
+spring:
+  data:
+    mongodb:
+      database: bdc
+      host: mongo11
+      username: root
+      password: root
+    redis:
+      port: 6379
+      host: redis1
+  elasticsearch:
+    uris: http://host.docker.internal:9200
+
+domain:
+  name: localhost
+
+base:
+  url: http://localhost

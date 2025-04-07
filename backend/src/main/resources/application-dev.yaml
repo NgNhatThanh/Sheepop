@@ -1,0 +1,24 @@
+spring:
+  data:
+    mongodb:
+      database: "bdc"
+      port: 27018
+      username: "nthanh"
+      password: "123456"
+    redis:
+      port: 6379
+      host: localhost
+  elasticsearch:
+    uris: http://localhost:9200
+
+logging:
+  level:
+    org:
+      elasticsearch:
+        client: TRACE
+
+domain:
+  name: localhost
+
+base:
+  url: http://localhost
