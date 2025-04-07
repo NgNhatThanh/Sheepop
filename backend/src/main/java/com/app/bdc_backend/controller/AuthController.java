@@ -3,6 +3,8 @@ package com.app.bdc_backend.controller;
 import com.app.bdc_backend.config.Constant;
 import com.app.bdc_backend.exception.RequestException;
 import com.app.bdc_backend.facade.AuthFacadeService;
+import com.app.bdc_backend.model.dto.request.ForgotPasswordDTO;
+import com.app.bdc_backend.model.dto.request.ResetPasswordDTO;
 import com.app.bdc_backend.model.dto.response.AuthResponseDTO;
 import com.app.bdc_backend.model.dto.request.LoginDTO;
 import com.app.bdc_backend.model.dto.request.RegistrationDTO;
@@ -36,7 +38,7 @@ public class AuthController{
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody @Valid RegistrationDTO dto){
-        AuthResponseDTO res = authFacadeService.registerUser(dto);
+        AuthResponseDTO res = authFacadeService.registerUser(dto, false);
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, getRefreshTokenCookie(res.getRefreshToken()).toString())
                 .body(Map.of(
@@ -66,18 +68,12 @@ public class AuthController{
     @PostMapping("/oauth2/login")
     public ResponseEntity<?> oauth2Login(@RequestParam(value = "provider") String provider,
                                          @RequestParam(value = "code") String code){
-        provider = provider.toLowerCase();
-        if (provider.equals("google")) {
-            AuthResponseDTO res = authFacadeService.oauthLogin(code, provider);
-            return ResponseEntity.ok()
-                    .header(HttpHeaders.SET_COOKIE, getRefreshTokenCookie(res.getRefreshToken()).toString())
-                    .body(Map.of(
-                            "token", res.getAccessToken()
-                    ));
-        }
-        else{
-            throw new RequestException("Invalid provider");
-        }
+        AuthResponseDTO res = authFacadeService.oauthLogin(code, provider);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, getRefreshTokenCookie(res.getRefreshToken()).toString())
+                .body(Map.of(
+                        "token", res.getAccessToken()
+                ));
     }
 
     @PostMapping("/logout")
@@ -110,6 +106,22 @@ public class AuthController{
                 .body(Map.of(
                         "token", res.getAccessToken()
                 ));
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody @Valid ForgotPasswordDTO dto){
+        authFacadeService.passwordRecovery(dto);
+        return ResponseEntity.ok(Map.of(
+                "status", "success"
+        ));
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody @Valid ResetPasswordDTO dto){
+        authFacadeService.resetPassword(dto);
+        return ResponseEntity.ok(Map.of(
+                "status", "success"
+        ));
     }
 
     private ResponseCookie getRefreshTokenCookie(String token){

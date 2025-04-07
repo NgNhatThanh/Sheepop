@@ -6,6 +6,8 @@ import com.app.bdc_backend.exception.RequestException;
 import com.app.bdc_backend.model.enums.RoleName;
 import com.app.bdc_backend.model.user.Role;
 import com.app.bdc_backend.model.user.User;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -104,4 +107,11 @@ public class UserService {
     }
 
 
+    public List<User> getAllUsersHasUsernameStartWith(String prefix) {
+        return userRepository.findAllByUsernameStartsWith(prefix);
+    }
+
+    public User getByEmail(@NotBlank @Email String email) {
+        return userRepository.findByEmail(email);
+    }
 }
