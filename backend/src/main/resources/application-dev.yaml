@@ -17,8 +17,14 @@ logging:
       elasticsearch:
         client: TRACE
 
-domain:
-  name: localhost
+server:
+  base_url: http://localhost
+  servlet:
+    session:
+      cookie:
+        domain: localhost
 
 base:
   url: http://localhost
+
+fe_base_url: ${server.base_url}:5173
