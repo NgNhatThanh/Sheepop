@@ -32,6 +32,8 @@ export async function checkAuthenticated(){
             ok = false
         }
     }
+    // const userData = JSON.parse(localStorage.getItem('userData'))
+    // return userData !== null
     return ok
 }
 

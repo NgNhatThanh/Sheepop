@@ -1,6 +1,6 @@
 import { useState } from "react"
-import { fetchWithAuth } from "../../util/AuthUtil"
-import { BASE_API_URL } from "../../constants"
+import { fetchWithAuth } from "../../../util/AuthUtil"
+import { BASE_API_URL } from "../../../constants"
 import { ToastContainer, toast } from "react-toastify"
 
 export default function CancelOrderForm({ reasons, whoCancel, closeForm, order }){

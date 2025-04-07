@@ -1,5 +1,6 @@
 package com.app.bdc_backend.controller;
 
+import com.app.bdc_backend.exception.RequestException;
 import com.app.bdc_backend.model.address.District;
 import com.app.bdc_backend.model.address.Ward;
 import com.app.bdc_backend.service.AddressService;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -28,7 +30,7 @@ public class AddressController {
     public ResponseEntity<?> getDistrictList(@RequestParam int provinceId){
         List<District> res = addressService.findDistrictListByProvinceId(provinceId);
         if(res == null || res.isEmpty()){
-            return ResponseEntity.notFound().build();
+            throw new RequestException("District not found");
         }
         return ResponseEntity.ok(res);
     }
@@ -37,7 +39,7 @@ public class AddressController {
     public ResponseEntity<?> getWardList(@RequestParam int districtId){
         List<Ward> res = addressService.findWardListByDistrictId(districtId);
         if(res == null || res.isEmpty()){
-            return ResponseEntity.notFound().build();
+            throw new RequestException("Ward not found");
         }
         return ResponseEntity.ok(res);
     }

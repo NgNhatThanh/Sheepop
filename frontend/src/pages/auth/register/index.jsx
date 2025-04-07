@@ -76,16 +76,16 @@ export default function RegisterPage({isAuthenticated}) {
                 {error && <p className="text-red-500 text-center mb-4">{error}</p>}
 
                 <form className="space-y-4" onSubmit={handleSubmit}>
-                <Input label="Họ và Tên" type="text" value={fullName} setValue={setFullName} />
-                <Input label="Tên đăng nhập" type="text" value={username} setValue={setUsername} />
-                <Input label="Số điện thoại" type="text" value={email} setValue={setEmail} />
-                <Input label="Ngày sinh" type="date" value={dob} setValue={setDob} />
-                <Input label="Mật khẩu" type="password" value={password} setValue={setPassword} />
-                <Input label="Nhập lại mật khẩu" type="password" value={passwordRetype} setValue={setPasswordRetype} />
+                    <Input label="Họ và Tên" type="text" value={fullName} setValue={setFullName} />
+                    <Input label="Tên đăng nhập" type="text" value={username} setValue={setUsername} />
+                    <Input label="Số điện thoại" type="text" value={email} setValue={setEmail} />
+                    <Input label="Ngày sinh" type="date" value={dob} setValue={setDob} />
+                    <Input label="Mật khẩu" type="password" value={password} setValue={setPassword} />
+                    <Input label="Nhập lại mật khẩu" type="password" value={passwordRetype} setValue={setPasswordRetype} />
 
-                <button type="submit" className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 rounded-lg transition duration-200 cursor-pointer">
-                    Đăng Ký
-                </button>
+                    <button type="submit" className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 rounded-lg transition duration-200 cursor-pointer">
+                        Đăng Ký
+                    </button>
                 </form>
 
                 <div className="flex items-center my-4">
@@ -120,6 +120,7 @@ export default function RegisterPage({isAuthenticated}) {
             <input
                 type={type}
                 value={value}
+                placeholder={label}
                 onChange={(e) => setValue(e.target.value)}
                 className="w-full px-4 py-2 mt-1 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required

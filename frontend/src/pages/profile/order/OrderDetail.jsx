@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { useNavigate, useParams, Link } from "react-router-dom"
-import { fetchWithAuth } from "../../util/AuthUtil"
-import { BASE_API_URL } from "../../constants"
+import { fetchWithAuth } from "../../../util/AuthUtil"
+import { BASE_API_URL } from "../../../constants"
 import OrderTrackSection from './OrderTrackSection'
 
 const statusText = [

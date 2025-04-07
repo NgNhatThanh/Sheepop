@@ -24,10 +24,6 @@ export default function LoginPage({isAuthenticated}) {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError("")
-    if (!username || !password) {
-      setError("Please fill in all fields")
-      return
-    }
 
     const loginDto = {
       "username": username,
@@ -82,7 +78,7 @@ export default function LoginPage({isAuthenticated}) {
 
         <p className="text-red-500">{error}</p>
 
-        <form className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-gray-700">Tên đăng nhập</label>
             <input
@@ -90,6 +86,7 @@ export default function LoginPage({isAuthenticated}) {
               placeholder="Nhập username"
               className="w-full px-4 py-2 mt-1 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               onChange={e => setUsername(e.target.value.trim())}
+              required
             />
           </div>
 
@@ -100,13 +97,13 @@ export default function LoginPage({isAuthenticated}) {
               placeholder="Nhập mật khẩu"
               className="w-full px-4 py-2 mt-1 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               onChange={e => setPassword(e.target.value.trim())}
+              required
             />
           </div>
 
           <button
             type="submit"
             className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 rounded-lg transition duration-200 cursor-pointer"
-            onClick={handleSubmit}
           >
             Đăng Nhập
           </button>
@@ -132,6 +129,15 @@ export default function LoginPage({isAuthenticated}) {
             Đăng ký
           </Link>
         </p>
+        
+        <div className="text-center">
+          <Link
+            to={'/forgot-password'}
+            className="text-blue-500 hover:underline"
+          >
+            Quên mật khẩu         
+          </Link>
+        </div>
         
       </div>
     </div>

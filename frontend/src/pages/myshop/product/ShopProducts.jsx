@@ -6,14 +6,9 @@ import { formatDate } from '../../../util/DateUtil'
 import { BASE_API_URL } from "../../../constants";
 import Pagination from "../../common/Pagination";
 import { ToastContainer, toast } from "react-toastify";
-import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
 import { LuPackageX } from "react-icons/lu";
 import TableLoading from '../../common/TableLoading'
+import Modal from '../../common/Modal'
 
 const tabs = [
     "Đang kích hoạt",
@@ -425,56 +420,28 @@ export default function ShopProducts(){
                             ))
                         )}
 
-                        <Dialog
+                        <Modal
                             open={changeVisibleProductId !== null}
+                            title='Thay đổi hiển thị sản phẩm?'
+                            content='Người mua sẽ không nhìn thấy và mua được sản phẩm của bạn nếu bạn ẩn đi,
+                                    và ngược lại'
                             onclose={() => setChangeVisibleProductId(null)}
-                            aria-labelledby="alert-dialog-title"
-                            aria-describedby="alert-dialog-description"
-                        >
-                            <DialogTitle id="alert-dialog-title">
-                                {"Thay đổi hiển thị sản phẩm?"}
-                            </DialogTitle>
-                            <DialogContent>
-                                <DialogContentText id="alert-dialog-description">
-                                    Người mua sẽ không nhìn thấy và mua được sản phẩm của bạn nếu bạn ẩn đi,
-                                    và ngược lại
-                                </DialogContentText>
-                            </DialogContent>
-                            <DialogActions>
-                                <Button onClick={() => setChangeVisibleProductId(null)}>Hủy</Button>
-                                <Button onClick={() => {
-                                    changeProductVisible(changeVisibleProductId)
-                                    setChangeVisibleProductId(null)
-                                }} autoFocus>
-                                Đồng ý
-                                </Button>
-                            </DialogActions>
-                        </Dialog>
+                            onSucess={() => {
+                                changeProductVisible(changeVisibleProductId)
+                                setChangeVisibleProductId(null)
+                            }}
+                        />
 
-                        <Dialog
+                        <Modal
                             open={deleteProductId !== null}
+                            title='Xóa sản phẩm?'
+                            content='Thao tác này sẽ xóa hoàn toàn sản phẩm của bạn, và không thể hoàn tác'
                             onclose={() => setDeleteProductId(null)}
-                            aria-labelledby="alert-dialog-title"
-                            aria-describedby="alert-dialog-description"
-                        >
-                            <DialogTitle id="alert-dialog-title">
-                                {"Xóa sản phẩm?"}
-                            </DialogTitle>
-                            <DialogContent>
-                                <DialogContentText id="alert-dialog-description">
-                                    Thao tác này sẽ xóa hoàn toàn sản phẩm của bạn, và không thể hoàn tác
-                                </DialogContentText>
-                            </DialogContent>
-                            <DialogActions>
-                                <Button onClick={() => setDeleteProductId(null)}>Hủy</Button>
-                                <Button onClick={() => {
-                                    handleDeleteProduct(deleteProductId)
-                                    setDeleteProductId(null)
-                                }} autoFocus>
-                                Đồng ý
-                                </Button>
-                            </DialogActions>
-                        </Dialog>
+                            onSucess={() => {
+                                handleDeleteProduct(deleteProductId)
+                                setDeleteProductId(null)
+                            }}
+                        />
 
                         </React.Fragment>
                     ))}

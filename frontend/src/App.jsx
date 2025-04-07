@@ -8,7 +8,8 @@ const MainLayout = lazy(() => import('./pages/home/MainLayout.jsx'));
 const LoginPage = lazy(() => import("./pages/auth/login/index.jsx"))
 const RegisterPage = lazy(() => import("./pages/auth/register/index.jsx"))
 const HandleRedirect = lazy(() => import("./pages/auth/login/HandleOauthRedirect.jsx"))
-const ForgotPassword = lazy(() => import('./pages/auth/ForgotPassword.jsx'))
+const ForgotPasswordPage = lazy(() => import('./pages/auth/ForgotPasswordPage.jsx'))
+const ResetPasswordPage = lazy(() => import('./pages/auth/ResetPasswordPage.jsx'))
 const MyShopLayout = lazy(() => import ('./pages/myshop/MyShopLayout.jsx'))
 const ShopProducts = lazy(() => import('./pages/myshop/product/ShopProducts.jsx'));
 const SaveProduct = lazy(() => import('./pages/myshop/product/SaveProduct.jsx'));
@@ -19,11 +20,11 @@ const ErrorPage = lazy(() => import('./pages/product/ErrorPage.jsx'));
 const CartPage = lazy(() => import('./pages/cart/CartPage.jsx'))
 const CheckoutPage = lazy(() => import('./pages/checkout/CheckoutPage.jsx'))
 const ProfilePageLayout = lazy(() => import('./pages/profile/ProfilePageLayout.jsx'))
-const AddressPage = lazy(() => import('./pages/profile/AddressPage.jsx'))
+const AddressPage = lazy(() => import('./pages/profile/address/AddressPage.jsx'))
 const ProfilePage = lazy(() => import('./pages/profile/ProfilePage.jsx'))
 const SuccessPage = lazy(() => import('./pages/order/success.jsx'));
-const OrdersPage = lazy(() => import('./pages/profile/OrdersPage.jsx'));
-const OrderDetail = lazy(() => import('./pages/profile/OrderDetail.jsx'));
+const OrdersPage = lazy(() => import('./pages/profile/order/OrdersPage.jsx'));
+const OrderDetail = lazy(() => import('./pages/profile/order/OrderDetail.jsx'));
 const ShopShipping = lazy(() => import('./pages/myshop/setting/ShopShipping.jsx'));
 const ShopProfile = lazy(() => import('./pages/myshop/setting/ShopProfile.jsx'));
 const PreviewProductPage = lazy(() => import('./pages/myshop/product/PreviewProductPage.jsx'))
@@ -68,7 +69,8 @@ function App() {
         <Routes>
           <Route exact path='/login' element={<LoginPage isAuthenticated={isAuthenticated}/>}/>
           <Route exact path='/register' element={<RegisterPage isAuthenticated={isAuthenticated}/>}/>
-          <Route exact path='forgot_password'/>
+          <Route exact path='/forgot-password' element={<ForgotPasswordPage/>}/>
+          <Route exact path='/reset-password/:token' element={<ResetPasswordPage/>}/>
           <Route path='/redirect/:target' element={<HandleRedirect/>}/>
           <Route path='/myshop' element={<MyShopLayout isAuthenticated={isAuthenticated}/>}>
             <Route path='dashboard' element={<ShopDashboard/>}/>

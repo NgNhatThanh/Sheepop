@@ -20,6 +20,9 @@ public class Constant {
     @Value("${server.servlet.session.cookie.domain}")
     private String domain;
 
+    @Value("${fe_base_url}")
+    private String feBaseUrl;
+
     private final String placeOrderRedirectUrl = "/myshop/order-list?type=1";
 
 }

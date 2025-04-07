@@ -3,6 +3,8 @@ package com.app.bdc_backend.controller;
 import com.app.bdc_backend.config.Constant;
 import com.app.bdc_backend.exception.RequestException;
 import com.app.bdc_backend.facade.AuthFacadeService;
+import com.app.bdc_backend.model.dto.request.ForgotPasswordDTO;
+import com.app.bdc_backend.model.dto.request.ResetPasswordDTO;
 import com.app.bdc_backend.model.dto.response.AuthResponseDTO;
 import com.app.bdc_backend.model.dto.request.LoginDTO;
 import com.app.bdc_backend.model.dto.request.RegistrationDTO;
@@ -95,7 +97,7 @@ public class AuthController{
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/refresh")
+    @GetMapping("/refreshToken")
     public ResponseEntity<Map<String, String>> refreshToken(
             @CookieValue(value = REFRESH_TOKEN_COOKIE_NAME, defaultValue = "") String refreshToken){
         AuthResponseDTO res = authFacadeService.refresh(refreshToken);
@@ -104,6 +106,22 @@ public class AuthController{
                 .body(Map.of(
                         "token", res.getAccessToken()
                 ));
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody @Valid ForgotPasswordDTO dto){
+        authFacadeService.passwordRecovery(dto);
+        return ResponseEntity.ok(Map.of(
+                "status", "success"
+        ));
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody @Valid ResetPasswordDTO dto){
+        authFacadeService.resetPassword(dto);
+        return ResponseEntity.ok(Map.of(
+                "status", "success"
+        ));
     }
 
     private ResponseCookie getRefreshTokenCookie(String token){

@@ -2,6 +2,8 @@ package com.app.bdc_backend.dao;
 
 import com.app.bdc_backend.model.user.Role;
 import com.app.bdc_backend.model.user.User;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -48,4 +50,6 @@ public interface UserRepository extends MongoRepository<User, ObjectId> {
     boolean existsByEmail(String email);
 
     List<User> findAllByUsernameStartsWith(String prefix);
+
+    User findByEmail(String email);
 }

@@ -21,4 +21,15 @@ public class UserAddressService {
         userAddressRepository.save(userAddress);
     }
 
+    public UserAddress getById(String addressId) {
+        return userAddressRepository.findById(addressId).orElse(null);
+    }
+
+    public void delete(UserAddress address) {
+        userAddressRepository.delete(address);
+    }
+
+    public void saveAll(List<UserAddress> needUpdate) {
+        userAddressRepository.saveAll(needUpdate);
+    }
 }
