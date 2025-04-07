@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import {BASE_API_URL} from "../../constants/index"
-import { setUserData } from '../../util/AuthUtil';
+import {BASE_API_URL} from "../../../constants/index"
+import { setUserData } from '../../../util/AuthUtil';
 
 function sendApi(code){
     fetch(`${BASE_API_URL}/v1/auth/oauth2/login?provider=google&code=${code}`, {

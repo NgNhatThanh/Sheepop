@@ -1,4 +1,4 @@
-package com.app.bdc_backend.model.dto;
+package com.app.bdc_backend.model.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

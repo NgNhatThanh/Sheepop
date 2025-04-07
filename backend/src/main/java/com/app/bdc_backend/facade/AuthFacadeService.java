@@ -2,7 +2,7 @@ package com.app.bdc_backend.facade;
 
 import com.app.bdc_backend.exception.RequestException;
 import com.app.bdc_backend.model.cart.Cart;
-import com.app.bdc_backend.model.dto.AuthResponseDTO;
+import com.app.bdc_backend.model.dto.response.AuthResponseDTO;
 import com.app.bdc_backend.model.dto.request.LoginDTO;
 import com.app.bdc_backend.model.dto.request.RegistrationDTO;
 import com.app.bdc_backend.model.dto.response.OauthUserDTO;
@@ -27,7 +27,7 @@ import java.util.HashMap;
 @RequiredArgsConstructor
 public class AuthFacadeService {
 
-    private final UserService userSevice;
+    private final UserService userService;
 
     private final JwtService jwtService;
 
@@ -50,7 +50,7 @@ public class AuthFacadeService {
             throw new RequestException("Invalid user information");
         }
         newUser.setAvatarUrl(userAvatarUrl);
-        userSevice.register(newUser);
+        userService.register(newUser);
         String accessToken = jwtService.generateAccessToken(newUser, new HashMap<>());
         String refreshToken = jwtService.generateRefreshToken(newUser.getUsername(), new HashMap<>());
         jwtRedisService.setNewRefreshToken(newUser.getUsername(), refreshToken);
@@ -68,7 +68,7 @@ public class AuthFacadeService {
     }
 
     public AuthResponseDTO login(LoginDTO dto)  {
-        User user = userSevice.findByUsername(dto.getUsername());
+        User user = userService.findByUsername(dto.getUsername());
         if(user.isDeleted())
             throw new RequestException("User was banned due to violations of our Terms of Service");
         String accessToken = jwtService.generateAccessToken(user, new HashMap<>());
@@ -81,7 +81,7 @@ public class AuthFacadeService {
 
     public AuthResponseDTO oauthLogin(String code, String provider)  {
         OauthUserDTO userInfo = oauth2Service.getOauth2Profile(code, provider);
-        User user = userSevice.findByUsername(userInfo.getUsername());
+        User user = userService.findByUsername(userInfo.getUsername());
         if(user == null){
             return registerUser(RegistrationDTO.builder()
                     .username(userInfo.getUsername())
@@ -112,7 +112,7 @@ public class AuthFacadeService {
         )
             throw new RequestException("Refresh token is invalid");
         String username = jwtService.extractUsername(refreshToken);
-        User user = userSevice.findByUsername(username);
+        User user = userService.findByUsername(username);
         String accessToken = jwtService.generateAccessToken(
                 user,
                 new HashMap<>());

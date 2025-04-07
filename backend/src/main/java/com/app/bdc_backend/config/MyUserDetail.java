@@ -24,8 +24,6 @@ public class MyUserDetail implements UserDetails {
     public MyUserDetail(User user){
         this.username = user.getUsername();
         this.password = user.getPassword();
-        System.out.println("ADMIN role: " + RoleName.ADMIN);
-        System.out.println("User role: " + user.getRole().getName().toString());
         this.authorities = List.of(new SimpleGrantedAuthority(user.getRole().getName().toString()));
     }
 

@@ -21,8 +21,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     private JwtService jwtService;
 
-    private ObjectMapper mapper;
-
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,

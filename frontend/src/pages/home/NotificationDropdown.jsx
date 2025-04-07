@@ -28,7 +28,7 @@ export default function NotificationDropdown(){
   
   const markAsRead = (id) => {
     if(id){
-      const isRead = notifications.some(noti => noti.id === id && noti.read);
+      const isRead = notifications[activeScope].some(noti => noti.id === id && noti.read);
       if(isRead) return
     }
 
@@ -202,13 +202,15 @@ export default function NotificationDropdown(){
             {notifications[activeScope].length > 0 ? (
               <div>
                 {notifications[activeScope].map((notification) => (
-                  <a
-                    href={notification.redirectUrl}
+                  <div
                     key={notification.id}
-                    className={`p-2 flex justify-between border-b border-gray-100 hover:bg-gray-100 cursor-pointer ${
+                    className={`cursor-pointer p-2 flex justify-between border-b border-gray-100 hover:bg-gray-100 cursor-pointer ${
                       notification.read ?  "" : "bg-blue-50"
                     }`}
-                    onClick={() => markAsRead(notification.id)}
+                    onClick={() => {
+                      markAsRead(notification.id)
+                      window.location.assign(notification.redirectUrl)
+                    }}
                   >
                     <div className="flex gap-2">
                       <img
@@ -230,7 +232,7 @@ export default function NotificationDropdown(){
                         <div className="h-2 w-2 rounded-full bg-blue-500"></div>
                       </div>
                     )}
-                  </a>
+                  </div>
                 ))}
                 {loading && (
                   <div className="flex justify-center p-4">

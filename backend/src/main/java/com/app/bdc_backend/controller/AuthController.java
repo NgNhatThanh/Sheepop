@@ -3,10 +3,9 @@ package com.app.bdc_backend.controller;
 import com.app.bdc_backend.config.Constant;
 import com.app.bdc_backend.exception.RequestException;
 import com.app.bdc_backend.facade.AuthFacadeService;
-import com.app.bdc_backend.model.dto.AuthResponseDTO;
+import com.app.bdc_backend.model.dto.response.AuthResponseDTO;
 import com.app.bdc_backend.model.dto.request.LoginDTO;
 import com.app.bdc_backend.model.dto.request.RegistrationDTO;
-import com.app.bdc_backend.model.enums.RoleName;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -16,8 +15,6 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -104,10 +101,10 @@ public class AuthController{
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/refreshToken")
+    @GetMapping("/refresh")
     public ResponseEntity<Map<String, String>> refreshToken(
-            @CookieValue(value = REFRESH_TOKEN_COOKIE_NAME, defaultValue = "") String token){
-        AuthResponseDTO res = authFacadeService.refresh(token);
+            @CookieValue(value = REFRESH_TOKEN_COOKIE_NAME, defaultValue = "") String refreshToken){
+        AuthResponseDTO res = authFacadeService.refresh(refreshToken);
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, getRefreshTokenCookie(res.getRefreshToken()).toString())
                 .body(Map.of(
