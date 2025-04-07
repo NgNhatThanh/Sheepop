@@ -110,4 +110,8 @@ public class UserService {
     public List<User> getAllUsersHasUsernameStartWith(String prefix) {
         return userRepository.findAllByUsernameStartsWith(prefix);
     }
+
+    public User getByEmail(@NotBlank @Email String email) {
+        return userRepository.findByEmail(email);
+    }
 }

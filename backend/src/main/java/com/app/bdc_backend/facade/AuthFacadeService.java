@@ -1,7 +1,12 @@
 package com.app.bdc_backend.facade;
 
+import com.app.bdc_backend.config.Constant;
+import com.app.bdc_backend.dao.ForgotPasswordDAO;
 import com.app.bdc_backend.exception.RequestException;
+import com.app.bdc_backend.model.ForgotPasswordToken;
 import com.app.bdc_backend.model.cart.Cart;
+import com.app.bdc_backend.model.dto.request.ForgotPasswordDTO;
+import com.app.bdc_backend.model.dto.request.ResetPasswordDTO;
 import com.app.bdc_backend.model.dto.response.AuthResponseDTO;
 import com.app.bdc_backend.model.dto.request.LoginDTO;
 import com.app.bdc_backend.model.dto.request.RegistrationDTO;
@@ -18,8 +23,11 @@ import com.app.bdc_backend.service.user.ShopService;
 import com.app.bdc_backend.service.user.UserService;
 import com.app.bdc_backend.util.ModelMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -36,9 +44,17 @@ public class AuthFacadeService {
 
     private final Oauth2Service oauth2Service;
 
-    private final ShopService shopSevice;
+    private final ShopService shopService;
 
-    private final CartService cartSevice;
+    private final CartService cartService;
+
+    private final MailService mailService;
+
+    private final ForgotPasswordDAO forgotPasswordDAO;
+
+    private final Constant constant;
+
+    private final PasswordEncoder passwordEncoder;
 
     private final String userAvatarUrl = "https://res.cloudinary.com/daxt0vwoc/image/upload/v1740297885/User-avatar.svg_nihuye.png";
 
@@ -83,10 +99,10 @@ public class AuthFacadeService {
         shop.setDescription(dto.getFullName() + "'s shop");
         shop.setCreatedAt(new Date());
         shop.setAvatarUrl(shopAvatarUrl);
-        shopSevice.save(shop);
+        shopService.save(shop);
         Cart cart = new Cart();
         cart.setUser(newUser);
-        cartSevice.save(cart);
+        cartService.save(cart);
         return new AuthResponseDTO(accessToken, refreshToken, false);
     }
 
@@ -150,4 +166,39 @@ public class AuthFacadeService {
                 !user.getRole().getName().toString().equals(RoleName.USER.toString()));
     }
 
+    public void passwordRecovery(ForgotPasswordDTO dto) {
+        User user = userService.getByEmail(dto.getEmail());
+        if(user == null){
+            throw new RequestException("Email không tồn tại");
+        }
+        String email = user.getEmail();
+        LocalDateTime tenMinutesLater = LocalDateTime.now().plusMinutes(10);
+        Date expire = Date.from(tenMinutesLater.atZone(ZoneId.systemDefault()).toInstant());
+        ForgotPasswordToken token = ForgotPasswordToken.builder()
+                .user(user)
+                .expiredAt(expire)
+                .build();
+        forgotPasswordDAO.save(token);
+        String recoveryUrl = constant.getFeBaseUrl() + "/reset-password/" + token.getToken();
+        mailService.sendEmail(email, "[Sheepop] Yêu cầu đặt lại mật khẩu",
+                String.format("""
+                        Hãy truy cập vào link sau để đặt lại mật khẩu: \
+                        
+                        %s \
+                        
+                        Link sẽ hết hạn trong 10 phút""", recoveryUrl));
+    }
+
+    public void resetPassword(ResetPasswordDTO dto) {
+        ForgotPasswordToken token = forgotPasswordDAO.findByToken(dto.getToken());
+        if(token == null)
+            throw new RequestException("Yêu cầu không hợp lệ");
+        if(token.getExpiredAt().before(new Date()))
+            throw new RequestException("Yêu cầu đã hết hạn, vui lòng tạo yêu cầu mới");
+        User user = token.getUser();
+        String hashPwd = passwordEncoder.encode(dto.getNewPassword());
+        user.setPassword(hashPwd);
+        userService.save(user);
+        forgotPasswordDAO.delete(token);
+    }
 }
