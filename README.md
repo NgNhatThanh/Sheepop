@@ -49,7 +49,10 @@ Admins' page
 - JWT
 - Oauth2 with Google
 
-**External API**
+**Storage**
+- Cloudinary for storing images
+
+**External Service**
 - VNPay for online banking
 - GHN for calculating shipping fee
 
