@@ -2,10 +2,10 @@ import { useState } from "react";
 import { AiFillStar, AiOutlineStar } from "react-icons/ai";
 import { FiUpload } from "react-icons/fi";
 import { FaTimes } from 'react-icons/fa'
-import { uploadImage } from '../../util/UploadUtil'
+import { uploadImage } from '../../../util/UploadUtil'
 import { toast } from "react-toastify";
-import { fetchWithAuth } from "../../util/AuthUtil";
-import { BASE_API_URL } from "../../constants";
+import { fetchWithAuth } from "../../../util/AuthUtil";
+import { BASE_API_URL } from "../../../constants";
 
 export default function ReviewForm({ shopOrder, closeForm, onSuccess }) {
   const [reviews, setReviews] = useState(

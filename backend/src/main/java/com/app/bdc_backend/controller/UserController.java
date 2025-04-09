@@ -2,6 +2,7 @@ package com.app.bdc_backend.controller;
 
 import com.app.bdc_backend.facade.UserFacadeService;
 import com.app.bdc_backend.model.dto.request.AddAddressDTO;
+import com.app.bdc_backend.model.dto.request.UpdateAddressDTO;
 import com.app.bdc_backend.model.dto.request.UpdateProfileDTO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +38,24 @@ public class UserController {
     @PostMapping("/address/add")
     public ResponseEntity<?> addAddress(@RequestBody @Valid AddAddressDTO dto){
         return ResponseEntity.ok(userFacadeService.addAddress(dto));
+    }
+
+    @PostMapping("/address/set-primary")
+    public ResponseEntity<?> makeAddressPrimary(@RequestParam String addressId){
+        userFacadeService.makeAddressPrimary(addressId);
+        return ResponseEntity.ok(Map.of("status", "success"));
+    }
+
+    @PostMapping("/address/update")
+    public ResponseEntity<?> updateAddress(@RequestBody @Valid UpdateAddressDTO dto){
+        userFacadeService.updateAddress(dto);
+        return ResponseEntity.ok(Map.of("status", "success"));
+    }
+
+    @PostMapping("/address/delete")
+    public ResponseEntity<?> deleteAddress(@RequestParam String addressId){
+        userFacadeService.deleteAddress(addressId);
+        return ResponseEntity.ok(Map.of("status", "success"));
     }
 
     @PostMapping("/follow")

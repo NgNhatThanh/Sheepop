@@ -97,7 +97,7 @@ public class AuthController{
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/refresh")
+    @GetMapping("/refreshToken")
     public ResponseEntity<Map<String, String>> refreshToken(
             @CookieValue(value = REFRESH_TOKEN_COOKIE_NAME, defaultValue = "") String refreshToken){
         AuthResponseDTO res = authFacadeService.refresh(refreshToken);

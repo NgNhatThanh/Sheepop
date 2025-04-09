@@ -1,7 +1,7 @@
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
-import { fetchWithAuth } from "../../util/AuthUtil";
-import { BASE_API_URL } from "../../constants";
+import { fetchWithAuth } from "../../../util/AuthUtil";
+import { BASE_API_URL } from "../../../constants";
 import { BsClipboard2PlusFill } from "react-icons/bs";
 import { ToastContainer, toast } from "react-toastify";
 import ReviewForm from "./ReviewForm";
