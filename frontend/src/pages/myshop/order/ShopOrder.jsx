@@ -6,7 +6,7 @@ import { BASE_API_URL } from "../../../constants";
 import { BsClipboard2PlusFill } from "react-icons/bs";
 import { FaChevronDown } from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
-import CancelOrderForm from '../../profile/CancelOrderForm.jsx'
+import CancelOrderForm from '../../profile/order/CancelOrderForm.jsx'
 import Pagination from "../../common/Pagination.jsx";
 
 const tabs = [

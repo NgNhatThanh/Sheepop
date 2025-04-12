@@ -1,7 +1,9 @@
 package com.app.bdc_backend.controller.admin;
 
+import com.app.bdc_backend.config.SwaggerSecurityName;
 import com.app.bdc_backend.model.product.Category;
 import com.app.bdc_backend.service.product.CategoryService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,14 +15,8 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/admin")
+@SecurityRequirement(name = SwaggerSecurityName.JWT_AUTH)
 public class AdminController {
-
-    private final CategoryService categoryService;
-
-    @GetMapping("/categories")
-    public List<Category> getAllCategories() {
-        return categoryService.findAll();
-    }
 
     @GetMapping("/ping")
     public ResponseEntity<?> ping(){
