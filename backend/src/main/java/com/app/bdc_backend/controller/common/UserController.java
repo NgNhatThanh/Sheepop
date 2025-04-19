@@ -3,6 +3,7 @@ package com.app.bdc_backend.controller.common;
 import com.app.bdc_backend.config.SwaggerSecurityName;
 import com.app.bdc_backend.facade.UserFacadeService;
 import com.app.bdc_backend.model.dto.request.AddAddressDTO;
+import com.app.bdc_backend.model.dto.request.ChangePasswordDTO;
 import com.app.bdc_backend.model.dto.request.UpdateAddressDTO;
 import com.app.bdc_backend.model.dto.request.UpdateProfileDTO;
 import com.app.bdc_backend.model.dto.response.UserResponseDTO;
@@ -37,6 +38,15 @@ public class UserController {
     @Operation(summary = "Update user profile information")
     public ResponseEntity<UserResponseDTO> updateProfile(@RequestBody @Valid UpdateProfileDTO dto) {
         return ResponseEntity.ok(userFacadeService.updateProfile(dto));
+    }
+
+    @PostMapping("/change-password")
+    @Operation(summary = "Change user's password")
+    public ResponseEntity<?> changePassword(@RequestBody @Valid ChangePasswordDTO dto) {
+        userFacadeService.changePassword(dto);
+        return ResponseEntity.ok().body(Map.of(
+                "status", "success"
+        ));
     }
 
     @GetMapping("/address/get-list")

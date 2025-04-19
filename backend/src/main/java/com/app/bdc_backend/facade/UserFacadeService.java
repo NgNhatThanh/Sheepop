@@ -2,6 +2,7 @@ package com.app.bdc_backend.facade;
 
 import com.app.bdc_backend.exception.RequestException;
 import com.app.bdc_backend.model.dto.request.AddAddressDTO;
+import com.app.bdc_backend.model.dto.request.ChangePasswordDTO;
 import com.app.bdc_backend.model.dto.request.UpdateAddressDTO;
 import com.app.bdc_backend.model.dto.request.UpdateProfileDTO;
 import com.app.bdc_backend.model.dto.response.UserResponseDTO;
@@ -18,6 +19,7 @@ import com.app.bdc_backend.util.ModelMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -36,6 +38,8 @@ public class UserFacadeService {
     private final FollowService followService;
 
     private final ShopService shopService;
+
+    private final PasswordEncoder passwordEncoder;
 
     public UserResponseDTO getUserProfile(){
         String curUsername = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -191,4 +195,15 @@ public class UserFacadeService {
         userAddressService.delete(address);
     }
 
+    public void changePassword(@Valid ChangePasswordDTO dto) {
+        if(dto.getNewPassword().equals(dto.getOldPassword()))
+            throw new RequestException("Old and new password are the same");
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userService.findByUsername(username);
+        if(!passwordEncoder.matches(dto.getOldPassword(), user.getPassword()))
+            throw new RequestException("Old password is wrong");
+        String hashedPassword = passwordEncoder.encode(dto.getNewPassword());
+        user.setPassword(hashedPassword);
+        userService.save(user);
+    }
 }
