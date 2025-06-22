@@ -11,6 +11,7 @@ public class RestrictUserDTO {
     @NotBlank
     private String userId;
 
+    @NotBlank
     private String reason;
 
 }

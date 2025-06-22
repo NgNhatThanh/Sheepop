@@ -32,6 +32,17 @@ public class SecurityConfig {
 
     private CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
+    private static final String[] API_DOC_ENDPOINTS = {
+            "/swagger-ui/**",
+            "/v2/api-docs",
+            "/v3/api-docs",
+            "/v3/api-docs/**",
+            "/configuration/ui",
+            "/configuration/security",
+            "/swagger-resources/**",
+            "/swagger-ui.html",
+    };
+
     private static final String[] PUBLIC_ENDPOINTS = {
             "/ws/**",
             "/api/v1/auth/**",
@@ -58,6 +69,7 @@ public class SecurityConfig {
                 .anonymous(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers(API_DOC_ENDPOINTS).permitAll()
                         .requestMatchers("/api/v1/admin/**").hasAuthority(RoleName.ADMIN.toString())
                         .requestMatchers("/api/v1/auth/ping").authenticated()
                         .requestMatchers("/api/v1/auth/logout").authenticated()

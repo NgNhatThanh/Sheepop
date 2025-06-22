@@ -1,6 +1,7 @@
-package com.app.bdc_backend.controller;
+package com.app.bdc_backend.controller.common;
 
 import com.app.bdc_backend.config.Constant;
+import com.app.bdc_backend.config.SwaggerSecurityName;
 import com.app.bdc_backend.exception.RequestException;
 import com.app.bdc_backend.facade.AuthFacadeService;
 import com.app.bdc_backend.model.dto.request.ForgotPasswordDTO;
@@ -8,6 +9,8 @@ import com.app.bdc_backend.model.dto.request.ResetPasswordDTO;
 import com.app.bdc_backend.model.dto.response.AuthResponseDTO;
 import com.app.bdc_backend.model.dto.request.LoginDTO;
 import com.app.bdc_backend.model.dto.request.RegistrationDTO;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +40,8 @@ public class AuthController{
     private final String REFRESH_TOKEN_COOKIE_NAME = "refresh_token";
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody @Valid RegistrationDTO dto){
+    @Operation(summary = "Register new user")
+    public ResponseEntity<Map<String, String>> register(@RequestBody @Valid RegistrationDTO dto){
         AuthResponseDTO res = authFacadeService.registerUser(dto, false);
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, getRefreshTokenCookie(res.getRefreshToken()).toString())
@@ -47,7 +51,8 @@ public class AuthController{
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody @Valid LoginDTO dto) {
+    @Operation(summary = "Login with username and password")
+    public ResponseEntity<Map<String, Object>> login(@RequestBody @Valid LoginDTO dto) {
         try{
             UsernamePasswordAuthenticationToken authToken =
                     new UsernamePasswordAuthenticationToken(dto.getUsername(), dto.getPassword());
@@ -66,7 +71,8 @@ public class AuthController{
     }
 
     @PostMapping("/oauth2/login")
-    public ResponseEntity<?> oauth2Login(@RequestParam(value = "provider") String provider,
+    @Operation(summary = "Login with OAuth2 provider")
+    public ResponseEntity<Map<String, String>> oauth2Login(@RequestParam(value = "provider") String provider,
                                          @RequestParam(value = "code") String code){
         AuthResponseDTO res = authFacadeService.oauthLogin(code, provider);
         return ResponseEntity.ok()
@@ -77,7 +83,9 @@ public class AuthController{
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(HttpServletRequest request){
+    @Operation(summary = "Logout user")
+    @SecurityRequirement(name = SwaggerSecurityName.JWT_AUTH)
+    public ResponseEntity<Void> logout(HttpServletRequest request){
         String accessToken = request.getHeader("Authorization").substring(7);
         authFacadeService.logout(accessToken);
         ResponseCookie cookie = ResponseCookie
@@ -93,11 +101,15 @@ public class AuthController{
     }
 
     @GetMapping("/ping")
-    public ResponseEntity<?> ping(){
+    @Operation(summary = "Check authentication status")
+    @SecurityRequirement(name = SwaggerSecurityName.JWT_AUTH)
+    public ResponseEntity<Void> ping(){
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/refresh")
+    @GetMapping("/refreshToken")
+    @Operation(summary = "Refresh access token")
+    @SecurityRequirement(name = SwaggerSecurityName.REFRESH_TOKEN_AUTH)
     public ResponseEntity<Map<String, String>> refreshToken(
             @CookieValue(value = REFRESH_TOKEN_COOKIE_NAME, defaultValue = "") String refreshToken){
         AuthResponseDTO res = authFacadeService.refresh(refreshToken);
@@ -109,7 +121,8 @@ public class AuthController{
     }
 
     @PostMapping("/forgot-password")
-    public ResponseEntity<?> forgotPassword(@RequestBody @Valid ForgotPasswordDTO dto){
+    @Operation(summary = "Request password recovery")
+    public ResponseEntity<Map<String, String>> forgotPassword(@RequestBody @Valid ForgotPasswordDTO dto){
         authFacadeService.passwordRecovery(dto);
         return ResponseEntity.ok(Map.of(
                 "status", "success"
@@ -117,7 +130,8 @@ public class AuthController{
     }
 
     @PostMapping("/reset-password")
-    public ResponseEntity<?> forgotPassword(@RequestBody @Valid ResetPasswordDTO dto){
+    @Operation(summary = "Reset password with token")
+    public ResponseEntity<Map<String, String>> resetPassword(@RequestBody @Valid ResetPasswordDTO dto){
         authFacadeService.resetPassword(dto);
         return ResponseEntity.ok(Map.of(
                 "status", "success"

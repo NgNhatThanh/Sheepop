@@ -20,11 +20,11 @@ const ErrorPage = lazy(() => import('./pages/product/ErrorPage.jsx'));
 const CartPage = lazy(() => import('./pages/cart/CartPage.jsx'))
 const CheckoutPage = lazy(() => import('./pages/checkout/CheckoutPage.jsx'))
 const ProfilePageLayout = lazy(() => import('./pages/profile/ProfilePageLayout.jsx'))
-const AddressPage = lazy(() => import('./pages/profile/AddressPage.jsx'))
+const AddressPage = lazy(() => import('./pages/profile/address/AddressPage.jsx'))
 const ProfilePage = lazy(() => import('./pages/profile/ProfilePage.jsx'))
 const SuccessPage = lazy(() => import('./pages/order/success.jsx'));
-const OrdersPage = lazy(() => import('./pages/profile/OrdersPage.jsx'));
-const OrderDetail = lazy(() => import('./pages/profile/OrderDetail.jsx'));
+const OrdersPage = lazy(() => import('./pages/profile/order/OrdersPage.jsx'));
+const OrderDetail = lazy(() => import('./pages/profile/order/OrderDetail.jsx'));
 const ShopShipping = lazy(() => import('./pages/myshop/setting/ShopShipping.jsx'));
 const ShopProfile = lazy(() => import('./pages/myshop/setting/ShopProfile.jsx'));
 const PreviewProductPage = lazy(() => import('./pages/myshop/product/PreviewProductPage.jsx'))

@@ -1,7 +1,10 @@
-package com.app.bdc_backend.controller;
+package com.app.bdc_backend.controller.common;
 
+import com.app.bdc_backend.config.SwaggerSecurityName;
 import com.app.bdc_backend.exception.RequestException;
 import com.app.bdc_backend.service.UploadService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +16,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/v1/upload")
 @RequiredArgsConstructor
+@SecurityRequirement(name = SwaggerSecurityName.JWT_AUTH)
 public class UploadController {
 
     private final UploadService uploadService;
@@ -22,13 +26,12 @@ public class UploadController {
 
     @PostMapping("/image")
     @ResponseBody
-    public ResponseEntity<?> uploadImage(@RequestParam("file") MultipartFile image) {
+    @Operation(summary = "Upload image")
+    public ResponseEntity<Map<String, String>> uploadImage(@RequestParam("file") MultipartFile image) {
         if(image.getSize() > maxImageSize) {
             throw new RequestException("Image size too large");
         }
-        return ResponseEntity.ok().body(Map.of(
-                "url", uploadService.uploadImage(image)
-        ));
+        return ResponseEntity.ok(Map.of("url", uploadService.uploadImage(image)));
     }
 
 }

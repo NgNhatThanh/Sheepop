@@ -123,7 +123,6 @@ public class ESProductRepository{
         SearchResponse<ObjectNode> response = client.search(rq, ObjectNode.class);
         NativeQueryBuilder nativeQueryBuilder = new NativeQueryBuilder();
         nativeQueryBuilder.withQuery(Objects.requireNonNull(rq.query()));
-        System.out.println(nativeQueryBuilder.getQuery());
         List<ObjectNode> nodes = response.hits().hits().stream()
                 .map(hit -> {
                     ObjectNode node = hit.source();

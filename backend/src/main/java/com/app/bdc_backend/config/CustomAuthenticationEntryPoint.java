@@ -22,7 +22,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, IOException {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType("application/json");
-        response.getWriter().write("{\"error\": \"Unauthorized\", \"message\": \"" + authException.getMessage() + "\"}");
+        response.getWriter().write("{\"error\": \"Unauthorized\", \"message\": \"" + "Unauthorized" + "\"}");
         String origin = request.getHeader("Origin");
         if(Arrays.asList(allowedOrigins).contains(origin)) {
             response.addHeader("Access-Control-Allow-Origin", origin);

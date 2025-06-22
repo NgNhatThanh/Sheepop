@@ -1,6 +1,6 @@
-mongo-url = "mongodb://mongo11/?replicaSet=my-mongo-set"
+mongo-url = "mongodb://mongo/?replicaSet=my-mongo-set"
 
-elasticsearch-urls = ["http://host.docker.internal:9200"]
+elasticsearch-urls = ["http://es:9200"]
 
 # những collections được sync
 change-stream-namespaces = ["bdc.products", "bdc.shop_orders"]

@@ -1,10 +1,9 @@
 package com.app.bdc_backend.facade;
 
 import com.app.bdc_backend.exception.RequestException;
-import com.app.bdc_backend.model.address.District;
-import com.app.bdc_backend.model.address.Province;
-import com.app.bdc_backend.model.address.Ward;
 import com.app.bdc_backend.model.dto.request.AddAddressDTO;
+import com.app.bdc_backend.model.dto.request.ChangePasswordDTO;
+import com.app.bdc_backend.model.dto.request.UpdateAddressDTO;
 import com.app.bdc_backend.model.dto.request.UpdateProfileDTO;
 import com.app.bdc_backend.model.dto.response.UserResponseDTO;
 import com.app.bdc_backend.model.shop.Follow;
@@ -17,10 +16,13 @@ import com.app.bdc_backend.service.user.ShopService;
 import com.app.bdc_backend.service.user.UserAddressService;
 import com.app.bdc_backend.service.user.UserService;
 import com.app.bdc_backend.util.ModelMapper;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -36,6 +38,8 @@ public class UserFacadeService {
     private final FollowService followService;
 
     private final ShopService shopService;
+
+    private final PasswordEncoder passwordEncoder;
 
     public UserResponseDTO getUserProfile(){
         String curUsername = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -118,36 +122,88 @@ public class UserFacadeService {
         userAddress.setDetail(dto.getDetail());
         userAddress.setPhoneNumber(dto.getPhoneNumber());
         userAddress.setReceiverName(dto.getReceiverName());
-        Province province = addressService.findProvinceByName(dto.getProvince());
-        if(province == null){
-            throw new RequestException("Địa chỉ không hợp lệ");
-        }
-        userAddress.setProvince(province);
-        List<District> districts = addressService.findDistrictByName(dto.getDistrict());
-        boolean okDistrict = false;
-        for(District d : districts){
-            if(d.getProvinceId() == province.getId()){
-                okDistrict = true;
-                userAddress.setDistrict(d);
-                break;
-            }
-        }
-        if(!okDistrict){
-            throw new RequestException("Địa chỉ không hợp lệ");
-        }
-        List<Ward> ward = addressService.findWardByName(dto.getWard());
-        boolean okWard = false;
-        for(Ward w : ward){
-            if(w.getDistrictId() == userAddress.getDistrict().getId()){
-                okWard = true;
-                userAddress.setWard(w);
-                break;
-            }
-        }
-        if(!okWard){
-            throw new RequestException("Địa chỉ không hợp lệ");
-        }
+        userAddress = (UserAddress) addressService.setInfo(userAddress,
+                dto.getProvince(),
+                dto.getDistrict(),
+                dto.getWard());
         return userAddress;
     }
 
+    public void makeAddressPrimary(String addressId) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        List<UserAddress> addresses = userAddressService.getAddressListByUser(username);
+        boolean ok = false;
+        List<UserAddress> needUpdate = new ArrayList<>();
+        for(UserAddress address : addresses){
+            if(address.getId().toString().equals(addressId)){
+                address.setPrimary(true);
+                needUpdate.add(address);
+                ok = true;
+            }
+            else{
+                if(address.isPrimary()){
+                    address.setPrimary(false);
+                    needUpdate.add(address);
+                }
+            }
+        }
+        if(!ok)
+            throw new RequestException("Address not found");
+        userAddressService.saveAll(needUpdate);
+    }
+
+    public void updateAddress(@Valid UpdateAddressDTO dto) {
+        UserAddress address = userAddressService.getById(dto.getAddressId());
+        if(address == null)
+            throw new RequestException("Address not found");
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        if(!address.getUsername().equals(username))
+            throw new RequestException("Address not found");
+        if(address.isPrimary() && !dto.isPrimary())
+            throw new RequestException("Cannot make a primary address non-primary");
+        List<UserAddress> needUpdate = new ArrayList<>();
+        if(!address.isPrimary() && dto.isPrimary()){
+            List<UserAddress> addresses = userAddressService.getAddressListByUser(username);
+            for(UserAddress addr : addresses){
+                if(addr.isPrimary()){
+                    addr.setPrimary(false);
+                    needUpdate.add(addr);
+                    break;
+                }
+            }
+        }
+        UserAddress updated = ModelMapper.getInstance().map(dto, UserAddress.class);
+        updated = (UserAddress) addressService.setInfo(updated,
+                dto.getProvince(),
+                dto.getDistrict(),
+                dto.getWard());
+        updated.setUsername(address.getUsername());
+        updated.setId(address.getId());
+        needUpdate.add(updated);
+        userAddressService.saveAll(needUpdate);
+    }
+
+    public void deleteAddress(String addressId) {
+        UserAddress address = userAddressService.getById(addressId);
+        if(address == null)
+            throw new RequestException("Address not found");
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        if(!address.getUsername().equals(username))
+            throw new RequestException("Address not found");
+        if(address.isPrimary())
+            throw new RequestException("Address is primary");
+        userAddressService.delete(address);
+    }
+
+    public void changePassword(@Valid ChangePasswordDTO dto) {
+        if(dto.getNewPassword().equals(dto.getOldPassword()))
+            throw new RequestException("Old and new password are the same");
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userService.findByUsername(username);
+        if(!passwordEncoder.matches(dto.getOldPassword(), user.getPassword()))
+            throw new RequestException("Old password is wrong");
+        String hashedPassword = passwordEncoder.encode(dto.getNewPassword());
+        user.setPassword(hashedPassword);
+        userService.save(user);
+    }
 }

@@ -2,9 +2,6 @@ package com.app.bdc_backend.facade;
 
 import com.app.bdc_backend.exception.RequestException;
 import com.app.bdc_backend.model.Notification;
-import com.app.bdc_backend.model.address.District;
-import com.app.bdc_backend.model.address.Province;
-import com.app.bdc_backend.model.address.Ward;
 import com.app.bdc_backend.model.dto.request.AddAddressDTO;
 import com.app.bdc_backend.model.dto.request.SaveProductDTO;
 import com.app.bdc_backend.model.dto.request.UpdateShopProfileDTO;
@@ -171,51 +168,39 @@ public class ShopFacadeService {
         User user = userService.findByUsername(username);
         Shop shop = shopService.findByUser(user);
         Pageable pageable = PageRequest.of(page, limit, sort);
-        Page<ShopOrder> data = null;
-        switch (type){
-            case 0:
-                data = orderService.getShopOrderByShopAndStatus(shop,
-                        ShopOrderStatus.getAllStatuses(),
-                        pageable,
-                        filterType,
-                        keyword);
-                break;
-            case 1:
-                data = orderService.getShopOrderByShopAndStatus(shop,
-                        List.of(ShopOrderStatus.PENDING),
-                        pageable,
-                        filterType,
-                        keyword);
-                break;
-            case 2:
-                data = orderService.getShopOrderByShopAndStatus(shop,
-                        List.of(ShopOrderStatus.PREPARING),
-                        pageable,
-                        filterType,
-                        keyword);
-                break;
-            case 3:
-                data = orderService.getShopOrderByShopAndStatus(shop,
-                        List.of(ShopOrderStatus.SENT, ShopOrderStatus.DELIVERING),
-                        pageable,
-                        filterType,
-                        keyword);
-                break;
-            case 4:
-                data = orderService.getShopOrderByShopAndStatus(shop,
-                        List.of(ShopOrderStatus.COMPLETED, ShopOrderStatus.RATED),
-                        pageable,
-                        filterType,
-                        keyword);
-                break;
-            case 5:
-                data = orderService.getShopOrderByShopAndStatus(shop,
-                        List.of(ShopOrderStatus.CANCELLED),
-                        pageable,
-                        filterType,
-                        keyword);
-                break;
-        }
+        Page<ShopOrder> data = switch (type) {
+            case 0 -> orderService.getShopOrderByShopAndStatus(shop,
+                    ShopOrderStatus.getAllStatuses(),
+                    pageable,
+                    filterType,
+                    keyword);
+            case 1 -> orderService.getShopOrderByShopAndStatus(shop,
+                    List.of(ShopOrderStatus.PENDING),
+                    pageable,
+                    filterType,
+                    keyword);
+            case 2 -> orderService.getShopOrderByShopAndStatus(shop,
+                    List.of(ShopOrderStatus.PREPARING),
+                    pageable,
+                    filterType,
+                    keyword);
+            case 3 -> orderService.getShopOrderByShopAndStatus(shop,
+                    List.of(ShopOrderStatus.SENT, ShopOrderStatus.DELIVERING),
+                    pageable,
+                    filterType,
+                    keyword);
+            case 4 -> orderService.getShopOrderByShopAndStatus(shop,
+                    List.of(ShopOrderStatus.COMPLETED, ShopOrderStatus.RATED),
+                    pageable,
+                    filterType,
+                    keyword);
+            case 5 -> orderService.getShopOrderByShopAndStatus(shop,
+                    List.of(ShopOrderStatus.CANCELLED),
+                    pageable,
+                    filterType,
+                    keyword);
+            default -> null;
+        };
         if(data == null){
             throw new RequestException("Invalid request");
         }
@@ -442,35 +427,10 @@ public class ShopFacadeService {
         address.setSenderName(dto.getSenderName());
         address.setPhoneNumber(dto.getPhoneNumber());
         address.setDetail(dto.getDetail());
-        Province province = addressService.findProvinceByName(dto.getProvince());
-        if(province == null){
-            throw new RequestException("Địa chỉ không hợp lệ");
-        }
-        address.setProvince(province);
-        List<District> districts = addressService.findDistrictByName(dto.getDistrict());
-        boolean okDistrict = false;
-        for(District d : districts){
-            if(d.getProvinceId() == province.getId()){
-                okDistrict = true;
-                address.setDistrict(d);
-                break;
-            }
-        }
-        if(!okDistrict){
-            throw new RequestException("Địa chỉ không hợp lệ");
-        }
-        List<Ward> ward = addressService.findWardByName(dto.getWard());
-        boolean okWard = false;
-        for(Ward w : ward){
-            if(w.getDistrictId() == address.getDistrict().getId()){
-                okWard = true;
-                address.setWard(w);
-                break;
-            }
-        }
-        if(!okWard){
-            throw new RequestException("Địa chỉ không hợp lệ");
-        }
+        address = (ShopAddress) addressService.setInfo(address,
+                dto.getProvince(),
+                dto.getDistrict(),
+                dto.getWard());
         return address;
     }
 
