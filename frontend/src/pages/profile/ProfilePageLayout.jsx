@@ -1,5 +1,5 @@
 import { Outlet } from "react-router-dom";
-import ProfileSidebar from "./SideBar";
+import ProfileSidebar from "./Sidebar.jsx";
 
 export default function ProfilePageLayout(){
 

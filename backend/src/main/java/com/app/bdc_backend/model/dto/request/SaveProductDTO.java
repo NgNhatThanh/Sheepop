@@ -16,7 +16,6 @@ import java.util.List;
 @ToString
 public class SaveProductDTO {
 
-    @NotBlank
     private String productId;
 
     @NotBlank(message = "Product's name cannot be empty")
