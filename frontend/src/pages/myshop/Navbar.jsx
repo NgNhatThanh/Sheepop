@@ -9,7 +9,7 @@ export default function Navbar() {
   const [showDropdown, setShopDropdown] = useState(false)
 
   return (
-    <nav className="flex w-full h-12 justify-between items-center bg-gray-800 text-white p-2 fixed z-100 shadow-sm">
+    <nav className="flex w-full h-12 justify-between items-center bg-gray-800 text-white p-2 fixed shadow-sm">
       <div className="text-lg font-bold ml-4">
         <a href="/" className="flex gap-2">
           <img src="/logo.svg"/>

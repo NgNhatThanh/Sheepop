@@ -78,7 +78,7 @@ export default function RegisterPage({isAuthenticated}) {
                 <form className="space-y-4" onSubmit={handleSubmit}>
                     <Input label="Họ và Tên" type="text" value={fullName} setValue={setFullName} />
                     <Input label="Tên đăng nhập" type="text" value={username} setValue={setUsername} />
-                    <Input label="Số điện thoại" type="text" value={email} setValue={setEmail} />
+                    <Input label="Email" type="text" value={email} setValue={setEmail} />
                     <Input label="Ngày sinh" type="date" value={dob} setValue={setDob} />
                     <Input label="Mật khẩu" type="password" value={password} setValue={setPassword} />
                     <Input label="Nhập lại mật khẩu" type="password" value={passwordRetype} setValue={setPasswordRetype} />

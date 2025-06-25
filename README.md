@@ -1,14 +1,12 @@
 # Sheepop
 
-<span style="color:red">**Attention:** Due to some issues with the changing list of provinces and cities in Vietnam, I will not be implementing the auto-import feature for locations into the database. As a result of this missing component, core functionalities will be affected, and the application will not operate as intended (though you can still run it). If you wish, you can manually input the data, and everything will function normally. </span>
-
 ## 1. Introduction
 An E-Commerce website that follow C2C (Customer-to-Customer) model, where a buyer can alse be a seller.
 
 ### Getting started with Docker compose
 
 1. Get the latest source code
-2. Fill information to [.env_sample](https://github.com/NgNhatThanh/Sheepop/blob/main/backend/src/main/resources/.env_sample) file, and change it's name to `.env`
+2. **[Optional]** Fill information to [.env_sample](https://github.com/NgNhatThanh/Sheepop/blob/main/backend/src/main/resources/.env_sample) file, and change it's name to `.env` (Base on feature you want, uploading feature is important if you want to create products)
 3. Open terminal at the root folder of the project, run `docker compose up -d`, and wait for some minutes
 4. Access the website via `http://localhost:5173`, you already have an admin account `admin/admin`
 

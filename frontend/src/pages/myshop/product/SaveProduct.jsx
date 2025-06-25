@@ -201,7 +201,7 @@ export default function SaveProduct({ curProduct }) {
     })
       .then((res) => {
         if (!res.ok) {
-          toast.error("Có lỗi xảy ra, vui lòng thử lại sau!")
+          toast.error(res.message)
         } else {
           alert("Done!")
           window.location.assign("/myshop/product-list")
@@ -284,7 +284,7 @@ export default function SaveProduct({ curProduct }) {
               <img
                 src={imgUrl}
                 alt={`Gallery ${index + 1}`}
-                className="w-24 h-24 object-contain rounded-lg shadow-lg"
+                className="w-24 h-24 z-0 object-contain rounded-lg shadow-lg"
               />
               <button
                 className="absolute top-0 right-0 bg-red-500 text-white text-xs p-1 rounded-full cursor-pointer hover:bg-red-600"

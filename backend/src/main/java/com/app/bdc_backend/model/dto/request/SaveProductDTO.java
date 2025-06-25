@@ -27,10 +27,8 @@ public class SaveProductDTO {
     @NotBlank
     private String thumbnailUrl;
 
-    @Min(value = 0)
     private long price;
 
-    @Min(value = 0)
     private int quantity;
 
     private Category category;

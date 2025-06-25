@@ -18,7 +18,7 @@ export default function DisplayCatManage() {
       .then((res) => res.json())
       .then((res) => {
         if (res.message) {
-          toast.error("Có lỗi khi thêm danh mục hiển thị")
+          toast.error(res.message)
         } else {
           setDisplayCats((prev) => [res, ...prev])
         }
@@ -32,7 +32,7 @@ export default function DisplayCatManage() {
       .then((res) => res.json())
       .then((res) => {
         if (res.message) {
-          toast.error("Có lỗi khi xóa danh mục hiển thị")
+          toast.error(res.message)
         } else {
           setDisplayCats((prev) => prev.filter((cat) => cat.category.id !== catId))
         }

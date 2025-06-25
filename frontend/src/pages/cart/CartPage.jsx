@@ -43,7 +43,7 @@ export default function CartPage() {
                 method: "POST"
             })
                 .then(res => {
-                    if(!res.ok) toast.error("Có lỗi xảy ra, vui lòng thử lại sau!");
+                    if(!res.ok) toast.error(res.message || "Có lỗi xảy ra, vui lòng thử lại sau!");
                     else {
                         res.json()
                             .then(data => {
@@ -123,7 +123,7 @@ export default function CartPage() {
                             {shopCart.items.map((item) => (
                                 <div key={item.itemId} className="flex items-center border-b py-3">
                                     <input type="checkbox" 
-                                        disabled={item.quantity > item.stock ? true : false}
+                                        disabled={item.quantity > item.stock}
                                         checked={item.selected} 
                                         className="mr-2" 
                                         onChange={(e) => updateSelectItems([item], e.target.checked)}

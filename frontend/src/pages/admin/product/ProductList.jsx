@@ -52,7 +52,7 @@ export default function ProductList(){
             .then(res => res.json())
             .then(res => {
                 if(res.message){
-                    toast.error("Có lỗi xảy ra, vui lòng thử lại sau")
+                    toast.error(res.message)
                 }
                 else{
                     toast.success("Gỡ đình chỉ thành công")
