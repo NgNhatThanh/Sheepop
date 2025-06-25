@@ -18,7 +18,7 @@ export default function ShopHeader({shopInfo}){
       .then(res => res.json())
       .then(res => {
         if(res.message){
-          toast.error("Không thể thực hiện")
+          toast.error(res.message)
         }
         else{
           window.location.reload()

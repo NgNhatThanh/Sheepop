@@ -64,7 +64,7 @@ export default function UserList(){
             .then(res => res.json())
             .then(res => {
                 if(res.message){
-                    toast.error("Có lỗi xảy ra, vui lòng thử lại sau")
+                    toast.error(res.message)
                 }
                 else{
                     if(res.content.length === 0) setIsEmpty(true)

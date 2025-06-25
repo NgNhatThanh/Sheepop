@@ -27,17 +27,17 @@ export default function CheckoutPage(){
                         'Content-type': 'application/json'
                     },
                     body: JSON.stringify(body),
-                } : {})
-            if(!res.ok){
-                alert("Có lỗi xảy ra, vui lòng thử lại sau")
-                navigate('/cart')
-            }
-            else{
-                res.json()
-                    .then(data => {
+                } : {});
+            res.json()
+                .then(data => {
+                    if(data.message){
+                        alert(res.message)
+                        navigate('/cart')
+                    }
+                    else{
                         setCheckoutList(data.shopCheckouts)
-                    })
-            }
+                    }
+                })
         }
         catch(err){
             console.log("Error: " + err)

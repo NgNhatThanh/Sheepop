@@ -49,8 +49,6 @@ services:
     image: mongo
     depends_on:
       - mongo
-    ports:
-      - "27020:27017"
     restart: no
     entrypoint: >
       sh -c "
@@ -71,6 +69,13 @@ services:
       ';
       echo '✅ Khởi tạo thành công!';
       "
+    networks:
+      - sheepop_network
+
+  mongo_import:
+    build: ./databases/mongo_import
+    depends_on:
+      - mongo
     networks:
       - sheepop_network
 

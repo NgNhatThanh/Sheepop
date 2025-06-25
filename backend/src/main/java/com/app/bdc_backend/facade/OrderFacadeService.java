@@ -353,7 +353,8 @@ public class OrderFacadeService {
     }
 
     public void recalculateProductData(Product product){
-        ProductSaleInfo saleInfo = orderService.getProductSaleInfo(product.getId());
+        ProductSaleInfo saleInfo = orderService.getProductSaleInfo(product.getId())
+                .orElse(new ProductSaleInfo(0, 0));
         product.setRevenue(saleInfo.getRevenue());
         product.setSold(saleInfo.getSold());
         if(!product.getSkuList().isEmpty()){

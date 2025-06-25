@@ -19,11 +19,15 @@ import com.app.bdc_backend.service.user.ShopService;
 import com.app.bdc_backend.service.user.UserAddressService;
 import com.app.bdc_backend.service.user.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class CheckoutFacaceService {
@@ -133,8 +137,9 @@ public class CheckoutFacaceService {
                 shopCheckoutDTO.setExpectedDeliveryDate(orderInfo.getExpectedDeliveryDate());
             }
             catch (Exception e){
-                e.printStackTrace();
-                return null;
+                log.error(e.getMessage());
+                shopCheckoutDTO.setShipmentFee(30000);
+                shopCheckoutDTO.setExpectedDeliveryDate(Date.from(Instant.now().plus(3, ChronoUnit.DAYS)));
             }
         }
         dto.setShopCheckouts(mp.values().stream().toList());

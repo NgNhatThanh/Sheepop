@@ -50,7 +50,7 @@ export default function ChatZone(){
             .then(res => res.json())
             .then(res => {
                 if(res.message){
-                    toast.error("Có lỗi khi tải tin nhắn, vui lòng thử lại sau")
+                    toast.error(res.message)
                 }
                 else{
                     setMessages(prev => [...(prev || []), ...res.content])

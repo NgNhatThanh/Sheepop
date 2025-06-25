@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -57,7 +58,7 @@ public class OrderService {
         return shopOrderRepository.findById(id).orElse(null);
     }
 
-    public ProductSaleInfo getProductSaleInfo(ObjectId productId){
+    public Optional<ProductSaleInfo> getProductSaleInfo(ObjectId productId){
         return orderItemRepository.getProductSaleInfo(productId);
     }
 
@@ -228,7 +229,8 @@ public class OrderService {
     }
 
     public int countProductSold(ObjectId productId){
-        return orderItemRepository.countProductSoldByProductId(productId);
+        Integer soldCount = orderItemRepository.countProductSoldByProductId(productId);
+        return soldCount == null ? 0 : soldCount;
     }
 
     public ShopOrderDTO toShopOrderDTO(ShopOrder shopOrder) {

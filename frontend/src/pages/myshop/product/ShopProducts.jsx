@@ -53,7 +53,7 @@ export default function ShopProducts(){
             .then(res => {
                 console.log(products)
                 if(res.message){
-                    toast.error("Có lỗi xảy ra, vui lòng thử lại sau")
+                    toast.error(res.message)
                 }
                 else{
                     setTotalPages(res.totalPages)
@@ -77,7 +77,7 @@ export default function ShopProducts(){
         })
             .then(res => {
                 if(!res.ok){
-                    toast.error('Có lỗi xảy ra, vui lòng thử lại sau!')
+                    toast.error(res.message)
                     return
                 }
                 const updateProd = [...products]
@@ -98,7 +98,7 @@ export default function ShopProducts(){
         })
             .then(res => {
                 if(!res.ok){
-                    toast.error("Có lỗi xảy ra, vui lòng thử lại sau!")
+                    toast.error(res.message)
                     return
                 }
                 toast.success("Xóa sản phẩm thành công")

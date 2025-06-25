@@ -38,7 +38,7 @@ export default function NotificationDropdown(){
       .then(res => res.json())
       .then(res => {
         if(res.message){
-          toast.error("Có lỗi")
+          toast.error(res.message)
         }
         else{
           if(!id){
@@ -145,7 +145,7 @@ export default function NotificationDropdown(){
       </button>
 
       {isOpen && (
-        <div className="absolute flex flex-col h-120 right-0 mt-2 w-80 sm:w-96 bg-white rounded-lg shadow-lg border border-gray-200 z-50 animate-slide-in">
+        <div className="absolute flex flex-col h-120 right-0 mt-2 w-80 sm:w-96 bg-white rounded-lg shadow-lg border border-gray-200 z-100 animate-slide-in">
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-gray-100">
             <h3 className="font-bold text-gray-800">Thông báo</h3>

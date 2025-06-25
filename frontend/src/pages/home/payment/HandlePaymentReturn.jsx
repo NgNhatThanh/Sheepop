@@ -21,7 +21,7 @@ export default function HandleReturn(){
         })
             .then(res => res.json())
             .then(res => {
-                if(res.message) toast.error("Có lỗi xảy ra, vui lòng thử lại sau")
+                if(res.message) toast.error(res.message)
                 else{
                     setSuccess(res.status === 'success')
                 }

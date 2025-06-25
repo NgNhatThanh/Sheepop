@@ -7,6 +7,8 @@ import org.springframework.data.mongodb.repository.Aggregation;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface OrderItemRepository extends MongoRepository<OrderItem, String> {
 
@@ -16,7 +18,7 @@ public interface OrderItemRepository extends MongoRepository<OrderItem, String> 
         "{ $match: { 'product_item._id': ?0, 'success': true } }",
         "{ $count: 'count' }"
     })
-    int countProductSoldByProductId(ObjectId productId);
+    Integer countProductSoldByProductId(ObjectId productId);
 
     @Aggregation(pipeline = {
         "{ $lookup: { from: 'products', localField: 'product', foreignField: '_id', as: 'product_item' }}",
@@ -24,6 +26,6 @@ public interface OrderItemRepository extends MongoRepository<OrderItem, String> 
         "{ $match: { 'product_item._id': ?0, success: true }}",
         "{ $group: { _id: null, revenue: { $sum: '$price' }, sold: { $sum: 1 } }}"
     })
-    ProductSaleInfo getProductSaleInfo(ObjectId productId);
+    Optional<ProductSaleInfo> getProductSaleInfo(ObjectId productId);
 
 }
