@@ -31,7 +31,7 @@ export default function CheckoutPage(){
             res.json()
                 .then(data => {
                     if(data.message){
-                        alert(res.message)
+                        alert(data.message)
                         navigate('/cart')
                     }
                     else{

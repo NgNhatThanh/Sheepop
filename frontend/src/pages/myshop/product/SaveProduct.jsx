@@ -201,7 +201,8 @@ export default function SaveProduct({ curProduct }) {
     })
       .then((res) => {
         if (!res.ok) {
-          toast.error(res.message)
+          res.json()
+              .then(data => toast.error(data.message))
         } else {
           alert("Done!")
           window.location.assign("/myshop/product-list")
