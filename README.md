@@ -36,6 +36,7 @@ An E-Commerce website that follow C2C (Customer-to-Customer) model, where a buye
 - MongoDB
 - Redis
 - ElasticSearch
+- Monstache for CDC
 
 **Authentication**
 - JWT
@@ -46,7 +47,7 @@ An E-Commerce website that follow C2C (Customer-to-Customer) model, where a buye
 
 **External Service**
 - VNPay for online banking
-- GHN for calculating shipping fee
+- GHN API for calculating shipping fee
 
 
 
